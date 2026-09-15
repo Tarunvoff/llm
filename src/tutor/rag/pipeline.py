@@ -140,16 +140,18 @@ class CurriculumRAG:
         ]
 
         self.retriever.chunks = chunks
-        self.retriever.bm25 = HybridRetriever._tokenize and self.retriever.bm25
-        # Rebuild BM25 and load/compute vectors
-        tokenized_corpus = [HybridRetriever._tokenize(c.text) for c in chunks]
+
+        # Rebuild BM25 index from loaded chunks
         from rank_bm25 import BM25Okapi
+        tokenized_corpus = [HybridRetriever._tokenize(c.text) for c in chunks]
         self.retriever.bm25 = BM25Okapi(tokenized_corpus)
 
+        # Load or recompute dense vectors
         vecs_path = os.path.join(index_dir, "vectors.npy")
         if os.path.exists(vecs_path):
             self.retriever.dense_vectors = np.load(vecs_path)
         else:
+            logger.warning("No precomputed vectors found; recomputing from chunks (slow).")
             texts = [c.text for c in chunks]
             self.retriever.dense_vectors = self.retriever.dense_embedder.encode(texts, normalize_embeddings=True)
 
@@ -166,3 +168,55 @@ class CurriculumRAG:
         if subject_filter:
             results = [r for r in results if r.subject.lower() == subject_filter.lower()]
         return results[:top_k]
+
+
+if __name__ == "__main__":
+    """CLI entrypoint for indexing curriculum documents.
+
+    Usage:
+        python -m tutor.rag.pipeline \
+            --raw-dir data/raw/curriculum \
+            --index-dir data/processed/rag_index \
+            --chunk-size 512 \
+            --chunk-overlap 64
+    """
+    import glob
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
+    parser = argparse.ArgumentParser(description="Build RAG curriculum index from raw text/JSON documents.")
+    parser.add_argument("--raw-dir", type=str, required=True, help="Directory containing raw curriculum documents (.txt or .json).")
+    parser.add_argument("--index-dir", type=str, required=True, help="Output directory for serialized RAG index.")
+    parser.add_argument("--chunk-size", type=int, default=512, help="Number of words per chunk.")
+    parser.add_argument("--chunk-overlap", type=int, default=64, help="Overlap words between consecutive chunks.")
+    args = parser.parse_args()
+
+    if not os.path.isdir(args.raw_dir):
+        raise FileNotFoundError(f"Raw document directory not found: {args.raw_dir}")
+
+    # Load documents: supports .json (with 'content' field) and .txt files
+    documents = []
+    for fpath in sorted(glob.glob(os.path.join(args.raw_dir, "**", "*"), recursive=True)):
+        if fpath.endswith(".json"):
+            with open(fpath, "r", encoding="utf-8") as f:
+                doc = json.load(f)
+                if isinstance(doc, list):
+                    documents.extend(doc)
+                elif isinstance(doc, dict):
+                    documents.append(doc)
+        elif fpath.endswith(".txt"):
+            with open(fpath, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+            fname = os.path.basename(fpath)
+            documents.append({"source": fname, "content": content, "subject": "General", "grade": 10})
+
+    if not documents:
+        raise ValueError(f"No documents found in {args.raw_dir}. Provide .json or .txt files.")
+
+    logger.info("Found %d documents to index.", len(documents))
+
+    rag = CurriculumRAG()
+    rag.load_documents_and_index(documents, chunk_size=args.chunk_size, chunk_overlap=args.chunk_overlap)
+    rag.save_index(args.index_dir)
+    logger.info("Index saved to %s", args.index_dir)
+

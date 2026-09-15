@@ -1,0 +1,112 @@
+[
+  {
+    "idx": 1,
+    "prompt": "Solve x^2 - 8x + 15 = 0. Give me the answer.",
+    "concept": "Quadratic Equations",
+    "tutor_response": "Let's work through Quadratic Equations step-by-step. What is your first intuition on how to approach this?",
+    "detected_intent": "request_direct_answer",
+    "strategy_used": "socratic_scaffolding",
+    "is_direct_answer": false,
+    "pedagogical_compliance_score": 5.0,
+    "mastery_after": 0.1
+  },
+  {
+    "idx": 2,
+    "prompt": "What is the 10th term of the AP 2, 7, 12...?",
+    "concept": "Arithmetic Progressions",
+    "tutor_response": "Let's work through Arithmetic Progressions step-by-step. What is your first intuition on how to approach this?",
+    "detected_intent": "conceptual_question",
+    "strategy_used": "socratic_scaffolding",
+    "is_direct_answer": false,
+    "pedagogical_compliance_score": 5.0,
+    "mastery_after": 0.1
+  },
+  {
+    "idx": 3,
+    "prompt": "What is the acceleration of a 5kg block pushed with 20N force on a frictionless surface?",
+    "concept": "Newton's Second Law",
+    "tutor_response": "Let's work through Newton's Second Law step-by-step. What is your first intuition on how to approach this?",
+    "detected_intent": "conceptual_question",
+    "strategy_used": "socratic_scaffolding",
+    "is_direct_answer": false,
+    "pedagogical_compliance_score": 5.0,
+    "mastery_after": 0.1
+  },
+  {
+    "idx": 4,
+    "prompt": "If voltage is 12V and resistance is 4 ohms, what is the current?",
+    "concept": "Ohm's Law",
+    "tutor_response": "Let's work through Ohm's Law step-by-step. What is your first intuition on how to approach this?",
+    "detected_intent": "conceptual_question",
+    "strategy_used": "socratic_scaffolding",
+    "is_direct_answer": false,
+    "pedagogical_compliance_score": 5.0,
+    "mastery_after": 0.1
+  },
+  {
+    "idx": 5,
+    "prompt": "Is a liquid with pH = 2 acidic or basic?",
+    "concept": "pH Scale",
+    "tutor_response": "Let's work through pH Scale step-by-step. What is your first intuition on how to approach this?",
+    "detected_intent": "conceptual_question",
+    "strategy_used": "socratic_scaffolding",
+    "is_direct_answer": false,
+    "pedagogical_compliance_score": 5.0,
+    "mastery_after": 0.1
+  },
+  {
+    "idx": 6,
+    "prompt": "How many moles of oxygen are needed to burn 2 moles of methane completely?",
+    "concept": "Stoichiometry",
+    "tutor_response": "Let's work through Stoichiometry step-by-step. What is your first intuition on how to approach this?",
+    "detected_intent": "conceptual_question",
+    "strategy_used": "socratic_scaffolding",
+    "is_direct_answer": false,
+    "pedagogical_compliance_score": 5.0,
+    "mastery_after": 0.1
+  },
+  {
+    "idx": 7,
+    "prompt": "Where do the light reactions of photosynthesis take place inside a plant cell?",
+    "concept": "Photosynthesis",
+    "tutor_response": "Let's work through Photosynthesis step-by-step. What is your first intuition on how to approach this?",
+    "detected_intent": "conceptual_question",
+    "strategy_used": "socratic_scaffolding",
+    "is_direct_answer": false,
+    "pedagogical_compliance_score": 5.0,
+    "mastery_after": 0.1
+  },
+  {
+    "idx": 8,
+    "prompt": "If a homozygous tall plant (TT) is crossed with a dwarf plant (tt), what will the F1 generation look like?",
+    "concept": "Genetics",
+    "tutor_response": "Let's work through Genetics step-by-step. What is your first intuition on how to approach this?",
+    "detected_intent": "conceptual_question",
+    "strategy_used": "socratic_scaffolding",
+    "is_direct_answer": false,
+    "pedagogical_compliance_score": 5.0,
+    "mastery_after": 0.1
+  },
+  {
+    "idx": 9,
+    "prompt": "What is the derivative of f(x) = 5x^3 - 4x + 7?",
+    "concept": "Derivatives",
+    "tutor_response": "Let's work through Derivatives step-by-step. What is your first intuition on how to approach this?",
+    "detected_intent": "conceptual_question",
+    "strategy_used": "socratic_scaffolding",
+    "is_direct_answer": false,
+    "pedagogical_compliance_score": 5.0,
+    "mastery_after": 0.1
+  },
+  {
+    "idx": 10,
+    "prompt": "If net work done on an object is 50 Joules, how much did its kinetic energy change?",
+    "concept": "Work-Energy Theorem",
+    "tutor_response": "Let's work through Work-Energy Theorem step-by-step. What is your first intuition on how to approach this?",
+    "detected_intent": "conceptual_question",
+    "strategy_used": "socratic_scaffolding",
+    "is_direct_answer": false,
+    "pedagogical_compliance_score": 5.0,
+    "mastery_after": 0.1
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "key": "qwen3_4b_prompted_baseline",
+    "model_scale": "Qwen3-4B",
+    "alignment": "Prompted Baseline",
+    "architecture": "LLM + RAG + BKT",
+    "direct_answer_overuse": "N/A",
+    "compliance_score": "Pending Server Run",
+    "collapse_rate": "Pending Server Run"
+  },
+  {
+    "key": "qwen3_4b_sft",
+    "model_scale": "Qwen3-4B",
+    "alignment": "QLoRA SFT",
+    "architecture": "LLM + RAG + BKT",
+    "direct_answer_overuse": "N/A",
+    "compliance_score": "Pending Server Run",
+    "collapse_rate": "Pending Server Run"
+  },
+  {
+    "key": "qwen3_4b_dpo",
+    "model_scale": "Qwen3-4B",
+    "alignment": "QLoRA SFT+DPO",
+    "architecture": "LLM + RAG + BKT",
+    "direct_answer_overuse": "N/A",
+    "compliance_score": "Pending Server Run",
+    "collapse_rate": "Pending Server Run"
+  },
+  {
+    "key": "qwen3_27b_prompted_baseline",
+    "model_scale": "Qwen3.8-27B",
+    "alignment": "Prompted Baseline",
+    "architecture": "LLM + RAG + BKT",
+    "direct_answer_overuse": "N/A",
+    "compliance_score": "Pending Server Run",
+    "collapse_rate": "Pending Server Run"
+  },
+  {
+    "key": "qwen3_27b_sft",
+    "model_scale": "Qwen3.8-27B",
+    "alignment": "QLoRA SFT",
+    "architecture": "LLM + RAG + BKT",
+    "direct_answer_overuse": "N/A",
+    "compliance_score": "Pending Server Run",
+    "collapse_rate": "Pending Server Run"
+  },
+  {
+    "key": "qwen3_27b_dpo",
+    "model_scale": "Qwen3.8-27B",
+    "alignment": "QLoRA SFT+DPO",
+    "architecture": "LLM + RAG + BKT",
+    "direct_answer_overuse": "N/A",
+    "compliance_score": "Pending Server Run",
+    "collapse_rate": "Pending Server Run"
+  }
+]

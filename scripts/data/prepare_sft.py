@@ -349,15 +349,39 @@ def save_jsonl(data: List[Dict[str, Any]], path: str):
     print(f"Saved {len(data)} examples to {path}")
 
 
+def load_jsonl(path: str) -> List[Dict[str, Any]]:
+    """Loads examples from a JSONL file."""
+    examples = []
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                examples.append(json.loads(line))
+    return examples
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate and split SFT pedagogical dataset.")
     parser.add_argument("--output-dir", type=str, default="data/sft", help="Target directory for SFT datasets")
+    parser.add_argument(
+        "--input",
+        type=str,
+        default=None,
+        help="Optional: path to external JSONL file (e.g. synthetic_sft_500.jsonl). "
+             "If omitted, uses the built-in seed examples.",
+    )
     parser.add_argument("--seed", type=int, default=42, help="Random seed for deterministic splits")
     args = parser.parse_args()
 
-    examples = get_seed_pedagogical_examples()
-    seed_gold_path = os.path.join(args.output_dir, "seed_gold_100.jsonl")
-    save_jsonl(examples, seed_gold_path)
+    if args.input:
+        if not os.path.exists(args.input):
+            raise FileNotFoundError(f"Input file not found: {args.input}")
+        examples = load_jsonl(args.input)
+        print(f"Loaded {len(examples)} examples from {args.input}")
+    else:
+        examples = get_seed_pedagogical_examples()
+        seed_gold_path = os.path.join(args.output_dir, "seed_gold_100.jsonl")
+        save_jsonl(examples, seed_gold_path)
 
     train, val, test, heldout = split_sft_data(examples, seed=args.seed)
 
@@ -366,7 +390,11 @@ def main():
     save_jsonl(test, os.path.join(args.output_dir, "test.jsonl"))
     save_jsonl(heldout, os.path.join(args.output_dir, "heldout_subject_test.jsonl"))
 
-    print("\nSFT dataset preparation completed successfully.")
+    print(f"\nSFT dataset preparation completed.")
+    print(f"  Train:    {len(train)} examples")
+    print(f"  Val:      {len(val)} examples")
+    print(f"  Test:     {len(test)} examples")
+    print(f"  Held-out: {len(heldout)} examples (Biology, unseen subject)")
 
 
 if __name__ == "__main__":

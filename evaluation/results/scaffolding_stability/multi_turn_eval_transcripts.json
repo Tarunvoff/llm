@@ -1,0 +1,290 @@
+[
+  {
+    "scenario_id": "sc_001",
+    "concept": "Quadratic Equations",
+    "subject": "Mathematics",
+    "has_scaffolding_collapse": false,
+    "turns_count": 6,
+    "transcript": [
+      {
+        "turn": 1,
+        "student_utterance": "Can you solve x^2 - 5x + 6 = 0 for me?",
+        "tutor_response": "Let's work through Quadratic Equations step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "request_direct_answer",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 2,
+        "student_utterance": "Don't give me hints, just tell me the numbers.",
+        "tutor_response": "Let's work through Quadratic Equations step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "request_direct_answer",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 3,
+        "student_utterance": "Why can't you just write x = 2 and x = 3?",
+        "tutor_response": "Let's work through Quadratic Equations step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 4,
+        "student_utterance": "Okay fine, how do I find two numbers that multiply to 6 and add to -5?",
+        "tutor_response": "Let's work through Quadratic Equations step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 5,
+        "student_utterance": "Is it -2 and -3?",
+        "tutor_response": "Let's work through Quadratic Equations step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 6,
+        "student_utterance": "So the factored form is (x - 2)(x - 3) = 0?",
+        "tutor_response": "Let's work through Quadratic Equations step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      }
+    ]
+  },
+  {
+    "scenario_id": "sc_002",
+    "concept": "Newton's Second Law",
+    "subject": "Physics",
+    "has_scaffolding_collapse": false,
+    "turns_count": 6,
+    "transcript": [
+      {
+        "turn": 1,
+        "student_utterance": "A spacecraft is drifting in deep space at 500 m/s. What force is keeping it moving?",
+        "tutor_response": "Let's work through Newton's Second Law step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 2,
+        "student_utterance": "Give me the formula and the force in Newtons.",
+        "tutor_response": "Let's work through Newton's Second Law step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "partial_understanding",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 3,
+        "student_utterance": "If there is no force, why doesn't it slow down and stop?",
+        "tutor_response": "Let's work through Newton's Second Law step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 4,
+        "student_utterance": "What is Newton's first law again?",
+        "tutor_response": "Let's work through Newton's Second Law step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 5,
+        "student_utterance": "So inertia keeps it moving without needing any force?",
+        "tutor_response": "Let's work through Newton's Second Law step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 6,
+        "student_utterance": "And force is only required to accelerate or decelerate it!",
+        "tutor_response": "Let's work through Newton's Second Law step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "partial_understanding",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      }
+    ]
+  },
+  {
+    "scenario_id": "sc_003",
+    "concept": "Chemical Equilibrium",
+    "subject": "Chemistry",
+    "has_scaffolding_collapse": false,
+    "turns_count": 5,
+    "transcript": [
+      {
+        "turn": 1,
+        "student_utterance": "How much will adding a catalyst increase our ammonia yield in Haber process?",
+        "tutor_response": "Let's work through Chemical Equilibrium step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 2,
+        "student_utterance": "Just tell me the percentage increase in yield.",
+        "tutor_response": "Let's work through Chemical Equilibrium step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "request_direct_answer",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 3,
+        "student_utterance": "If it doesn't increase yield, what does a catalyst actually do?",
+        "tutor_response": "Let's work through Chemical Equilibrium step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 4,
+        "student_utterance": "Does it lower activation energy for both forward and backward reactions equally?",
+        "tutor_response": "Let's work through Chemical Equilibrium step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 5,
+        "student_utterance": "So equilibrium position doesn't shift, we just reach equilibrium faster!",
+        "tutor_response": "Let's work through Chemical Equilibrium step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "partial_understanding",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      }
+    ]
+  },
+  {
+    "scenario_id": "sc_004",
+    "concept": "Cellular Respiration",
+    "subject": "Biology",
+    "has_scaffolding_collapse": false,
+    "turns_count": 5,
+    "transcript": [
+      {
+        "turn": 1,
+        "student_utterance": "Why do plants only respire at night?",
+        "tutor_response": "Let's work through Cellular Respiration step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 2,
+        "student_utterance": "Just tell me why they turn off respiration in sunlight.",
+        "tutor_response": "Let's work through Cellular Respiration step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "request_direct_answer",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 3,
+        "student_utterance": "Do plant cells need ATP during the day?",
+        "tutor_response": "Let's work through Cellular Respiration step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 4,
+        "student_utterance": "So plants perform cellular respiration 24 hours a day continuously?",
+        "tutor_response": "Let's work through Cellular Respiration step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 5,
+        "student_utterance": "And photosynthesis happens alongside respiration during the day with net oxygen release!",
+        "tutor_response": "Let's work through Cellular Respiration step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "partial_understanding",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      }
+    ]
+  },
+  {
+    "scenario_id": "sc_005",
+    "concept": "Calculus Derivatives",
+    "subject": "Mathematics",
+    "has_scaffolding_collapse": false,
+    "turns_count": 5,
+    "transcript": [
+      {
+        "turn": 1,
+        "student_utterance": "Is the derivative of (x^2 * sin(x)) just 2x * cos(x)?",
+        "tutor_response": "Let's work through Calculus Derivatives step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 2,
+        "student_utterance": "Why is that wrong? Just tell me the right derivative.",
+        "tutor_response": "Let's work through Calculus Derivatives step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "request_direct_answer",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 3,
+        "student_utterance": "What is the product rule formula?",
+        "tutor_response": "Let's work through Calculus Derivatives step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 4,
+        "student_utterance": "So it is u*v' + v*u'?",
+        "tutor_response": "Let's work through Calculus Derivatives step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "conceptual_question",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      },
+      {
+        "turn": 5,
+        "student_utterance": "That gives x^2*cos(x) + 2x*sin(x)!",
+        "tutor_response": "Let's work through Calculus Derivatives step-by-step. What is your first intuition on how to approach this?",
+        "detected_intent": "partial_understanding",
+        "strategy_used": "socratic_scaffolding",
+        "is_direct_answer": false,
+        "mastery_after": 0.1
+      }
+    ]
+  }
+]
