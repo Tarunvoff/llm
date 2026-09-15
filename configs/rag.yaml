@@ -1,0 +1,37 @@
+# RAG Pipeline Configuration
+# All parameters are overridable at runtime via config_path argument.
+
+paths:
+  pdf_dir: "data/raw/pdfs"
+  processed_dir: "data/processed"
+  index_dir: "data/index"
+  log_dir: "logs/rag"
+
+chunking:
+  chunk_size: 800          # target characters per chunk
+  chunk_overlap: 120       # overlap characters between consecutive chunks
+  min_chunk_size: 100      # discard chunks smaller than this
+
+embedding:
+  model_name: "BAAI/bge-small-en-v1.5"
+  device: "auto"           # "auto", "cpu", "cuda"
+  batch_size: 64
+  normalize: true
+
+retrieval:
+  bm25_top_k: 20
+  dense_top_k: 20
+  visual_top_k: 10
+  fusion: "rrf"            # "rrf" (Reciprocal Rank Fusion) or "linear"
+  rrf_k: 60               # RRF constant (higher = smoother)
+  final_candidates: 30
+
+reranker:
+  model_name: "BAAI/bge-reranker-base"
+  top_k: 5
+  device: "auto"
+
+pixelrag:
+  enabled: true
+  tile_size: 1024          # pixel dimension for page tiles
+  overlap_ratio: 0.1       # tile overlap ratio

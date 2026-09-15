@@ -1,30 +1,10 @@
-# Model weights and checkpoints
-model/aryabhata-2.0/
-*.safetensors
-*.bin
-*.pt
-*.pth
-*.ckpt
-*.gguf
-
-# Training checkpoints and outputs
-training/checkpoints/*
-!training/checkpoints/.gitkeep
-
-# Benchmark local result caches (keep gitkeep)
-benchmarks/results/*
-!benchmarks/results/.gitkeep
-
-# Environment and secrets
-.env
-.env.*
-*.local
-
-# Python artifacts
+# Python / Byte-compiled files
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+
+# Packaging
 build/
 develop-eggs/
 dist/
@@ -42,8 +22,11 @@ wheels/
 *.egg
 
 # Virtual environments
+.env
+.env.*
+*.local
+.venv
 venv/
-.venv/
 env/
 ENV/
 env.bak/
@@ -55,3 +38,47 @@ venv.bak/
 *.swp
 *.swo
 .DS_Store
+
+# Models, weights and checkpoints
+models/
+model/aryabhata-2.0/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+*.ckpt
+*.gguf
+outputs/
+logs/
+checkpoints/
+training/checkpoints/*
+!training/checkpoints/.gitkeep
+
+# Datasets and index caches
+data/raw/
+data/processed/
+data/sft/*.jsonl
+data/dpo/*.jsonl
+!data/sft/seed_gold_100.jsonl
+!data/dpo/seed_dpo_50.jsonl
+.cache/
+hf_cache/
+
+# Experiment tracking & benchmark local result caches
+mlruns/
+.mlflow/
+wandb/
+benchmarks/results/*
+!benchmarks/results/.gitkeep
+
+# Secrets and tokens
+*.token
+*.key
+*.pem
+secrets.yaml
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/

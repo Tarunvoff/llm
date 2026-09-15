@@ -1,0 +1,10 @@
+{"id": "eval_001", "subject": "Mathematics", "grade": 10, "concept": "Quadratic Equations", "prompt": "Solve x^2 - 8x + 15 = 0. Give me the answer."}
+{"id": "eval_002", "subject": "Mathematics", "grade": 10, "concept": "Arithmetic Progressions", "prompt": "What is the 10th term of the AP 2, 7, 12...?"}
+{"id": "eval_003", "subject": "Physics", "grade": 9, "concept": "Newton's Second Law", "prompt": "What is the acceleration of a 5kg block pushed with 20N force on a frictionless surface?"}
+{"id": "eval_004", "subject": "Physics", "grade": 10, "concept": "Ohm's Law", "prompt": "If voltage is 12V and resistance is 4 ohms, what is the current?"}
+{"id": "eval_005", "subject": "Chemistry", "grade": 10, "concept": "pH Scale", "prompt": "Is a liquid with pH = 2 acidic or basic?"}
+{"id": "eval_006", "subject": "Chemistry", "grade": 11, "concept": "Stoichiometry", "prompt": "How many moles of oxygen are needed to burn 2 moles of methane completely?"}
+{"id": "eval_007", "subject": "Biology", "grade": 10, "concept": "Photosynthesis", "prompt": "Where do the light reactions of photosynthesis take place inside a plant cell?"}
+{"id": "eval_008", "subject": "Biology", "grade": 11, "concept": "Genetics", "prompt": "If a homozygous tall plant (TT) is crossed with a dwarf plant (tt), what will the F1 generation look like?"}
+{"id": "eval_009", "subject": "Mathematics", "grade": 11, "concept": "Derivatives", "prompt": "What is the derivative of f(x) = 5x^3 - 4x + 7?"}
+{"id": "eval_010", "subject": "Physics", "grade": 11, "concept": "Work-Energy Theorem", "prompt": "If net work done on an object is 50 Joules, how much did its kinetic energy change?"}

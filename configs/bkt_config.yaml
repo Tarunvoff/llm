@@ -1,0 +1,10 @@
+bkt:
+  default_p_init: 0.10      # Prior probability of mastery (L_0)
+  default_p_transit: 0.15   # Probability of transitioning from unmastered to mastered (T)
+  default_p_guess: 0.20     # Probability of guessing correctly without mastery (G)
+  default_p_slip: 0.10      # Probability of slipping on a known concept (S)
+  mastery_threshold: 0.85   # Threshold above which concept is marked as mastered
+  remediation_threshold: 0.50 # Threshold below which prerequisite review is triggered
+
+prerequisites:
+  default_graph_path: "data/processed/prerequisite_graph.json"

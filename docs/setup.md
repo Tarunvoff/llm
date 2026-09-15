@@ -1,12 +1,46 @@
 # Environment Setup and Deployment Guide
 
-This guide details the complete server deployment workflow for downloading, verifying, benchmarking, and serving the model.
+This guide details local development setup and deployment workflows for building, testing, benchmarking, and serving the AI Tutor system.
 
 ---
 
-## 1. Remote Server Workflow
+## 1. Local Development Setup (Windows / Workstation)
 
-All code development occurs in Antigravity, pushed to GitHub, and pulled on the target execution server.
+Local development focuses on code authoring, unit testing, schema validation, and pipeline mocking without requiring multi-gigabyte GPU models.
+
+### 1.1 Prerequisites
+- Python 3.10+ (Python 3.11/3.14 verified)
+- Git
+
+### 1.2 Installation
+```bash
+# Clone the repository
+git clone https://github.com/Tarunvoff/llm.git
+cd llm
+
+# Create and activate virtual environment
+python -m venv .venv
+# On Windows:
+.venv\Scripts\activate
+# On Linux/macOS:
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+pip install -e .
+```
+
+### 1.3 Running Local Unit Tests
+All unit tests execute locally without requiring external GPUs:
+```bash
+pytest tests/ -v
+```
+
+---
+
+## 2. Remote GPU Server Workflow
+
+All code development occurs locally in Antigravity IDE, pushed to GitHub, and pulled on the target execution server.
 
 ```bash
 # Navigate to repository directory
@@ -24,77 +58,21 @@ unset CUDA_VISIBLE_DEVICES
 
 ---
 
-## 2. Model Download
-
-Download the original unquantized Hugging Face weights directly into `model/aryabhata-2.0/`:
+## 3. PDF RAG Pipeline Usage
 
 ```bash
-python scripts/download_model.py
-```
+# Build/Update persistent hybrid vector index from raw PDFs
+python -c "from tutor.rag.pipeline import RAGPipeline; rag = RAGPipeline(); rag.build()"
 
-*Note: Model weights are configured via `configs/model.yaml` and are never committed to Git.*
-
----
-
-## 3. Model Verification
-
-Validate the presence and integrity of all checkpoint shards, configuration files, and tokenizers:
-
-```bash
-python scripts/verify_model.py
-```
-
-Expected output:
-- Model path check
-- Total checkpoint files and sizes
-- Tokenizer and config presence
-- Verification status (`PASSED` with exit code `0`)
-
----
-
-## 4. Model Inference
-
-Run local inference on test STEM queries using Transformers:
-
-```bash
-python scripts/run_model.py \
-    --prompt "Solve the quadratic equation x^2 - 5x + 6 = 0"
-```
-
-The runner prints:
-- Generated response (with step-by-step reasoning and boxed answers)
-- Input token count
-- Output token count
-- Generation latency (seconds)
-- Generation speed (tokens/sec)
-
----
-
-## 5. Benchmarking
-
-### Official Benchmarks
-Official model card results are pre-packaged in the application and accessible via the API/Frontend:
-- **In-Distribution**: JEE Advanced 2025 (86.51%), NEET 2025 (84.66%), JEE Main 2025 (87.80%), JEE Main 2026 (92.99%)
-- **Out-of-Distribution**: AIME (86.67%), HMMT (78.96%), GPQA (74.86%), MMLU-Pro (88.49%), MMLU-Redux 2.0 (92.92%)
-
-### Local Evaluation
-To execute evaluations against local evaluation datasets:
-
-```bash
-python scripts/run_benchmark.py --dataset path/to/eval_dataset.jsonl --benchmark-name "custom_stem_test"
-```
-
-If no dataset is provided:
-```bash
-python scripts/run_benchmark.py
-# Output: "No local benchmark dataset supplied."
+# Query RAG pipeline from Python
+python -c "from tutor.rag.pipeline import RAGPipeline; rag = RAGPipeline(); print(rag.retrieve('Newton second law', top_k=3))"
 ```
 
 ---
 
-## 6. Starting FastAPI & Chat Interface
+## 4. Starting FastAPI & Chat Interface
 
-Launch the FastAPI backend serving both API endpoints and the static chat UI:
+Launch the FastAPI backend serving both API endpoints and the chat UI:
 
 ```bash
 uvicorn backend.main:app \
@@ -102,17 +80,15 @@ uvicorn backend.main:app \
     --port 8000
 ```
 
-Access the web interface at:
+Access points:
 - **Web UI**: `http://<server-ip>:8000/`
 - **Health Check**: `http://<server-ip>:8000/health`
-- **Benchmarks Endpoint**: `http://<server-ip>:8000/benchmarks`
 - **Interactive API Docs**: `http://<server-ip>:8000/docs`
 
 ---
 
-## 7. Shared Server Safety Guidelines
+## 5. Shared Server Safety Guidelines
 
 1. **GPU Allocation**: Always respect `CUDA_VISIBLE_DEVICES`. Do not hard-code specific GPU device indices.
 2. **Process Safety**: Never terminate or interfere with processes belonging to other users.
-3. **Hardware Config**: Do not modify MIG (Multi-Instance GPU) profiles, CUDA drivers, or root system settings.
-4. **Model Loading**: The backend singleton loads the model only once at startup into available VRAM.
+3. **Hardware Config**: Do not modify MIG profiles, CUDA drivers, or root system settings.

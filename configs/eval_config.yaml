@@ -1,0 +1,17 @@
+evaluation:
+  judge_model: "Qwen/Qwen2.5-72B-Instruct"  # External judge family to avoid self-preference bias
+  temperature: 0.0
+  max_eval_tokens: 512
+  metrics:
+    - "pedagogical_compliance"
+    - "direct_answer_overuse"
+    - "factual_correctness"
+    - "rag_faithfulness"
+    - "misconception_handling"
+    - "prerequisite_awareness"
+    - "scaffolding_collapse_rate"
+
+benchmarks:
+  stem_single_turn: "evaluation/benchmarks/stem_eval_500.jsonl"
+  scaffolding_multi_turn: "evaluation/benchmarks/scaffolding_scenarios.jsonl"
+  human_validation_sample_pct: 0.15
