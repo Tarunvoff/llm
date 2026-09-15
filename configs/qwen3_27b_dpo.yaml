@@ -1,0 +1,44 @@
+experiment:
+  name: "qwen3_27b_qlora_dpo"
+  description: "QLoRA DPO of Qwen3.8-27B on top of 27B SFT adapter"
+  seed: 42
+  tracking:
+    use_mlflow: false
+    experiment_name: "pedagogical_tutor_dpo_27b"
+
+model:
+  name: "Qwen/Qwen3.8-27B"
+  sft_adapter_path: "outputs/qwen3_27b_sft/final_adapter"
+  torch_dtype: "bfloat16"
+  use_4bit: true
+  bnb_4bit_compute_dtype: "bfloat16"
+  bnb_4bit_quant_type: "nf4"
+
+data:
+  train_file: "data/dpo/train_dpo.jsonl"
+  validation_file: "data/dpo/val_dpo.jsonl"
+  max_length: 2048
+  max_prompt_length: 1024
+  max_target_length: 1024
+
+dpo:
+  beta: 0.1
+  loss_type: "sigmoid"
+
+training:
+  output_dir: "outputs/qwen3_27b_dpo"
+  num_train_epochs: 2
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 32
+  learning_rate: 2.0e-6
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.05
+  gradient_checkpointing: true
+  logging_steps: 10
+  eval_strategy: "steps"
+  eval_steps: 50
+  save_strategy: "steps"
+  save_steps: 50
+  save_total_limit: 2
+  bf16: true

@@ -1,23 +1,80 @@
-# Models
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Models, weights and checkpoints
 models/
 *.safetensors
 *.bin
 *.pt
 *.pth
-
-# Training outputs
+*.onnx
 outputs/
 logs/
+checkpoints/
 
-# Datasets
+# Datasets and caches
 data/raw/
 data/processed/
+data/sft/*.jsonl
+data/dpo/*.jsonl
+!data/sft/seed_gold_100.jsonl
+!data/dpo/seed_dpo_50.jsonl
+.cache/
+hf_cache/
 
-# Python
-__pycache__/
-*.pyc
+# Experiment tracking
+mlruns/
+.mlflow/
+wandb/
 
-# Environment/secrets
-.env
+# Secrets and tokens
 *.token
+*.key
+*.pem
+secrets.yaml
 
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
