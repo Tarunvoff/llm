@@ -30,7 +30,6 @@ def get_torch_dtype(dtype_str: str) -> torch.dtype:
     elif dtype_str in ["float16", "fp16"] and torch.cuda.is_available():
         return torch.float16
     elif dtype_str in ["bfloat16", "bf16"]:
-        # Fallback for CPU if bfloat16 is requested
         return torch.bfloat16
     return torch.float32
 
@@ -56,17 +55,65 @@ def load_model_and_tokenizer(model_dir: str, config: dict):
         device_map = None
         torch_dtype = torch.float32
 
-    model = AutoModelForCausalLM.from_pretrained(
-        model_dir,
-        torch_dtype=torch_dtype,
-        device_map=device_map,
-        trust_remote_code=trust_remote_code
-    )
+    model_kwargs = {
+        "device_map": device_map,
+        "trust_remote_code": trust_remote_code
+    }
+    # Pass torch_dtype / dtype
+    try:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_dir,
+            dtype=torch_dtype,
+            **model_kwargs
+        )
+    except TypeError:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_dir,
+            torch_dtype=torch_dtype,
+            **model_kwargs
+        )
 
     if not torch.cuda.is_available():
         model = model.to("cpu")
 
     return model, tokenizer
+
+
+def prepare_inputs(encoded, device="cpu"):
+    """
+    Extracts tensor input_ids and attention_mask from apply_chat_template or tokenizer outputs,
+    safely handling BatchEncoding, dict, list, or tensor types.
+    """
+    if isinstance(encoded, dict) or hasattr(encoded, "data") or hasattr(encoded, "get"):
+        raw_ids = encoded.get("input_ids", encoded)
+        raw_mask = encoded.get("attention_mask", None)
+    else:
+        raw_ids = encoded
+        raw_mask = None
+
+    if isinstance(raw_ids, torch.Tensor):
+        input_ids = raw_ids
+    elif isinstance(raw_ids, list):
+        input_ids = torch.tensor(raw_ids, dtype=torch.long)
+    else:
+        input_ids = torch.as_tensor(raw_ids, dtype=torch.long)
+
+    if input_ids.ndim == 1:
+        input_ids = input_ids.unsqueeze(0)
+
+    if raw_mask is not None:
+        if isinstance(raw_mask, torch.Tensor):
+            attention_mask = raw_mask
+        elif isinstance(raw_mask, list):
+            attention_mask = torch.tensor(raw_mask, dtype=torch.long)
+        else:
+            attention_mask = torch.as_tensor(raw_mask, dtype=torch.long)
+        if attention_mask.ndim == 1:
+            attention_mask = attention_mask.unsqueeze(0)
+    else:
+        attention_mask = torch.ones_like(input_ids)
+
+    return input_ids.to(device), attention_mask.to(device)
 
 
 def run_inference(
@@ -84,23 +131,25 @@ def run_inference(
     messages.append({"role": "user", "content": prompt})
 
     if hasattr(tokenizer, "apply_chat_template"):
-        input_ids = tokenizer.apply_chat_template(
+        encoded = tokenizer.apply_chat_template(
             messages,
             add_generation_prompt=True,
             return_tensors="pt"
         )
     else:
         full_text = f"{system_prompt}\nUser: {prompt}\nAssistant:" if system_prompt else f"User: {prompt}\nAssistant:"
-        input_ids = tokenizer(full_text, return_tensors="pt")["input_ids"]
+        encoded = tokenizer(full_text, return_tensors="pt")
 
     device = model.device if hasattr(model, "device") else ("cuda" if torch.cuda.is_available() else "cpu")
-    input_ids = input_ids.to(device)
+    input_ids, attention_mask = prepare_inputs(encoded, device=device)
     input_token_count = input_ids.shape[-1]
 
     # Generation
     start_time = time.perf_counter()
     with torch.no_grad():
         generation_kwargs = {
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
             "max_new_tokens": max_new_tokens,
             "pad_token_id": tokenizer.eos_token_id if tokenizer.eos_token_id is not None else 0
         }
@@ -110,7 +159,7 @@ def run_inference(
         else:
             generation_kwargs["do_sample"] = False
 
-        outputs = model.generate(input_ids, **generation_kwargs)
+        outputs = model.generate(**generation_kwargs)
     end_time = time.perf_counter()
 
     generation_time = max(end_time - start_time, 1e-6)

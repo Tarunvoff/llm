@@ -14,6 +14,43 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
+def prepare_inputs(encoded, device="cpu"):
+    """
+    Extracts tensor input_ids and attention_mask from apply_chat_template or tokenizer outputs,
+    safely handling BatchEncoding, dict, list, or tensor types.
+    """
+    if isinstance(encoded, dict) or hasattr(encoded, "data") or hasattr(encoded, "get"):
+        raw_ids = encoded.get("input_ids", encoded)
+        raw_mask = encoded.get("attention_mask", None)
+    else:
+        raw_ids = encoded
+        raw_mask = None
+
+    if isinstance(raw_ids, torch.Tensor):
+        input_ids = raw_ids
+    elif isinstance(raw_ids, list):
+        input_ids = torch.tensor(raw_ids, dtype=torch.long)
+    else:
+        input_ids = torch.as_tensor(raw_ids, dtype=torch.long)
+
+    if input_ids.ndim == 1:
+        input_ids = input_ids.unsqueeze(0)
+
+    if raw_mask is not None:
+        if isinstance(raw_mask, torch.Tensor):
+            attention_mask = raw_mask
+        elif isinstance(raw_mask, list):
+            attention_mask = torch.tensor(raw_mask, dtype=torch.long)
+        else:
+            attention_mask = torch.as_tensor(raw_mask, dtype=torch.long)
+        if attention_mask.ndim == 1:
+            attention_mask = attention_mask.unsqueeze(0)
+    else:
+        attention_mask = torch.ones_like(input_ids)
+
+    return input_ids.to(device), attention_mask.to(device)
+
+
 class ModelEngine:
     _instance: Optional["ModelEngine"] = None
 
@@ -80,12 +117,22 @@ class ModelEngine:
                 device_map = None
                 torch_dtype = torch.float32
 
-            self.model = AutoModelForCausalLM.from_pretrained(
-                self.model_path,
-                torch_dtype=torch_dtype,
-                device_map=device_map,
-                trust_remote_code=trust_remote_code
-            )
+            model_kwargs = {
+                "device_map": device_map,
+                "trust_remote_code": trust_remote_code
+            }
+            try:
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    self.model_path,
+                    dtype=torch_dtype,
+                    **model_kwargs
+                )
+            except TypeError:
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    self.model_path,
+                    torch_dtype=torch_dtype,
+                    **model_kwargs
+                )
 
             if not torch.cuda.is_available():
                 self.model = self.model.to("cpu")
@@ -134,22 +181,24 @@ class ModelEngine:
 
         # Apply chat template
         if hasattr(self.tokenizer, "apply_chat_template"):
-            input_ids = self.tokenizer.apply_chat_template(
+            encoded = self.tokenizer.apply_chat_template(
                 formatted_messages,
                 add_generation_prompt=True,
                 return_tensors="pt"
             )
         else:
             text = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in formatted_messages]) + "\nAssistant:"
-            input_ids = self.tokenizer(text, return_tensors="pt")["input_ids"]
+            encoded = self.tokenizer(text, return_tensors="pt")
 
         device = self.model.device if hasattr(self.model, "device") else ("cuda" if torch.cuda.is_available() else "cpu")
-        input_ids = input_ids.to(device)
+        input_ids, attention_mask = prepare_inputs(encoded, device=device)
         input_token_count = input_ids.shape[-1]
 
         start_time = time.perf_counter()
         with torch.no_grad():
             gen_kwargs = {
+                "input_ids": input_ids,
+                "attention_mask": attention_mask,
                 "max_new_tokens": max_tokens,
                 "pad_token_id": self.tokenizer.eos_token_id if self.tokenizer.eos_token_id is not None else 0
             }
@@ -159,7 +208,7 @@ class ModelEngine:
             else:
                 gen_kwargs["do_sample"] = False
 
-            outputs = self.model.generate(input_ids, **gen_kwargs)
+            outputs = self.model.generate(**gen_kwargs)
         end_time = time.perf_counter()
 
         generation_time = max(end_time - start_time, 1e-6)

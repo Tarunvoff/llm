@@ -62,21 +62,34 @@ class STEMInstructionDataset(Dataset):
 
         # Apply chat template
         if hasattr(self.tokenizer, "apply_chat_template"):
-            input_ids = self.tokenizer.apply_chat_template(
+            encoded = self.tokenizer.apply_chat_template(
                 messages,
                 tokenize=True,
                 truncation=True,
                 max_length=self.max_seq_length,
                 return_tensors="pt"
-            )[0]
+            )
+            if isinstance(encoded, dict) or hasattr(encoded, "data") or hasattr(encoded, "get"):
+                raw_ids = encoded.get("input_ids", encoded)
+            else:
+                raw_ids = encoded
+
+            if isinstance(raw_ids, torch.Tensor):
+                input_ids = raw_ids.squeeze(0) if raw_ids.ndim > 1 else raw_ids
+            elif isinstance(raw_ids, list):
+                t = torch.tensor(raw_ids, dtype=torch.long)
+                input_ids = t.squeeze(0) if t.ndim > 1 else t
+            else:
+                input_ids = torch.as_tensor(raw_ids, dtype=torch.long)
         else:
             text = "\n".join([f"{m['role']}: {m['content']}" for m in messages])
-            input_ids = self.tokenizer(
+            encoded = self.tokenizer(
                 text,
                 truncation=True,
                 max_length=self.max_seq_length,
                 return_tensors="pt"
-            )["input_ids"][0]
+            )
+            input_ids = encoded["input_ids"][0]
 
         labels = input_ids.clone()
 
