@@ -1,0 +1,63 @@
+# ==============================================================================
+# Training Configuration Blueprint (Future Setup)
+# NOTE: Training is disabled for the current deployment stage.
+# ==============================================================================
+
+status:
+  training_enabled: false
+  reason: "Training setup is configured as architectural blueprint; training execution is disabled for this deployment."
+
+model:
+  base_model_name_or_path: "model/aryabhata-2.0"
+  tokenizer_name_or_path: "model/aryabhata-2.0"
+  torch_dtype: "bfloat16"
+  trust_remote_code: true
+
+data:
+  train_file: "training/data/train.jsonl"
+  validation_file: "training/data/val.jsonl"
+  max_seq_length: 4096
+  preprocessing_num_workers: 4
+  overwrite_cache: false
+
+training:
+  output_dir: "training/checkpoints"
+  per_device_train_batch_size: 2
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.03
+  lr_scheduler_type: "cosine"
+  num_train_epochs: 3
+  logging_steps: 10
+  save_steps: 500
+  eval_steps: 250
+  save_total_limit: 3
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  dataloader_num_workers: 4
+  evaluation_strategy: "steps"
+  seed: 42
+
+lora:
+  r: 64
+  lora_alpha: 128
+  lora_dropout: 0.0
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "embed_tokens"
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+reinforcement_learning:
+  method: "GRPO" # Group Relative Policy Optimization as specified in architecture
+  group_size: 8
+  num_generations: 8
+  reward_functions:
+    - "accuracy"
+    - "format_alignment"
