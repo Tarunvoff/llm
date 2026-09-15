@@ -6,7 +6,9 @@ set -Eeuo pipefail
 # CONFIGURATION
 # ============================================================
 
-BASE_DIR="${HOME}/NEET_JEE_STUDY_MATERIAL"
+# Accepts custom target path as first argument: ./scripts/download_study_material.sh /custom/path
+# Or via environment variable: STUDY_MATERIAL_DIR=/custom/path
+BASE_DIR="${1:-${STUDY_MATERIAL_DIR:-${HOME}/NEET_JEE_STUDY_MATERIAL}}"
 
 REPO_DIR="${BASE_DIR}/_repositories"
 PDF_DIR="${BASE_DIR}/PDF_LIBRARY"
