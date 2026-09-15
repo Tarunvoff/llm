@@ -1,0 +1,25 @@
+model:
+  name: Qwen/Qwen3-4B
+
+training:
+  method: qlora
+  stage: sft
+
+data:
+  train: data/sft/train.jsonl
+  validation: data/sft/validation.jsonl
+
+output:
+  directory: outputs/qwen3-4b-sft
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+
+optimization:
+  learning_rate: 2.0e-4
+  epochs: 3
+
+logging:
+  directory: logs/qwen3-4b-sft
