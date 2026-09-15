@@ -6,9 +6,15 @@ set -Eeuo pipefail
 # CONFIGURATION
 # ============================================================
 
-# Accepts custom target path as first argument: ./scripts/download_study_material.sh /custom/path
-# Or via environment variable: STUDY_MATERIAL_DIR=/custom/path
-BASE_DIR="${1:-${STUDY_MATERIAL_DIR:-${HOME}/NEET_JEE_STUDY_MATERIAL}}"
+# Target download directory can be supplied as:
+# 1. First argument:  ./scripts/download_study_material.sh /custom/path
+# 2. Environment variable: STUDY_MATERIAL_DIR=/custom/path
+# 3. Default: ${HOME}/NEET_JEE_STUDY_MATERIAL
+TARGET_DIR="${1:-${STUDY_MATERIAL_DIR:-${HOME}/NEET_JEE_STUDY_MATERIAL}}"
+
+# Resolve absolute path
+mkdir -p "$TARGET_DIR"
+BASE_DIR="$(cd "$TARGET_DIR" && pwd)"
 
 REPO_DIR="${BASE_DIR}/_repositories"
 PDF_DIR="${BASE_DIR}/PDF_LIBRARY"
@@ -50,7 +56,7 @@ timestamp() {
 }
 
 log() {
-    echo "[$(timestamp)] $*" | tee -a "$LOG_FILE"
+    echo "[$(timestamp)] $*" | tee -a "$LOG_FILE" >&2
 }
 
 error_log() {
@@ -104,11 +110,10 @@ clone_or_update() {
 
     local category="$1"
     local url="$2"
+    local destination="$3"
 
     local repo_name
     repo_name="$(basename "$url" .git)"
-
-    local destination="${REPO_DIR}/${repo_name}"
 
     mkdir -p "$destination"
 
@@ -133,8 +138,6 @@ clone_or_update() {
         fi
 
     fi
-
-    echo "$destination"
 }
 
 
@@ -443,16 +446,19 @@ summary() {
 
 log "============================================================"
 log "Starting study material downloader"
+log "Target Directory: ${BASE_DIR}"
 log "============================================================"
 
 for category in "${!REPOS[@]}"; do
 
     url="${REPOS[$category]}"
+    repo_name="$(basename "$url" .git)"
+    repo_path="${REPO_DIR}/${repo_name}"
 
     log "Processing: ${category}"
     log "Repository: ${url}"
 
-    repo_path="$(clone_or_update "$category" "$url")"
+    clone_or_update "$category" "$url" "$repo_path"
 
     copy_pdfs "$category" "$repo_path"
 
