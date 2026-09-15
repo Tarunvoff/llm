@@ -1,0 +1,23 @@
+# Models
+models/
+*.safetensors
+*.bin
+*.pt
+*.pth
+
+# Training outputs
+outputs/
+logs/
+
+# Datasets
+data/raw/
+data/processed/
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment/secrets
+.env
+*.token
+
