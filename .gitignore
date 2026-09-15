@@ -1,14 +1,10 @@
-# Byte-compiled / optimized / DLL files
+# Python / Byte-compiled files
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
+# Packaging
 build/
 develop-eggs/
 dist/
@@ -21,39 +17,45 @@ parts/
 sdist/
 var/
 wheels/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # Virtual environments
 .env
+.env.*
+*.local
 .venv
-env/
 venv/
+env/
 ENV/
 env.bak/
 venv.bak/
 
-# IDE files
+# IDE / Editor artifacts
 .vscode/
 .idea/
 *.swp
 *.swo
+.DS_Store
 
 # Models, weights and checkpoints
 models/
+model/aryabhata-2.0/
 *.safetensors
 *.bin
 *.pt
 *.pth
 *.onnx
+*.ckpt
+*.gguf
 outputs/
 logs/
 checkpoints/
+training/checkpoints/*
+!training/checkpoints/.gitkeep
 
-# Datasets and caches
+# Datasets and index caches
 data/raw/
 data/processed/
 data/sft/*.jsonl
@@ -63,10 +65,12 @@ data/dpo/*.jsonl
 .cache/
 hf_cache/
 
-# Experiment tracking
+# Experiment tracking & benchmark local result caches
 mlruns/
 .mlflow/
 wandb/
+benchmarks/results/*
+!benchmarks/results/.gitkeep
 
 # Secrets and tokens
 *.token

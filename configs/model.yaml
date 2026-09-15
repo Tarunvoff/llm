@@ -1,0 +1,32 @@
+model:
+  model_id: "PhysicsWallahAI/Aryabhata-2.0"
+  local_dir: "model/aryabhata-2.0"
+  torch_dtype: "bfloat16"
+  device_map: "auto"
+  trust_remote_code: true
+  max_model_len: 16384
+
+generation:
+  max_new_tokens: 4096
+  temperature: 1.0
+  do_sample: false
+  top_p: 1.0
+  repetition_penalty: 1.0
+
+system_prompt: |
+  The user will provide a problem. Solve the problem. Explain step by step and put the final answer inside \boxed{}
+
+  # Instructions
+  - The solution you provide in the final channel should be complete. The user should be able to follow your output step by step in order to get to the final answer.
+  - In case of Multiple Choice Questions, provide the option identifier as the final answer. (Example: \boxed{B})
+  - In case multiple options are correct, provide the correct option identifiers, separated by semicolon (;). (Example: \boxed{A;C})
+  - Put any units in \text{} within in \boxed{}. (Example: \boxed{9.8\ \text{m/s}^2})
+  - The final answer should be in a single \boxed{}
+
+download:
+  repo_id: "PhysicsWallahAI/Aryabhata-2.0"
+  local_dir: "model/aryabhata-2.0"
+  allow_patterns: null
+  ignore_patterns:
+    - "*.gguf"
+    - "*.bin"
