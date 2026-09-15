@@ -1,137 +1,207 @@
-"""Hybrid Retriever combining BM25 lexical search and dense semantic search with reranking."""
+"""Hybrid Retriever — BM25 + Dense + PixelRAG with Reciprocal Rank Fusion (RRF).
 
-from dataclasses import dataclass, field
+Combines results from three retrievers:
+  1. BM25 lexical retrieval
+  2. Dense semantic retrieval (FAISS + sentence-transformers)
+  3. Visual retrieval (PixelRAG tiles via CLIP)
+
+Fusion: Reciprocal Rank Fusion (RRF) — standard approach for multi-list merging.
+"""
+
 import logging
-import re
-from typing import Any, Dict, List, Optional, Tuple
-
-import numpy as np
-from rank_bm25 import BM25Okapi
-
-from tutor.rag.embeddings import DenseEmbedder
+from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class RetrievedChunk:
-    """Represents a curriculum passage with rich metadata provenance."""
+    """Dataclass representing a retrieved document chunk with provenance metadata."""
 
-    chunk_id: str
     text: str
-    score: float = 0.0
-    subject: str = "General STEM"
-    grade: int = 10
+    subject: str = ""
+    grade: Optional[int] = None
     chapter: str = ""
     topic: str = ""
-    source: str = "Curriculum"
-    license: str = "Educational CC-BY-NC"
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    source: str = ""
+    chunk_id: str = ""
+    fusion_score: float = 0.0
+    rerank_score: float = 0.0
+    page_number: Optional[int] = None
+    pdf_name: str = ""
+    visual_score: Optional[float] = None
+    tile_image_path: Optional[str] = None
+    metadata: Optional[Dict[str, Any]] = None
 
     def to_citation_text(self) -> str:
-        """Formats chunk for inclusion in LLM prompt with provenance."""
-        header = f"[{self.source} | Grade {self.grade} {self.subject} | {self.chapter} - {self.topic}]"
-        return f"{header}\n{self.text.strip()}"
+        parts = []
+        if self.subject:
+            parts.append(f"Subject: {self.subject}")
+        if self.chapter:
+            parts.append(f"Chapter: {self.chapter}")
+        if self.topic:
+            parts.append(f"Topic: {self.topic}")
+        if self.pdf_name or self.source:
+            parts.append(f"Source: {self.pdf_name or self.source}")
+        if self.page_number is not None:
+            parts.append(f"Page: {self.page_number}")
+        header = f"[{', '.join(parts)}]\n" if parts else ""
+        return f"{header}{self.text}"
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "RetrievedChunk":
+        return cls(
+            text=data.get("text", ""),
+            subject=data.get("subject", ""),
+            grade=data.get("grade"),
+            chapter=data.get("chapter", ""),
+            topic=data.get("topic", ""),
+            source=data.get("source", ""),
+            chunk_id=data.get("chunk_id", ""),
+            fusion_score=data.get("fusion_score", 0.0),
+            rerank_score=data.get("rerank_score", 0.0),
+            page_number=data.get("page_number"),
+            pdf_name=data.get("pdf_name", ""),
+            visual_score=data.get("visual_score"),
+            tile_image_path=data.get("tile_image_path"),
+            metadata=data.get("metadata"),
+        )
 
 
-class HybridRetriever:
-    """Combines BM25 lexical search with dense embeddings and reciprocal rank fusion."""
 
-    def __init__(
-        self,
-        dense_embedder: Optional[DenseEmbedder] = None,
-        use_cross_encoder: bool = False,
-    ):
-        self.dense_embedder = dense_embedder or DenseEmbedder()
-        self.use_cross_encoder = use_cross_encoder
-        self.chunks: List[RetrievedChunk] = []
-        self.bm25: Optional[BM25Okapi] = None
-        self.dense_vectors: Optional[np.ndarray] = None
-        self._reranker = None
+def reciprocal_rank_fusion(
+    result_lists: List[List[Dict[str, Any]]],
+    k: int = 60,
+    id_field: str = "chunk_id",
+) -> List[Dict[str, Any]]:
+    """Merges multiple ranked result lists using Reciprocal Rank Fusion.
 
-    @staticmethod
-    def _tokenize(text: str) -> List[str]:
-        """Simple whitespace and punctuation tokenizer for BM25."""
-        return re.findall(r"\w+", text.lower())
+    RRF score for a document d across N lists:
+        score(d) = sum_{i=1..N} 1 / (k + rank_i(d))
 
-    def index(self, chunks: List[RetrievedChunk]):
-        """Indexes a list of RetrievedChunk objects for hybrid search."""
-        self.chunks = chunks
-        if not chunks:
-            self.bm25 = None
-            self.dense_vectors = None
-            return
+    where rank_i(d) is the 1-based position of d in list i.
+    Documents not appearing in a list contribute 0 for that list.
 
-        # Build BM25 Index
-        tokenized_corpus = [self._tokenize(c.text) for c in chunks]
-        self.bm25 = BM25Okapi(tokenized_corpus)
+    Args:
+        result_lists: List of ranked result lists (each is a list of dicts).
+        k: RRF constant (higher = more weight to lower-ranked docs).
+        id_field: Field to use as unique document identifier.
 
-        # Build Dense Embeddings Index
-        texts = [c.text for c in chunks]
-        self.dense_vectors = self.dense_embedder.encode(texts, normalize_embeddings=True)
-        logger.info("Indexed %d curriculum chunks.", len(chunks))
+    Returns:
+        Merged list sorted by RRF score descending, with 'fusion_score' field.
+    """
+    rrf_scores: Dict[str, float] = defaultdict(float)
+    doc_store: Dict[str, Dict[str, Any]] = {}
 
-    def retrieve_bm25(self, query: str, top_k: int = 10) -> List[Tuple[int, float]]:
-        """Performs lexical search using BM25."""
-        if self.bm25 is None or not self.chunks:
-            return []
-        tokenized_query = self._tokenize(query)
-        scores = self.bm25.get_scores(tokenized_query)
-        top_indices = np.argsort(scores)[::-1][:top_k]
-        return [(int(idx), float(scores[idx])) for idx in top_indices if scores[idx] > 0]
+    for result_list in result_lists:
+        for rank, doc in enumerate(result_list, start=1):
+            doc_id = doc.get(id_field, "")
+            if not doc_id:
+                continue
+            rrf_scores[doc_id] += 1.0 / (k + rank)
+            if doc_id not in doc_store:
+                doc_store[doc_id] = doc
 
-    def retrieve_dense(self, query: str, top_k: int = 10) -> List[Tuple[int, float]]:
-        """Performs semantic vector search using cosine similarity."""
-        if self.dense_vectors is None or not self.chunks:
-            return []
-        query_vec = self.dense_embedder.encode(query, normalize_embeddings=True)[0]
-        scores = np.dot(self.dense_vectors, query_vec)
-        top_indices = np.argsort(scores)[::-1][:top_k]
-        return [(int(idx), float(scores[idx])) for idx in top_indices]
+    fused = []
+    for doc_id, score in sorted(rrf_scores.items(), key=lambda x: x[1], reverse=True):
+        doc = dict(doc_store[doc_id])
+        doc["fusion_score"] = round(score, 6)
+        fused.append(doc)
 
-    def retrieve_hybrid(
-        self,
-        query: str,
-        top_k_bm25: int = 10,
-        top_k_dense: int = 10,
-        top_k_final: int = 3,
-        rrf_k: int = 60,
-    ) -> List[RetrievedChunk]:
-        """Performs hybrid retrieval using Reciprocal Rank Fusion (RRF)."""
-        if not self.chunks:
-            return []
+    return fused
 
-        bm25_results = self.retrieve_bm25(query, top_k=top_k_bm25)
-        dense_results = self.retrieve_dense(query, top_k=top_k_dense)
 
-        # Reciprocal Rank Fusion (RRF)
-        rrf_scores: Dict[int, float] = {}
+def linear_fusion(
+    result_lists: List[List[Dict[str, Any]]],
+    score_fields: List[str],
+    weights: Optional[List[float]] = None,
+    id_field: str = "chunk_id",
+) -> List[Dict[str, Any]]:
+    """Linear weighted combination of normalized retrieval scores.
 
-        for rank, (idx, _) in enumerate(bm25_results):
-            rrf_scores[idx] = rrf_scores.get(idx, 0.0) + (1.0 / (rrf_k + rank + 1))
+    Args:
+        result_lists: Result lists from each retriever.
+        score_fields: Score field name for each list (e.g. 'bm25_score').
+        weights: Weight for each retriever. Defaults to equal weights.
+        id_field: Unique document ID field.
 
-        for rank, (idx, _) in enumerate(dense_results):
-            rrf_scores[idx] = rrf_scores.get(idx, 0.0) + (1.0 / (rrf_k + rank + 1))
+    Returns:
+        Merged list sorted by fusion_score descending.
+    """
+    if weights is None:
+        weights = [1.0 / len(result_lists)] * len(result_lists)
 
-        sorted_indices = sorted(rrf_scores.keys(), key=lambda i: rrf_scores[i], reverse=True)[
-            :top_k_final
-        ]
+    doc_store: Dict[str, Dict[str, Any]] = {}
+    fusion_scores: Dict[str, float] = defaultdict(float)
 
-        results = []
-        for idx in sorted_indices:
-            orig = self.chunks[idx]
-            chunk = RetrievedChunk(
-                chunk_id=orig.chunk_id,
-                text=orig.text,
-                score=rrf_scores[idx],
-                subject=orig.subject,
-                grade=orig.grade,
-                chapter=orig.chapter,
-                topic=orig.topic,
-                source=orig.source,
-                license=orig.license,
-                metadata=orig.metadata,
-            )
-            results.append(chunk)
+    for result_list, field, weight in zip(result_lists, score_fields, weights):
+        if not result_list:
+            continue
+        max_score = max(abs(d.get(field, 0.0)) for d in result_list) or 1.0
 
-        return results
+        for doc in result_list:
+            doc_id = doc.get(id_field, "")
+            if not doc_id:
+                continue
+            norm_score = doc.get(field, 0.0) / max_score
+            fusion_scores[doc_id] += weight * norm_score
+            if doc_id not in doc_store:
+                doc_store[doc_id] = doc
+
+    fused = []
+    for doc_id, score in sorted(fusion_scores.items(), key=lambda x: x[1], reverse=True):
+        doc = dict(doc_store[doc_id])
+        doc["fusion_score"] = round(score, 6)
+        fused.append(doc)
+
+    return fused
+
+
+def hybrid_retrieve(
+    query: str,
+    bm25_results: List[Dict[str, Any]],
+    dense_results: List[Dict[str, Any]],
+    visual_results: Optional[List[Dict[str, Any]]] = None,
+    fusion: str = "rrf",
+    rrf_k: int = 60,
+    final_candidates: int = 30,
+) -> List[Dict[str, Any]]:
+    """Combines results from BM25, dense, and optional visual retrieval.
+
+    Args:
+        query: The original query (for logging).
+        bm25_results: Results from BM25 search.
+        dense_results: Results from dense vector search.
+        visual_results: Results from PixelRAG visual search (optional).
+        fusion: 'rrf' or 'linear'.
+        rrf_k: RRF constant.
+        final_candidates: Maximum number of fused candidates to return.
+
+    Returns:
+        Fused and sorted candidate list with 'fusion_score'.
+    """
+    all_lists = [bm25_results, dense_results]
+    if visual_results:
+        all_lists.append(visual_results)
+
+    logger.debug(
+        "Hybrid retrieve: BM25=%d, Dense=%d, Visual=%d",
+        len(bm25_results), len(dense_results), len(visual_results or []),
+    )
+
+    if fusion == "rrf":
+        fused = reciprocal_rank_fusion(all_lists, k=rrf_k)
+    elif fusion == "linear":
+        fields = ["bm25_score", "dense_score"]
+        if visual_results:
+            fields.append("visual_score")
+        fused = linear_fusion(all_lists, score_fields=fields)
+    else:
+        logger.warning("Unknown fusion method '%s'. Falling back to RRF.", fusion)
+        fused = reciprocal_rank_fusion(all_lists, k=rrf_k)
+
+    result = fused[:final_candidates]
+    logger.debug("Hybrid fusion produced %d candidates (requested %d)", len(result), final_candidates)
+    return result
