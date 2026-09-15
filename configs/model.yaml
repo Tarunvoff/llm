@@ -27,6 +27,4 @@ download:
   repo_id: "PhysicsWallahAI/Aryabhata-2.0"
   local_dir: "model/aryabhata-2.0"
   allow_patterns: null
-  ignore_patterns:
-    - "*.gguf"
-    - "*.bin"
+  ignore_patterns: null
