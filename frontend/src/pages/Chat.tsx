@@ -189,9 +189,46 @@ export const Chat: React.FC<ChatProps> = ({ initialPrompt, onClearInitialPrompt 
                   )}
                 </div>
 
-                <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-sans">
-                  {msg.content}
-                </div>
+                {/* Message Body with Socratic Reasoning Trace support */}
+                {msg.role === 'assistant' ? (
+                  (() => {
+                    let reasoning = "";
+                    let answer = msg.content;
+                    if (msg.content.includes("assistantfinal")) {
+                      const parts = msg.content.split("assistantfinal");
+                      reasoning = parts[0].replace(/^analysis/i, "").trim();
+                      answer = parts[1].trim();
+                    } else if (msg.content.startsWith("analysis")) {
+                      const stepIdx = msg.content.indexOf("**Step");
+                      if (stepIdx !== -1) {
+                        reasoning = msg.content.substring(8, stepIdx).trim();
+                        answer = msg.content.substring(stepIdx).trim();
+                      }
+                    }
+
+                    return (
+                      <div className="space-y-3">
+                        {reasoning && (
+                          <details className="rounded-xl bg-slate-50 border border-slate-200/80 p-3 text-xs text-slate-600 transition-all">
+                            <summary className="cursor-pointer font-bold text-slate-700 hover:text-brand-600 select-none flex items-center gap-1.5">
+                              <span>🧠 Socratic Thought &amp; Strategy Trace (Click to view)</span>
+                            </summary>
+                            <div className="mt-2.5 pt-2 border-t border-slate-200 text-slate-600 leading-relaxed font-mono whitespace-pre-wrap">
+                              {reasoning}
+                            </div>
+                          </details>
+                        )}
+                        <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-sans text-slate-900">
+                          {answer}
+                        </div>
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-sans">
+                    {msg.content}
+                  </div>
+                )}
               </div>
             ))}
 
