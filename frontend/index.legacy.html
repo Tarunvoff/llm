@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aryabhata 2.0 | Best Quality STEM Reasoning &amp; AI Education</title>
+  
+  <!-- Modern Typography: Plus Jakarta Sans / Inter & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- KaTeX for LaTeX Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  
+  <!-- Marked for Markdown Parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <!-- Motion One for Smooth Spring Animations -->
+  <script src="https://cdn.jsdelivr.net/npm/motion@10.16.2/dist/motion.umd.js"></script>
+
+  <!-- Tailwind CSS Integration (Preflight disabled to preserve custom styling) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      corePlugins: {
+        preflight: false,
+      },
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f5ff',
+              100: '#e0ebff',
+              500: '#3b5bfd',
+              600: '#1d4ed8',
+              700: '#1e40af',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Chart.js for High-Contrast Benchmark Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="light-theme">
+  <!-- Top Floating Math & Doodle Particles (Subtle Light Texture) -->
+  <div id="math-ambient-layer" class="math-ambient-layer" aria-hidden="true"></div>
+
+  <!-- App Wrapper -->
+  <div class="app-layout">
+
+    <!-- ====================================================================
+         SOLID PROFESSIONAL HEADER NAVBAR (Not Transparent)
+         ==================================================================== -->
+    <header class="navbar-solid">
+      <div class="navbar-container">
+        <!-- Left: Brand Logo -->
+        <a href="#hero" class="navbar-brand">
+          <div class="brand-badge-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">Aryabhata<span class="brand-highlight">AI</span></span>
+            <span class="brand-sub">STEM REASONING LAB</span>
+          </div>
+        </a>
+
+        <!-- Center: Navigation Links & View Switchers -->
+        <nav class="navbar-menu" aria-label="Main Navigation">
+          <button class="nav-link nav-tab active" data-tab="chat-view" id="tab-chat">
+            <span>Learn &amp; Practice</span>
+          </button>
+          <a href="#browse-categories" class="nav-link">
+            <span>Subjects</span>
+          </a>
+          <a href="#learning-path" class="nav-link">
+            <span>Learning Path</span>
+          </a>
+          <a href="#bkt-mastery" class="nav-link">
+            <span>Knowledge Mastery</span>
+          </a>
+          <button class="nav-link nav-tab" data-tab="benchmarks-view" id="tab-benchmarks">
+            <span>Benchmarks</span>
+          </button>
+          <a href="#methodology" class="nav-link">
+            <span>Methodology</span>
+          </a>
+        </nav>
+
+        <!-- Right: Speed Pill, Status Pill & Yellow CTA (Dopamine Accent) -->
+        <div class="navbar-actions">
+          <div class="token-rate-pill" id="global-speed-pill" style="display: none;">
+            <span class="pulse-dot speed-pulse"></span>
+            <span id="global-speed-val">0.0 t/s</span>
+          </div>
+
+          <div class="status-badge-solid" title="Model Engine Status">
+            <span class="pulse-dot" id="status-pulse"></span>
+            <span class="badge-status" id="server-status">Connecting...</span>
+          </div>
+
+          <a href="#workspace-section" class="btn-yellow-cta" id="nav-cta-btn">
+            <span>Start Learning</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Scrollable Page -->
+    <main class="content-scroll-container">
+
+      <!-- ====================================================================
+           HERO SECTION: Clean White Educational Hero with Aryabhata
+           ==================================================================== -->
+      <section class="hero-clean" id="hero">
+        <div class="hero-grid">
+          
+          <!-- Left: Headline, Subtitle, Quick Actions -->
+          <div class="hero-copy">
+            <div class="hero-tag-pill">
+              <span class="tag-emoji">🎓</span>
+              <span>Best AI STEM Learning Platform &bull; JEE &amp; NEET 2026</span>
+            </div>
+
+            <h1 class="hero-title">
+              Getting Best Quality <br>
+              STEM Reasoning <br>
+              Is Now More <span class="highlight-doodle">Easier.</span>
+            </h1>
+
+            <p class="hero-description">
+              Personalized STEM learning powered by <strong>Aryabhata 2.0</strong> — an adaptive 20B MoE reasoning engine
+              providing Socratic guidance, step-by-step derivations, and Bayesian mastery tracking.
+            </p>
+
+            <div class="hero-cta-row">
+              <a href="#workspace-section" class="btn-hero-yellow">
+                <span>Start Learning</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+              <a href="#learning-path" class="btn-hero-video">
+                <div class="play-circle">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                </div>
+                <span>See how it works</span>
+              </a>
+            </div>
+
+            <!-- Fast Problem Input Bar -->
+            <div class="hero-fast-inquiry">
+              <div class="fast-inquiry-box">
+                <span class="inquiry-icon">⚡</span>
+                <input type="text" id="hero-quick-prompt" placeholder="Ask Aryabhata: e.g., Solve dy/dx + 2y = e^(-x)..." autocomplete="off">
+                <button class="btn-inquiry-submit" id="hero-quick-submit" title="Send problem to Aryabhata">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Aryabhata Graphic with Floating Educational Stickers -->
+          <div class="hero-visual">
+            <div class="visual-art-stage">
+              <!-- Decorative Pastel Rings & Floating Badges -->
+              <div class="art-backdrop-circle"></div>
+              
+              <div class="floating-sticker sticker-1">
+                <div class="sticker-icon bg-purple">📚</div>
+                <div class="sticker-info">
+                  <strong>JEE Advanced</strong>
+                  <span>86.51% Accuracy</span>
+                </div>
+              </div>
+
+              <div class="floating-sticker sticker-2">
+                <div class="sticker-icon bg-green">⚡</div>
+                <div class="sticker-info">
+                  <strong>Token Efficiency</strong>
+                  <span>64% Fewer Tokens</span>
+                </div>
+              </div>
+
+              <div class="floating-sticker sticker-3">
+                <div class="sticker-icon bg-orange">🎯</div>
+                <div class="sticker-info">
+                  <strong>Active Concept</strong>
+                  <span>Differentiation</span>
+                </div>
+              </div>
+
+              <!-- Aryabhata Portrait Frame (Solid, Sharp, Beautiful) -->
+              <div class="aryabhata-clean-frame">
+                <img 
+                  src="/static/assets/aryabhata.png" 
+                  alt="Aryabhata - Master Indian Mathematician and Astronomer" 
+                  class="aryabhata-clean-img"
+                />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SOLID ROYAL BLUE STATS BANNER (Direct Reference Feature)
+           ==================================================================== -->
+      <section class="royal-stats-bar">
+        <div class="stats-bar-grid">
+          <div class="stat-item">
+            <div class="stat-num">88.95%</div>
+            <div class="stat-label">In-Distribution Average</div>
+          </div>
+          <div class="stat-divider"></div>
+
+          <div class="stat-item">
+            <div class="stat-num">2,102</div>
+            <div class="stat-label">Average Output Tokens</div>
+          </div>
+          <div class="stat-divider"></div>
+
+          <div class="stat-item">
+            <div class="stat-num">42.31</div>
+            <div class="stat-label">Accuracy / 1K Tokens</div>
+          </div>
+          <div class="stat-divider"></div>
+
+          <div class="stat-item">
+            <div class="stat-num">20B MoE</div>
+            <div class="stat-label">Mixture-of-Experts Engine</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           BROWSE STEM SUBJECTS (High Dopamine Colorful Category Cards)
+           ==================================================================== -->
+      <section class="section-padded bg-light" id="browse-categories">
+        <div class="section-container">
+          <div class="section-header-clean">
+            <div class="badge-tag-pill">CURATED CURRICULUM</div>
+            <h2 class="section-heading-clean">Browse STEM Reasoning by Domain</h2>
+            <p class="section-subtext-clean">Interactive personalized problem solving calibrated to national competitive exams.</p>
+          </div>
+
+          <div class="categories-grid">
+            <div class="category-card">
+              <div class="category-icon-box bg-purple-soft">
+                <span>📐</span>
+              </div>
+              <h3 class="category-title">Calculus &amp; Algebra</h3>
+              <p class="category-desc">Differential equations, limits, matrices &amp; quadratic roots with step-by-step proofs.</p>
+              <span class="category-link">Practice Math →</span>
+            </div>
+
+            <div class="category-card">
+              <div class="category-icon-box bg-blue-soft">
+                <span>⚡</span>
+              </div>
+              <h3 class="category-title">Mechanics &amp; Physics</h3>
+              <p class="category-desc">Kinematics, rotational dynamics, electromagnetism &amp; work-energy theorems.</p>
+              <span class="category-link">Practice Physics →</span>
+            </div>
+
+            <div class="category-card">
+              <div class="category-icon-box bg-green-soft">
+                <span>🧪</span>
+              </div>
+              <h3 class="category-title">Chemical Reasoning</h3>
+              <p class="category-desc">Thermodynamics, chemical equilibrium, organic reaction mechanisms &amp; stoichiometry.</p>
+              <span class="category-link">Practice Chemistry →</span>
+            </div>
+
+            <div class="category-card">
+              <div class="category-icon-box bg-orange-soft">
+                <span>💡</span>
+              </div>
+              <h3 class="category-title">Socratic Scaffolding</h3>
+              <p class="category-desc">Self-discovery hints without answer dumping to build real intuition and understanding.</p>
+              <span class="category-link">Learn How →</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           MAIN WORKSPACE: PROFESSIONAL SQUARE CHAT INTERFACE (Solid, Not Transparent)
+           ==================================================================== -->
+      <section class="section-padded" id="workspace-section">
+        <div class="section-container">
+
+          <div class="section-header-clean">
+            <div class="badge-tag-pill">INTERACTIVE AI TUTOR</div>
+            <h2 class="section-heading-clean">Your Personal Learning Workspace</h2>
+            <p class="section-subtext-clean">Engage with Aryabhata 2.0. Clean, professional, structured reasoning.</p>
+          </div>
+
+          <!-- DUAL WORKSPACE: Profile + Square Chatbox -->
+          <div class="workspace-square-layout">
+            
+            <!-- LEFT: Student Learning Profile (Solid Professional Card) -->
+            <aside class="sidebar-square" id="sidebar">
+              <div class="profile-square-card">
+                
+                <div class="profile-avatar-row">
+                  <div class="profile-avatar-square">
+                    <span>S</span>
+                  </div>
+                  <div class="profile-identity">
+                    <h3 class="student-name">Student Learner</h3>
+                    <span class="student-track">JEE Advanced Track</span>
+                  </div>
+                </div>
+
+                <!-- Learning Streak Banner -->
+                <div class="streak-card-clean">
+                  <span class="streak-flame">🔥</span>
+                  <div class="streak-text">
+                    <strong>5-Day Active Streak</strong>
+                    <span>14 STEM concepts practiced</span>
+                  </div>
+                </div>
+
+                <!-- Overall Mastery Gauge -->
+                <div class="metric-clean-block">
+                  <div class="metric-clean-header">
+                    <span>Overall Mastery</span>
+                    <strong class="text-royal">78%</strong>
+                  </div>
+                  <div class="progress-track-clean">
+                    <div class="progress-fill-clean" style="width: 78%;"></div>
+                  </div>
+                </div>
+
+                <!-- Detailed Parameters -->
+                <div class="specs-clean-list">
+                  <div class="specs-clean-row">
+                    <span class="spec-label">Target Exam</span>
+                    <strong class="spec-value">JEE Advanced '26</strong>
+                  </div>
+                  <div class="specs-clean-row">
+                    <span class="spec-label">Subject Domain</span>
+                    <strong class="spec-value">Mathematics</strong>
+                  </div>
+                  <div class="specs-clean-row">
+                    <span class="spec-label">Active Concept</span>
+                    <strong class="spec-value text-royal">Differentiation</strong>
+                  </div>
+                  <div class="specs-clean-row">
+                    <span class="spec-label">Reasoning Engine</span>
+                    <strong class="spec-value">Aryabhata 2.0 (20B)</strong>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="profile-square-actions">
+                  <button class="btn-square-action btn-new-chat" id="btn-new-chat" title="New reasoning problem">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>New Session</span>
+                  </button>
+                  <button class="btn-square-action btn-clear" id="btn-clear-chat" title="Clear conversation log">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Clear</span>
+                  </button>
+                </div>
+
+              </div>
+            </aside>
+
+            <!-- RIGHT: SOLID PROFESSIONAL SQUARE CHATBOX (Not Transparent!) -->
+            <div class="chatbox-square-wrapper">
+              <div class="chatbox-square" id="chat-view">
+                
+                <!-- Chat Header (Solid, Crisp) -->
+                <div class="chatbox-header-solid">
+                  <div class="chatbox-title-box">
+                    <div class="tutor-square-icon">
+                      <img src="/static/assets/aryabhata.png" alt="Aryabhata Icon" width="30" height="30" />
+                    </div>
+                    <div>
+                      <h3 class="chatbox-title">Ask Aryabhata</h3>
+                      <p class="chatbox-sub">Your personal STEM reasoning tutor &bull; Socratic derivations</p>
+                    </div>
+                  </div>
+
+                  <!-- Quick Strategy Action Pills -->
+                  <div class="strategy-pills-row">
+                    <button class="pill-strategy btn-hint" data-action="hint">💡 Show Hint</button>
+                    <button class="pill-strategy btn-example" data-action="example">📐 Give Example</button>
+                    <button class="pill-strategy btn-explain" data-action="explain">🔍 Explain Again</button>
+                    <button class="pill-strategy btn-practice" data-action="practice">🎯 Practice This</button>
+                  </div>
+                </div>
+
+                <!-- Messages Thread Scroll Area -->
+                <div class="chat-messages" id="chat-messages">
+                  <!-- Welcome Hero Card (Preserved ID) -->
+                  <div class="welcome-card welcome-square" id="welcome-card">
+                    <div class="welcome-chip">
+                      <span>✨ Namaste! Welcome to Aryabhata Reasoning Lab</span>
+                    </div>
+                    <h4 class="welcome-square-title">What problem would you like to solve?</h4>
+                    <p class="welcome-square-desc">
+                      Type any high-school or competitive mathematics, physics, or chemistry problem.
+                      Aryabhata guides your thinking step-by-step without giving away answers immediately.
+                    </p>
+
+                    <!-- Example Starter Buttons (Clean White Cards) -->
+                    <div class="example-prompts-clean">
+                      <button class="example-btn card-starter" data-prompt="Solve the differential equation dy/dx + 2y = e^(-x) with y(0) = 1. Provide step-by-step reasoning.">
+                        <div class="starter-icon bg-blue-soft">∫</div>
+                        <div class="starter-body">
+                          <span class="starter-title">Differential Equations</span>
+                          <span class="starter-formula">$\frac{dy}{dx} + 2y = e^{-x},\; y(0)=1$</span>
+                        </div>
+                      </button>
+
+                      <button class="example-btn card-starter" data-prompt="Can you explain the chain rule and how to differentiate composite functions like f(g(x))?">
+                        <div class="starter-icon bg-purple-soft">∂</div>
+                        <div class="starter-body">
+                          <span class="starter-title">Chain Rule Derivations</span>
+                          <span class="starter-formula">$\frac{d}{dx}[f(g(x))] = f'(g(x))g'(x)$</span>
+                        </div>
+                      </button>
+
+                      <button class="example-btn card-starter" data-prompt="A particle moves along the x-axis with acceleration a(t) = 6t - 2. If v(0)=3 and x(0)=5, find position x(t).">
+                        <div class="starter-icon bg-green-soft">Δ</div>
+                        <div class="starter-body">
+                          <span class="starter-title">Kinematics &amp; Motion</span>
+                          <span class="starter-formula">$a(t) = 6t - 2,\; v(0)=3,\; x(0)=5$</span>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Chat Input (Solid White Box, Not Transparent) -->
+                <div class="chat-input-solid-box">
+                  <form class="chat-form-solid" id="chat-form">
+                    <textarea
+                      id="prompt-input"
+                      placeholder="Type your STEM problem or show your step-by-step calculation (Shift+Enter for newline)..."
+                      rows="1"
+                      required
+                    ></textarea>
+                    <button type="submit" class="btn-solid-submit" id="btn-send" title="Send to Aryabhata">
+                      <span>Solve Problem</span>
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </button>
+                  </form>
+                  <div class="input-note-clean">
+                    <span>Mathematical formulas auto-rendered in LaTeX $\dots$ and boxed answers in $\boxed{\dots}$</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <!-- VIEW PANEL 2: BENCHMARKS TAB (Preserved ID) -->
+          <div class="view-panel" id="benchmarks-view">
+            <!-- Dynamically switched or scrolled -->
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           ADAPTIVE LEARNING SECTION ("Your Learning Path" - Prerequisite DAG)
+           ==================================================================== -->
+      <section class="section-padded bg-light" id="learning-path">
+        <div class="section-container">
+          <div class="section-header-clean">
+            <div class="badge-tag-pill">CURRICULUM PREREQUISITE GRAPH</div>
+            <h2 class="section-heading-clean">Your Adaptive Learning Path</h2>
+            <p class="section-subtext-clean">Deterministic sequencing powered by Prerequisite Knowledge DAG. Master fundamentals before tackling advanced calculus.</p>
+          </div>
+
+          <div class="dag-white-card">
+            <div class="dag-nodes-row">
+              
+              <div class="dag-step-item node-mastered">
+                <div class="step-status-chip chip-green">Mastered</div>
+                <div class="step-circle circle-green">✓</div>
+                <strong class="step-name">Algebra</strong>
+                <span class="step-detail">Foundations</span>
+              </div>
+
+              <div class="step-arrow-line line-green"></div>
+
+              <div class="dag-step-item node-mastered">
+                <div class="step-status-chip chip-green">Mastered</div>
+                <div class="step-circle circle-green">✓</div>
+                <strong class="step-name">Functions</strong>
+                <span class="step-detail">Mappings &amp; Graphs</span>
+              </div>
+
+              <div class="step-arrow-line line-green"></div>
+
+              <div class="dag-step-item node-mastered">
+                <div class="step-status-chip chip-green">Mastered</div>
+                <div class="step-circle circle-green">✓</div>
+                <strong class="step-name">Limits</strong>
+                <span class="step-detail">Continuity</span>
+              </div>
+
+              <div class="step-arrow-line line-blue"></div>
+
+              <div class="dag-step-item node-active">
+                <div class="step-status-chip chip-blue">Active Focus</div>
+                <div class="step-circle circle-blue">⚡</div>
+                <strong class="step-name">Differentiation</strong>
+                <span class="step-detail">Chain &amp; Product Rule</span>
+              </div>
+
+              <div class="step-arrow-line line-gray"></div>
+
+              <div class="dag-step-item node-locked">
+                <div class="step-status-chip chip-gray">Locked</div>
+                <div class="step-circle circle-gray">🔒</div>
+                <strong class="step-name">Integration</strong>
+                <span class="step-detail">Definite Integrals</span>
+              </div>
+
+            </div>
+
+            <!-- Invariant Note -->
+            <div class="callout-clean-box">
+              <span class="callout-icon-badge">💡</span>
+              <p class="callout-desc">
+                <strong>Architectural Invariant:</strong> Student mastery is measured deterministically via Bayesian Knowledge Tracing. The Prerequisite DAG selects what to learn next. Aryabhata 2.0 explains the selected concept without writing to learner state directly.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           BKT KNOWLEDGE MASTERY ANALYTICS
+           ==================================================================== -->
+      <section class="section-padded" id="bkt-mastery">
+        <div class="section-container">
+          <div class="section-header-clean">
+            <div class="badge-tag-pill">BAYESIAN TRACING</div>
+            <h2 class="section-heading-clean">Knowledge Mastery Probabilities</h2>
+            <p class="section-subtext-clean">Mastery is estimated using deterministic Bayesian Knowledge Tracing formulas: prior $P(L_0)$, transition $P(T)$, guess $P(G)$, and slip $P(S)$.</p>
+          </div>
+
+          <div class="mastery-white-grid">
+            
+            <div class="mastery-white-card">
+              <div class="mastery-head">
+                <strong class="concept-title">Differentiation</strong>
+                <span class="score-badge text-blue-bg">82%</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill bg-blue" style="width: 82%;"></div>
+              </div>
+              <div class="mastery-footer">
+                <span>Status: In Progress</span>
+                <span>Consecutive Success: 2</span>
+              </div>
+            </div>
+
+            <div class="mastery-white-card">
+              <div class="mastery-head">
+                <strong class="concept-title">Limits &amp; Continuity</strong>
+                <span class="score-badge text-green-bg">91%</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill bg-green" style="width: 91%;"></div>
+              </div>
+              <div class="mastery-footer">
+                <span>Status: Mastered (&gt;85%)</span>
+                <span>Consecutive Success: 5</span>
+              </div>
+            </div>
+
+            <div class="mastery-white-card">
+              <div class="mastery-head">
+                <strong class="concept-title">Inverse Functions</strong>
+                <span class="score-badge text-amber-bg">74%</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill bg-amber" style="width: 74%;"></div>
+              </div>
+              <div class="mastery-footer">
+                <span>Status: Needs Practice</span>
+                <span>Prerequisite for Calculus</span>
+              </div>
+            </div>
+
+            <div class="mastery-white-card">
+              <div class="mastery-head">
+                <strong class="concept-title">Integration by Parts</strong>
+                <span class="score-badge text-gray-bg">43%</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill bg-orange" style="width: 43%;"></div>
+              </div>
+              <div class="mastery-footer">
+                <span>Status: Locked</span>
+                <span>Requires Diff &ge; 85%</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           MODEL BENCHMARKS DASHBOARD
+           ==================================================================== -->
+      <section class="section-padded bg-light" id="model-benchmarks">
+        <div class="section-container">
+          <div class="section-header-clean">
+            <div class="badge-tag-pill">EMPIRICAL BENCHMARKS</div>
+            <h2 class="section-heading-clean">Aryabhata 2.0 Benchmarks</h2>
+            <p class="section-subtext-clean">Evaluated on JEE and NEET STEM reasoning benchmarks alongside international mathematics Olympiads.</p>
+          </div>
+
+          <!-- Top Benchmark KPI Cards -->
+          <div class="benchmark-kpis-clean">
+            <div class="kpi-white-card">
+              <div class="kpi-top">
+                <span class="kpi-title">IN-DISTRIBUTION AVG</span>
+                <span class="kpi-tag tag-green">Competitive #1</span>
+              </div>
+              <div class="kpi-figure">88.95<span class="kpi-pct">%</span></div>
+              <div class="kpi-caption">JEE Advanced, NEET &amp; JEE Main</div>
+            </div>
+
+            <div class="kpi-white-card">
+              <div class="kpi-top">
+                <span class="kpi-title">AVERAGE OUTPUT TOKENS</span>
+                <span class="kpi-tag tag-blue">High Efficiency</span>
+              </div>
+              <div class="kpi-figure">2,102<span class="kpi-pct">tokens</span></div>
+              <div class="kpi-caption">64% fewer tokens than base model</div>
+            </div>
+
+            <div class="kpi-white-card kpi-highlight-clean">
+              <div class="kpi-top">
+                <span class="kpi-title">ACCURACY / 1K TOKENS</span>
+                <span class="kpi-tag tag-yellow">Industry Best</span>
+              </div>
+              <div class="kpi-figure">42.31<span class="kpi-pct">ratio</span></div>
+              <div class="kpi-caption">Best token-to-accuracy ratio</div>
+            </div>
+          </div>
+
+          <!-- Interactive Benchmark Chart (Chart.js on White Canvas) -->
+          <div class="chart-card-white">
+            <div class="chart-top-bar">
+              <div>
+                <h3 class="chart-heading">Model Comparison Benchmark Curve</h3>
+                <p class="chart-sub">Pass@1 Mean Accuracy (%) across Competitive Exams &amp; International Reasoning</p>
+              </div>
+              <button class="btn-sync-benchmarks" id="btn-refresh-benchmarks" title="Sync live benchmark data">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                <span>Sync Live Metrics</span>
+              </button>
+            </div>
+            <div class="chart-container-white">
+              <canvas id="benchmark-chart" height="150"></canvas>
+            </div>
+          </div>
+
+          <!-- In-Dist & Out-of-Dist Tables (Clean White Bordered Data Tables) -->
+          <div class="tables-clean-grid">
+            
+            <div class="table-card-white">
+              <div class="table-card-head">
+                <span class="table-badge badge-blue">IN-DISTRIBUTION</span>
+                <h4 class="table-heading-text">Competitive Exam Benchmarks (Pass@1 %)</h4>
+              </div>
+              <div class="table-responsive">
+                <table class="bench-table-clean">
+                  <thead>
+                    <tr>
+                      <th>Model</th>
+                      <th>JEE Adv.</th>
+                      <th>NEET</th>
+                      <th>JEE '25</th>
+                      <th>JEE '26</th>
+                      <th>Average</th>
+                    </tr>
+                  </thead>
+                  <tbody id="in-dist-table-body">
+                    <!-- Populated dynamically by app.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="table-card-white">
+              <div class="table-card-head">
+                <span class="table-badge badge-purple">OUT-OF-DISTRIBUTION</span>
+                <h4 class="table-heading-text">General Reasoning Benchmarks (Pass@1 %)</h4>
+              </div>
+              <div class="table-responsive">
+                <table class="bench-table-clean">
+                  <thead>
+                    <tr>
+                      <th>Model</th>
+                      <th>AIME</th>
+                      <th>HMMT</th>
+                      <th>GPQA</th>
+                      <th>MMLU-Pro</th>
+                      <th>Average</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ood-table-body">
+                    <!-- Populated dynamically by app.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Evaluation Transparency Note -->
+          <div class="notice-clean-card">
+            <span class="notice-icon">📊</span>
+            <p class="notice-text">
+              <strong>Evaluation Note:</strong> Aryabhata 2.0 achieves competitive STEM benchmark accuracy while using substantially fewer reported output tokens than its GPT-OSS-20B base model. All figures reflect official 4-sample mean Pass@1 results.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           BENCHMARK METHODOLOGY ("How We Evaluate Aryabhata")
+           ==================================================================== -->
+      <section class="section-padded" id="methodology">
+        <div class="section-container">
+          <div class="section-header-clean">
+            <div class="badge-tag-pill">SCIENTIFIC PROTOCOL</div>
+            <h2 class="section-heading-clean">How We Evaluate Aryabhata</h2>
+            <p class="section-subtext-clean">A standardized, reproducible pipeline from raw question to deterministic correctness verification.</p>
+          </div>
+
+          <!-- 6-Stage Methodology Flow Cards -->
+          <div class="methodology-cards-row">
+            <div class="method-card">
+              <div class="method-step-num text-blue">01</div>
+              <strong class="method-title">Benchmark Dataset</strong>
+              <p class="method-desc">Curated competition papers from <strong>JEE Main</strong>, <strong>JEE Advanced</strong>, and <strong>NEET</strong>.</p>
+            </div>
+
+            <div class="method-arrow">→</div>
+
+            <div class="method-card">
+              <div class="method-step-num text-purple">02</div>
+              <strong class="method-title">Question Input</strong>
+              <p class="method-desc">Standard prompt feeding without answer clues or test leakage.</p>
+            </div>
+
+            <div class="method-arrow">→</div>
+
+            <div class="method-card">
+              <div class="method-step-num text-royal">03</div>
+              <strong class="method-title">Aryabhata 2.0</strong>
+              <p class="method-desc">20B MoE generation with causal reasoning chain and intermediate proofs.</p>
+            </div>
+
+            <div class="method-arrow">→</div>
+
+            <div class="method-card">
+              <div class="method-step-num text-green">04</div>
+              <strong class="method-title">Generated Answer</strong>
+              <p class="method-desc">Complete solution terminating with final answer in <code>\boxed{}</code>.</p>
+            </div>
+
+            <div class="method-arrow">→</div>
+
+            <div class="method-card">
+              <div class="method-step-num text-amber">05</div>
+              <strong class="method-title">Answer Verification</strong>
+              <p class="method-desc">Deterministic parsing and numerical/symbolic equivalence checks.</p>
+            </div>
+
+            <div class="method-arrow">→</div>
+
+            <div class="method-card card-method-highlight">
+              <div class="method-step-num text-royal">06</div>
+              <strong class="method-title">Accuracy Metric</strong>
+              <p class="method-desc">Pass@1 across 4 trials + exact token latency logging.</p>
+            </div>
+          </div>
+
+          <!-- Local Evaluation Runs Container (Preserved ID) -->
+          <div class="local-runs-clean-card">
+            <div class="local-clean-head">
+              <span class="table-badge badge-green">LOCAL EVALUATION RUNS</span>
+              <h4 class="table-heading-text">Host Server Benchmarks</h4>
+            </div>
+            <div id="local-benchmarks-container">
+              <div class="empty-state-clean" id="empty-local-state">
+                <div class="empty-icon-clean">📁</div>
+                <p class="empty-title-clean">No local benchmark results available.</p>
+                <span class="empty-sub-clean">To evaluate on local datasets, run: <code>python scripts/run_benchmark.py --dataset path/to/data.jsonl</code></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="methodology-note-footer">
+            <span>Benchmark figures are based on the evaluation methodology and results reported in the Aryabhata 2.0 model documentation.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Clean White Footer -->
+      <footer class="footer-clean">
+        <div class="footer-clean-container">
+          <div class="footer-left-info">
+            <strong>ARYABHATA 2.0 &bull; STEM REASONING AI</strong>
+            <p>Empowering students with adaptive Socratic AI education inspired by the spirit of Aryabhata.</p>
+          </div>
+          <div class="footer-right-link">
+            <a href="#hero" class="btn-back-top">Back to top ↑</a>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

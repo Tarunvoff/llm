@@ -111,11 +111,17 @@ def benchmarks_endpoint():
 
 # Serve Frontend
 frontend_dir = Path("frontend").resolve()
+dist_dir = frontend_dir / "dist"
+if dist_dir.exists() and (dist_dir / "assets").exists():
+    app.mount("/assets", StaticFiles(directory=str(dist_dir / "assets")), name="assets")
+
 if frontend_dir.exists():
     app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static")
 
     @app.get("/")
     def serve_root():
+        if dist_dir.exists() and (dist_dir / "index.html").exists():
+            return FileResponse(str(dist_dir / "index.html"))
         index_file = frontend_dir / "index.html"
         if index_file.exists():
             return FileResponse(str(index_file))
