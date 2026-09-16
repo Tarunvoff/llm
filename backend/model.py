@@ -103,7 +103,7 @@ class ModelEngine:
         dtype_str = model_cfg.get("torch_dtype", "bfloat16")
         device_map = model_cfg.get("device_map", "auto")
         trust_remote_code = model_cfg.get("trust_remote_code", True)
-        load_in_4bit = os.getenv("LOAD_IN_4BIT", "").lower() in ["1", "true", "yes"] or model_cfg.get("load_in_4bit", False)
+        load_in_4bit = os.getenv("LOAD_IN_4BIT", "").lower() in ["1", "true", "yes"] or model_cfg.get("load_in_4bit", True)
         load_in_8bit = os.getenv("LOAD_IN_8BIT", "").lower() in ["1", "true", "yes"] or model_cfg.get("load_in_8bit", False)
         torch_dtype = self._get_torch_dtype(dtype_str)
 
@@ -133,7 +133,6 @@ class ModelEngine:
                         bnb_4bit_compute_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
                         bnb_4bit_quant_type="nf4",
                         bnb_4bit_use_double_quant=True,
-                        llm_int8_enable_fp32_cpu_offload=True
                     )
                 except ImportError:
                     print("[WARNING] bitsandbytes is not installed. Falling back to default precision.")
@@ -143,7 +142,6 @@ class ModelEngine:
                     from transformers import BitsAndBytesConfig
                     model_kwargs["quantization_config"] = BitsAndBytesConfig(
                         load_in_8bit=True,
-                        llm_int8_enable_fp32_cpu_offload=True
                     )
                 except ImportError:
                     print("[WARNING] bitsandbytes is not installed. Falling back to default precision.")
@@ -168,7 +166,7 @@ class ModelEngine:
                 self.model = self.model.to("cpu")
                 self.device = "cpu"
             else:
-                self.device = str(self.model.device) if hasattr(self.model, "device") else "cuda"
+                self.device = str(next(self.model.parameters()).device) if hasattr(self.model, "parameters") else "cuda"
 
             self.is_loaded = True
             print(f"[INFO] Model successfully loaded on device: {self.device}")
@@ -220,25 +218,44 @@ class ModelEngine:
             text = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in formatted_messages]) + "\nAssistant:"
             encoded = self.tokenizer(text, return_tensors="pt")
 
-        device = self.model.device if hasattr(self.model, "device") else ("cuda" if torch.cuda.is_available() else "cpu")
+        try:
+            device = next(self.model.parameters()).device if hasattr(self.model, "parameters") else ("cuda" if torch.cuda.is_available() else "cpu")
+        except Exception:
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+
         input_ids, attention_mask = prepare_inputs(encoded, device=device)
         input_token_count = input_ids.shape[-1]
 
-        start_time = time.perf_counter()
-        with torch.no_grad():
-            gen_kwargs = {
-                "input_ids": input_ids,
-                "attention_mask": attention_mask,
-                "max_new_tokens": max_tokens,
-                "pad_token_id": self.tokenizer.eos_token_id if self.tokenizer.eos_token_id is not None else 0
-            }
-            if do_sample and temp > 0:
-                gen_kwargs["do_sample"] = True
-                gen_kwargs["temperature"] = temp
-            else:
-                gen_kwargs["do_sample"] = False
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
-            outputs = self.model.generate(**gen_kwargs)
+        start_time = time.perf_counter()
+        try:
+            with torch.no_grad():
+                gen_kwargs = {
+                    "input_ids": input_ids,
+                    "attention_mask": attention_mask,
+                    "max_new_tokens": max_tokens,
+                    "pad_token_id": self.tokenizer.eos_token_id if self.tokenizer.eos_token_id is not None else 0
+                }
+                if do_sample and temp > 0:
+                    gen_kwargs["do_sample"] = True
+                    gen_kwargs["temperature"] = temp
+                else:
+                    gen_kwargs["do_sample"] = False
+
+                outputs = self.model.generate(**gen_kwargs)
+        except Exception as gen_err:
+            print(f"[ERROR] Generation failed: {gen_err}", file=sys.stderr)
+            return {
+                "response": f"⚠️ Inference error: {str(gen_err)}",
+                "input_tokens": input_token_count,
+                "output_tokens": 0,
+                "generation_time": 0.0,
+                "tokens_per_sec": 0.0,
+                "error": str(gen_err)
+            }
+
         end_time = time.perf_counter()
 
         generation_time = max(end_time - start_time, 1e-6)

@@ -3,7 +3,9 @@ FastAPI Server Entrypoint
 Hosts STEM Chat API and serves static frontend application.
 """
 
+import json
 import os
+import traceback
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import List, Optional
@@ -116,30 +118,39 @@ def chat_endpoint(request: ChatRequest):
                 detail=f"Remote NVIDIA server error at {REMOTE_SERVER_URL}: {str(e)}"
             )
 
-    engine = ModelEngine.get_instance()
+    try:
+        engine = ModelEngine.get_instance()
 
-    conversation = []
-    if request.messages:
-        conversation = [{"role": m.role, "content": m.content} for m in request.messages]
-    elif request.message:
-        conversation = [{"role": "user", "content": request.message}]
-    else:
-        raise HTTPException(status_code=400, detail="Either 'message' or 'messages' must be provided.")
+        conversation = []
+        if request.messages:
+            conversation = [{"role": m.role, "content": m.content} for m in request.messages]
+        elif request.message:
+            conversation = [{"role": "user", "content": request.message}]
+        else:
+            raise HTTPException(status_code=400, detail="Either 'message' or 'messages' must be provided.")
 
-    result = engine.generate(
-        messages=conversation,
-        max_new_tokens=request.max_tokens,
-        temperature=request.temperature
-    )
+        result = engine.generate(
+            messages=conversation,
+            max_new_tokens=request.max_tokens,
+            temperature=request.temperature
+        )
 
-    return ChatResponse(
-        response=result["response"],
-        generation_time=result["generation_time"],
-        input_tokens=result["input_tokens"],
-        output_tokens=result["output_tokens"],
-        tokens_per_sec=result["tokens_per_sec"],
-        error=result.get("error")
-    )
+        return ChatResponse(
+            response=result["response"],
+            generation_time=result["generation_time"],
+            input_tokens=result["input_tokens"],
+            output_tokens=result["output_tokens"],
+            tokens_per_sec=result["tokens_per_sec"],
+            error=result.get("error")
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Inference error: {str(e)}"
+        )
 
 
 @app.get("/benchmarks")
