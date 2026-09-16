@@ -103,6 +103,8 @@ class ModelEngine:
         dtype_str = model_cfg.get("torch_dtype", "bfloat16")
         device_map = model_cfg.get("device_map", "auto")
         trust_remote_code = model_cfg.get("trust_remote_code", True)
+        load_in_4bit = os.getenv("LOAD_IN_4BIT", "").lower() in ["1", "true", "yes"] or model_cfg.get("load_in_4bit", False)
+        load_in_8bit = os.getenv("LOAD_IN_8BIT", "").lower() in ["1", "true", "yes"] or model_cfg.get("load_in_8bit", False)
         torch_dtype = self._get_torch_dtype(dtype_str)
 
         print(f"[INFO] Initializing tokenizer from: {self.model_path}")
@@ -112,25 +114,34 @@ class ModelEngine:
                 trust_remote_code=trust_remote_code
             )
 
-            print(f"[INFO] Initializing model from: {self.model_path} (dtype: {torch_dtype})")
+            print(f"[INFO] Initializing model from: {self.model_path} (dtype: {torch_dtype}, 4-bit: {load_in_4bit}, 8-bit: {load_in_8bit})")
             if not torch.cuda.is_available():
                 device_map = None
                 torch_dtype = torch.float32
 
             model_kwargs = {
                 "device_map": device_map,
-                "trust_remote_code": trust_remote_code
+                "trust_remote_code": trust_remote_code,
+                "low_cpu_mem_usage": True
             }
+
+            if load_in_4bit:
+                model_kwargs["load_in_4bit"] = True
+            elif load_in_8bit:
+                model_kwargs["load_in_8bit"] = True
+            else:
+                model_kwargs["torch_dtype"] = torch_dtype
+
             try:
                 self.model = AutoModelForCausalLM.from_pretrained(
                     self.model_path,
-                    dtype=torch_dtype,
                     **model_kwargs
                 )
             except TypeError:
+                if "load_in_4bit" not in model_kwargs and "load_in_8bit" not in model_kwargs:
+                    model_kwargs["dtype"] = torch_dtype
                 self.model = AutoModelForCausalLM.from_pretrained(
                     self.model_path,
-                    torch_dtype=torch_dtype,
                     **model_kwargs
                 )
 

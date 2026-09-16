@@ -34,7 +34,7 @@ def get_torch_dtype(dtype_str: str) -> torch.dtype:
     return torch.float32
 
 
-def load_model_and_tokenizer(model_dir: str, config: dict):
+def load_model_and_tokenizer(model_dir: str, config: dict, load_in_4bit: bool = False, load_in_8bit: bool = False):
     model_cfg = config.get("model", {})
     dtype_str = model_cfg.get("torch_dtype", "bfloat16")
     device_map = model_cfg.get("device_map", "auto")
@@ -48,7 +48,7 @@ def load_model_and_tokenizer(model_dir: str, config: dict):
         trust_remote_code=trust_remote_code
     )
 
-    print(f"Loading model weights from: {model_dir} (dtype: {torch_dtype}, device_map: {device_map})")
+    print(f"Loading model weights from: {model_dir} (dtype: {torch_dtype}, device_map: {device_map}, 4-bit: {load_in_4bit}, 8-bit: {load_in_8bit})")
     
     # Respect CUDA_VISIBLE_DEVICES without hardcoding GPUs
     if not torch.cuda.is_available():
@@ -57,19 +57,28 @@ def load_model_and_tokenizer(model_dir: str, config: dict):
 
     model_kwargs = {
         "device_map": device_map,
-        "trust_remote_code": trust_remote_code
+        "trust_remote_code": trust_remote_code,
+        "low_cpu_mem_usage": True
     }
-    # Pass torch_dtype / dtype
+
+    if load_in_4bit:
+        model_kwargs["load_in_4bit"] = True
+    elif load_in_8bit:
+        model_kwargs["load_in_8bit"] = True
+    else:
+        model_kwargs["torch_dtype"] = torch_dtype
+
     try:
         model = AutoModelForCausalLM.from_pretrained(
             model_dir,
-            dtype=torch_dtype,
             **model_kwargs
         )
     except TypeError:
+        # Fallback if torch_dtype needs to be explicit
+        if "load_in_4bit" not in model_kwargs and "load_in_8bit" not in model_kwargs:
+            model_kwargs["dtype"] = torch_dtype
         model = AutoModelForCausalLM.from_pretrained(
             model_dir,
-            torch_dtype=torch_dtype,
             **model_kwargs
         )
 
@@ -204,6 +213,16 @@ def main():
         default=None,
         help="Maximum generation tokens."
     )
+    parser.add_argument(
+        "--load-in-4bit",
+        action="store_true",
+        help="Load model in 4-bit quantization (~11 GB VRAM) to fit into smaller GPUs."
+    )
+    parser.add_argument(
+        "--load-in-8bit",
+        action="store_true",
+        help="Load model in 8-bit quantization (~22 GB VRAM)."
+    )
     args = parser.parse_args()
 
     config = load_config(args.config)
@@ -219,7 +238,12 @@ def main():
         print(f"[ERROR] Model directory '{model_dir}' not found. Please run 'python scripts/download_model.py' first.", file=sys.stderr)
         sys.exit(1)
 
-    model, tokenizer = load_model_and_tokenizer(model_dir, config)
+    model, tokenizer = load_model_and_tokenizer(
+        model_dir=model_dir,
+        config=config,
+        load_in_4bit=args.load_in_4bit or model_cfg.get("load_in_4bit", False),
+        load_in_8bit=args.load_in_8bit or model_cfg.get("load_in_8bit", False)
+    )
 
     result = run_inference(
         model=model,
