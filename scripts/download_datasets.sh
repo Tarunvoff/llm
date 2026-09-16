@@ -6,7 +6,7 @@
 # datasets directly to the server under the designated dataset directory.
 #
 # Usage:
-#   bash scripts/download_datasets.sh [TARGET_DIR]
+#   bash scripts/download_datasets.sh
 #   bash scripts/download_datasets.sh dataset
 #   DATASET_DIR=/data/storage/dataset bash scripts/download_datasets.sh
 #
@@ -16,10 +16,16 @@
 
 set -Eeuo pipefail
 
-# Configuration
-DATASET_DIR="${1:-${DATASET_DIR:-dataset}}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Parse arguments: If the first argument starts with '--', use default DATASET_DIR
+if [ $# -gt 0 ] && [[ "$1" != --* ]]; then
+    DATASET_DIR="$1"
+    shift
+else
+    DATASET_DIR="${DATASET_DIR:-dataset}"
+fi
 
 # Colors for terminal output
 BOLD='\033[1m'
@@ -37,10 +43,35 @@ echo -e "Target Dir   : ${DATASET_DIR}"
 echo -e "Date/Time    : $(date '+%Y-%m-%d %H:%M:%S')"
 echo -e "${BOLD}${BLUE}==============================================================================${NC}"
 
-# Ensure python and datasets library are present
+# ==============================================================================
+# Python & Virtual Environment Resolution (PEP 668 safe)
+# ==============================================================================
+
+VENV_DIR="${PROJECT_ROOT}/.venv"
 PYTHON_CMD="python3"
-if ! command -v python3 &>/dev/null; then
-    if command -v python &>/dev/null; then
+
+# 1. Check if an existing virtual environment is active
+if [ -n "${VIRTUAL_ENV:-}" ] && [ -f "${VIRTUAL_ENV}/bin/python" ]; then
+    PYTHON_CMD="${VIRTUAL_ENV}/bin/python"
+    echo -e "${GREEN}Using active virtual environment:${NC} ${VIRTUAL_ENV}"
+# 2. Check if .venv exists in project root
+elif [ -f "${PROJECT_ROOT}/.venv/bin/python" ]; then
+    PYTHON_CMD="${PROJECT_ROOT}/.venv/bin/python"
+    echo -e "${GREEN}Using existing project virtualenv:${NC} ${PROJECT_ROOT}/.venv"
+# 3. Check if venv exists in project root
+elif [ -f "${PROJECT_ROOT}/venv/bin/python" ]; then
+    PYTHON_CMD="${PROJECT_ROOT}/venv/bin/python"
+    echo -e "${GREEN}Using existing project virtualenv:${NC} ${PROJECT_ROOT}/venv"
+else
+    # 4. Attempt to create project .venv to avoid PEP 668 externally-managed-environment errors
+    echo -e "${YELLOW}No active virtual environment found. Setting up '${VENV_DIR}'...${NC}"
+    if python3 -m venv "${VENV_DIR}" 2>/dev/null; then
+        PYTHON_CMD="${VENV_DIR}/bin/python"
+        echo -e "${GREEN}✓ Created virtual environment:${NC} ${VENV_DIR}"
+    elif command -v python3 &>/dev/null; then
+        PYTHON_CMD="python3"
+        echo -e "${YELLOW}Could not create venv automatically. Falling back to system python3.${NC}"
+    elif command -v python &>/dev/null; then
         PYTHON_CMD="python"
     else
         echo -e "${RED}ERROR: Python is not installed or not in PATH.${NC}" >&2
@@ -48,10 +79,26 @@ if ! command -v python3 &>/dev/null; then
     fi
 fi
 
-# Verify 'datasets' library
+# Ensure datasets and dependencies are installed
 if ! "$PYTHON_CMD" -c "import datasets" &>/dev/null; then
-    echo -e "${YELLOW}Warning: 'datasets' package not found. Attempting installation...${NC}"
-    "$PYTHON_CMD" -m pip install --upgrade datasets huggingface_hub pyarrow
+    echo -e "${YELLOW}Installing required Python dependencies (datasets, huggingface_hub, pyarrow)...${NC}"
+    
+    PIP_CMD=""
+    if [ -f "$(dirname "$PYTHON_CMD")/pip" ]; then
+        PIP_CMD="$(dirname "$PYTHON_CMD")/pip"
+    elif [ -f "$(dirname "$PYTHON_CMD")/pip3" ]; then
+        PIP_CMD="$(dirname "$PYTHON_CMD")/pip3"
+    fi
+
+    if [ -n "$PIP_CMD" ]; then
+        "$PIP_CMD" install --upgrade datasets huggingface_hub pyarrow
+    else
+        # Try standard pip install, or fall back to --break-system-packages if on PEP 668 system python
+        if ! "$PYTHON_CMD" -m pip install --upgrade datasets huggingface_hub pyarrow 2>/dev/null; then
+            echo -e "${YELLOW}Retrying pip install with --break-system-packages flag...${NC}"
+            "$PYTHON_CMD" -m pip install --upgrade datasets huggingface_hub pyarrow --break-system-packages
+        fi
+    fi
 fi
 
 # Create target directories under dataset folder
