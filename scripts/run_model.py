@@ -62,9 +62,26 @@ def load_model_and_tokenizer(model_dir: str, config: dict, load_in_4bit: bool = 
     }
 
     if load_in_4bit:
-        model_kwargs["load_in_4bit"] = True
+        try:
+            from transformers import BitsAndBytesConfig
+            model_kwargs["quantization_config"] = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_use_double_quant=True
+            )
+        except ImportError:
+            print("[WARNING] bitsandbytes is not installed. Installing or falling back to default precision.")
+            model_kwargs["torch_dtype"] = torch_dtype
     elif load_in_8bit:
-        model_kwargs["load_in_8bit"] = True
+        try:
+            from transformers import BitsAndBytesConfig
+            model_kwargs["quantization_config"] = BitsAndBytesConfig(
+                load_in_8bit=True
+            )
+        except ImportError:
+            print("[WARNING] bitsandbytes is not installed. Falling back to default precision.")
+            model_kwargs["torch_dtype"] = torch_dtype
     else:
         model_kwargs["torch_dtype"] = torch_dtype
 
@@ -73,9 +90,8 @@ def load_model_and_tokenizer(model_dir: str, config: dict, load_in_4bit: bool = 
             model_dir,
             **model_kwargs
         )
-    except TypeError:
-        # Fallback if torch_dtype needs to be explicit
-        if "load_in_4bit" not in model_kwargs and "load_in_8bit" not in model_kwargs:
+    except TypeError as te:
+        if "dtype" not in model_kwargs and "quantization_config" not in model_kwargs:
             model_kwargs["dtype"] = torch_dtype
         model = AutoModelForCausalLM.from_pretrained(
             model_dir,
