@@ -65,8 +65,26 @@ class ChatResponse(BaseModel):
     error: Optional[str] = None
 
 
+REMOTE_SERVER_URL = os.getenv("REMOTE_SERVER_URL", "").rstrip("/")
+
+
 @app.get("/health")
 def health_check():
+    if REMOTE_SERVER_URL:
+        try:
+            import urllib.request
+            with urllib.request.urlopen(f"{REMOTE_SERVER_URL}/health", timeout=5) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                data["remote_proxy"] = True
+                data["remote_url"] = REMOTE_SERVER_URL
+                return data
+        except Exception as e:
+            return {
+                "status": "warning",
+                "message": f"Could not reach remote server at {REMOTE_SERVER_URL}: {e}",
+                "remote_proxy": True
+            }
+
     engine = ModelEngine.get_instance()
     return {
         "status": "ok",
@@ -78,6 +96,26 @@ def health_check():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat_endpoint(request: ChatRequest):
+    # If configured with a remote NVIDIA server URL, forward request
+    if REMOTE_SERVER_URL:
+        try:
+            import urllib.request
+            req_data = json.dumps(request.dict()).encode("utf-8")
+            remote_req = urllib.request.Request(
+                f"{REMOTE_SERVER_URL}/chat",
+                data=req_data,
+                headers={"Content-Type": "application/json"}
+            )
+            with urllib.request.urlopen(remote_req, timeout=120) as resp:
+                remote_json = json.loads(resp.read().decode("utf-8"))
+                return ChatResponse(**remote_json)
+        except Exception as e:
+            print(f"[ERROR] Remote inference error on {REMOTE_SERVER_URL}: {e}")
+            raise HTTPException(
+                status_code=502,
+                detail=f"Remote NVIDIA server error at {REMOTE_SERVER_URL}: {str(e)}"
+            )
+
     engine = ModelEngine.get_instance()
 
     conversation = []
