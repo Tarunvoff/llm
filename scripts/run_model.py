@@ -48,6 +48,16 @@ def load_model_and_tokenizer(model_dir: str, config: dict, load_in_4bit: bool = 
         trust_remote_code=trust_remote_code
     )
 
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        print("\n=== GPU Memory Status ===")
+        for i in range(torch.cuda.device_count()):
+            free_b, total_b = torch.cuda.mem_get_info(i)
+            print(f"  GPU {i} ({torch.cuda.get_device_name(i)}): {free_b / 1e9:.2f} GB free / {total_b / 1e9:.2f} GB total")
+        print("=========================\n")
+    else:
+        print("[INFO] No CUDA GPU detected, running on CPU.")
+
     print(f"Loading model weights from: {model_dir} (dtype: {torch_dtype}, device_map: {device_map}, 4-bit: {load_in_4bit}, 8-bit: {load_in_8bit})")
     
     # Respect CUDA_VISIBLE_DEVICES without hardcoding GPUs
