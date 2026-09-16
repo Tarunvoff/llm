@@ -2,9 +2,8 @@
 # Startup script for Vidhya LLM Inference Server on NVIDIA DGX
 set -e
 
-# Target clean GPU 7 with 140 GB free VRAM (or use env var if provided)
+# Target clean GPU 7 with 140 GB free VRAM
 export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-7}
-export LOAD_IN_4BIT=1
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 # Use port 5208 by default (or custom port)

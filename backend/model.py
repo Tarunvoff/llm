@@ -51,23 +51,6 @@ def prepare_inputs(encoded, device="cpu"):
     return input_ids.to(device), attention_mask.to(device)
 
 
-def find_best_gpu() -> int:
-    """Find the GPU ID with the most free VRAM."""
-    if not torch.cuda.is_available():
-        return 0
-    best_gpu = 0
-    max_free = 0
-    for i in range(torch.cuda.device_count()):
-        try:
-            free_mem, _ = torch.cuda.mem_get_info(i)
-            if free_mem > max_free:
-                max_free = free_mem
-                best_gpu = i
-        except Exception:
-            pass
-    return best_gpu
-
-
 class ModelEngine:
     _instance: Optional["ModelEngine"] = None
 
@@ -120,8 +103,20 @@ class ModelEngine:
         dtype_str = model_cfg.get("torch_dtype", "bfloat16")
         device_map = model_cfg.get("device_map", "auto")
         trust_remote_code = model_cfg.get("trust_remote_code", True)
-        load_in_4bit = os.getenv("LOAD_IN_4BIT", "1").lower() in ["1", "true", "yes"] or model_cfg.get("load_in_4bit", True)
-        load_in_8bit = os.getenv("LOAD_IN_8BIT", "").lower() in ["1", "true", "yes"] or model_cfg.get("load_in_8bit", False)
+        
+        # Check environment overrides for 4-bit / 8-bit
+        env_4bit = os.getenv("LOAD_IN_4BIT")
+        if env_4bit is not None:
+            load_in_4bit = env_4bit.lower() in ["1", "true", "yes"]
+        else:
+            load_in_4bit = model_cfg.get("load_in_4bit", False)
+
+        env_8bit = os.getenv("LOAD_IN_8BIT")
+        if env_8bit is not None:
+            load_in_8bit = env_8bit.lower() in ["1", "true", "yes"]
+        else:
+            load_in_8bit = model_cfg.get("load_in_8bit", False)
+
         torch_dtype = self._get_torch_dtype(dtype_str)
 
         print(f"[INFO] Initializing tokenizer from: {self.model_path}")
@@ -136,21 +131,14 @@ class ModelEngine:
                 torch_dtype = torch.float32
                 load_in_4bit = False
                 load_in_8bit = False
-            else:
-                # Auto-detect the best GPU with maximum free memory if using default auto device_map
-                if device_map == "auto" and "CUDA_VISIBLE_DEVICES" not in os.environ:
-                    best_gpu = find_best_gpu()
-                    free_gb, total_gb = torch.cuda.mem_get_info(best_gpu)
-                    print(f"[INFO] Auto-selected GPU {best_gpu} with {free_gb / (1024**3):.1f} GB free VRAM (total: {total_gb / (1024**3):.1f} GB)")
-                    device_map = {"": best_gpu}
 
-            print(f"[INFO] Initializing model from: {self.model_path} (dtype: {torch_dtype}, 4-bit: {load_in_4bit}, 8-bit: {load_in_8bit})")
+            print(f"[INFO] Initializing model from: {self.model_path} (dtype: {torch_dtype}, device_map: {device_map}, 4-bit: {load_in_4bit}, 8-bit: {load_in_8bit})")
 
             model_kwargs = {
-                "device_map": device_map,
                 "trust_remote_code": trust_remote_code,
-                "low_cpu_mem_usage": True
             }
+            if device_map is not None:
+                model_kwargs["device_map"] = device_map
 
             if load_in_4bit:
                 try:
@@ -160,7 +148,6 @@ class ModelEngine:
                         bnb_4bit_compute_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
                         bnb_4bit_quant_type="nf4",
                         bnb_4bit_use_double_quant=True,
-                        llm_int8_enable_fp32_cpu_offload=True
                     )
                 except ImportError:
                     print("[WARNING] bitsandbytes is not installed. Falling back to default precision.")
@@ -170,7 +157,6 @@ class ModelEngine:
                     from transformers import BitsAndBytesConfig
                     model_kwargs["quantization_config"] = BitsAndBytesConfig(
                         load_in_8bit=True,
-                        llm_int8_enable_fp32_cpu_offload=True
                     )
                 except ImportError:
                     print("[WARNING] bitsandbytes is not installed. Falling back to default precision.")
@@ -195,7 +181,10 @@ class ModelEngine:
                 self.model = self.model.to("cpu")
                 self.device = "cpu"
             else:
-                self.device = str(next(self.model.parameters()).device) if hasattr(self.model, "parameters") else "cuda"
+                try:
+                    self.device = str(next(self.model.parameters()).device)
+                except Exception:
+                    self.device = "cuda"
 
             self.is_loaded = True
             print(f"[INFO] Model successfully loaded on device: {self.device}")
@@ -248,7 +237,7 @@ class ModelEngine:
             encoded = self.tokenizer(text, return_tensors="pt")
 
         try:
-            device = next(self.model.parameters()).device if hasattr(self.model, "parameters") else ("cuda" if torch.cuda.is_available() else "cpu")
+            device = next(self.model.parameters()).device
         except Exception:
             device = "cuda" if torch.cuda.is_available() else "cpu"
 
