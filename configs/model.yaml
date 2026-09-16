@@ -4,6 +4,7 @@ model:
   torch_dtype: "bfloat16"
   device_map: "auto"
   trust_remote_code: true
+  load_in_4bit: true
   max_model_len: 16384
 
 generation:
