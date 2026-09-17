@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from typing import List
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.api.auth import get_current_user
@@ -47,7 +47,6 @@ def get_dashboard_summary(
             if item.is_completed:
                 completed_count += 1
     else:
-        # Fallback default plan items if none in DB
         plan_items = [
             StudyPlanItemOut(id="p1", time="08:00", subject="Biology", topic="Cell Division (Mitosis & Meiosis)", duration_min=45, activity_type="Study", is_completed=True),
             StudyPlanItemOut(id="p2", time="10:30", subject="Physics", topic="Kinematics Problem Set", duration_min=60, activity_type="Practice", is_completed=False),
@@ -94,7 +93,6 @@ def get_dashboard_summary(
     revision_due: List[RevisionDueOut] = []
     now = datetime.now(timezone.utc)
     for r in db_revisions:
-        # Determine due label
         delta = (r.due_date.replace(tzinfo=timezone.utc) if r.due_date.tzinfo is None else r.due_date) - now
         if delta.days <= 0:
             due_str = "Due Today"
@@ -119,8 +117,6 @@ def get_dashboard_summary(
             RevisionDueOut(id="r3", topic="Markovnikov Rule Exceptions", subject="Chemistry", due_text="Tomorrow", interval_stage=2),
         ]
         
-    # AI Recommendation
-    # Find most frequent mistake topic if any
     top_mistake = db.query(Mistake).filter(Mistake.user_id == current_user.id, Mistake.is_resolved == False).first()
     if top_mistake:
         ai_rec = AIRecommendationOut(
@@ -153,3 +149,22 @@ def get_dashboard_summary(
         accuracy_percentage=accuracy,
         questions_solved=questions_solved
     )
+
+@router.post("/tasks/{task_id}/toggle")
+def toggle_task_completion(
+    task_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    item = (
+        db.query(StudyPlanItem)
+        .join(StudyPlan, StudyPlanItem.plan_id == StudyPlan.id)
+        .filter(StudyPlanItem.id == task_id, StudyPlan.user_id == current_user.id)
+        .first()
+    )
+    if not item:
+        raise HTTPException(status_code=404, detail="Study plan task not found")
+        
+    item.is_completed = not item.is_completed
+    db.commit()
+    return {"status": "success", "task_id": item.id, "is_completed": item.is_completed}

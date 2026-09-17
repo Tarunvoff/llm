@@ -12,6 +12,8 @@ from app.api.auth import seed_initial_user_data, router as auth_router
 from app.api.dashboard import router as dashboard_router
 from app.api.tutor import router as tutor_router
 from app.api.documents import router as documents_router
+from app.api.curriculum import router as curriculum_router
+from app.api.profile import router as profile_router
 from app.api.quizzes import router as quizzes_router
 from app.api.mistakes import router as mistakes_router
 from app.api.revision import router as revision_router
@@ -27,7 +29,6 @@ def init_db():
     logger.info("Initializing database tables...")
     Base.metadata.create_all(bind=engine)
     
-    # Check if default demo user exists
     db: Session = SessionLocal()
     try:
         demo_user = db.query(User).filter(User.email == "student@intellitutor.ai").first()
@@ -94,6 +95,8 @@ app.include_router(auth_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
 app.include_router(tutor_router, prefix="/api")
 app.include_router(documents_router, prefix="/api")
+app.include_router(curriculum_router, prefix="/api")
+app.include_router(profile_router, prefix="/api")
 app.include_router(quizzes_router, prefix="/api")
 app.include_router(mistakes_router, prefix="/api")
 app.include_router(revision_router, prefix="/api")

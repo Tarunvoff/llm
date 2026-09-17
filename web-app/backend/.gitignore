@@ -8,6 +8,7 @@ __pycache__/
 *.sqlite
 *.sqlite3
 intellitutor.db
+uploads/
 
 # Environment variables
 .env

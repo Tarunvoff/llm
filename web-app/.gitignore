@@ -17,6 +17,7 @@ __pycache__/
 *.sqlite
 *.sqlite3
 intellitutor.db
+uploads/
 .pytest_cache/
 .coverage
 htmlcov/

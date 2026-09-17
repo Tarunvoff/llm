@@ -35,6 +35,48 @@ export interface AuthResponse {
   };
 }
 
+export interface DocumentItem {
+  id: string;
+  title: string;
+  subject: string;
+  chapter: string;
+  pages: number;
+  size: string;
+  status: string;
+  extracted_topics: string[];
+  created_at: string;
+  last_accessed: string;
+}
+
+export interface Citation {
+  document_title: string;
+  page: number;
+  excerpt: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  explanation_mode?: string;
+  citations?: Citation[];
+  related_topics?: string[];
+  recommended_action?: {
+    title: string;
+    type: string;
+  };
+  created_at?: string;
+}
+
+export interface ConversationItem {
+  id: string;
+  title: string;
+  subject: string;
+  topic?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface DashboardSummary {
   user_name: string;
   target_exam: string;
@@ -76,7 +118,7 @@ export interface DashboardSummary {
 }
 
 export class ApiClient {
-  private static getToken(): string | null {
+  public static getToken(): string | null {
     if (typeof window === "undefined") return null;
     return localStorage.getItem("intellitutor_token");
   }
@@ -84,9 +126,12 @@ export class ApiClient {
   private static async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = this.getToken();
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
       ...(options.headers as Record<string, string>),
     };
+
+    if (!(options.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
 
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
@@ -111,6 +156,7 @@ export class ApiClient {
     return res.json();
   }
 
+  // --- Auth & User ---
   static async register(data: { email: string; password: string; full_name: string }): Promise<AuthResponse> {
     return this.request<AuthResponse>("/auth/register", {
       method: "POST",
@@ -129,22 +175,160 @@ export class ApiClient {
     return this.request<User>("/auth/me");
   }
 
-  static async completeOnboarding(data: {
-    full_name?: string;
-    target_exam: string;
-    selected_subjects: string[];
-    target_exam_date?: string;
-    daily_study_hours: number;
-    confidence_level: string;
-    explanation_preference: string;
-  }): Promise<User> {
+  static async completeOnboarding(data: any): Promise<User> {
     return this.request<User>("/auth/onboarding", {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
+  static async updateProfile(data: Partial<UserProfile> & { full_name?: string }): Promise<User> {
+    return this.request<User>("/profile", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
+  // --- Dashboard ---
   static async getDashboard(): Promise<DashboardSummary> {
     return this.request<DashboardSummary>("/dashboard");
+  }
+
+  static async toggleTask(taskId: string): Promise<{ status: string; is_completed: boolean }> {
+    return this.request<{ status: string; is_completed: boolean }>(`/dashboard/tasks/${taskId}/toggle`, {
+      method: "POST",
+    });
+  }
+
+  // --- Study Library ---
+  static async getDocuments(subject?: string): Promise<{ documents: DocumentItem[] }> {
+    const query = subject && subject !== "All" ? `?subject=${encodeURIComponent(subject)}` : "";
+    return this.request<{ documents: DocumentItem[] }>(`/documents${query}`);
+  }
+
+  static async uploadDocument(formData: FormData): Promise<any> {
+    return this.request<any>("/documents/upload", {
+      method: "POST",
+      body: formData,
+    });
+  }
+
+  static async getDocumentDetails(documentId: string): Promise<any> {
+    return this.request<any>(`/documents/${documentId}`);
+  }
+
+  static async deleteDocument(documentId: string): Promise<any> {
+    return this.request<any>(`/documents/${documentId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // --- AI Tutor & Conversations ---
+  static async getConversations(): Promise<{ conversations: ConversationItem[] }> {
+    return this.request<{ conversations: ConversationItem[] }>("/tutor/conversations");
+  }
+
+  static async createConversation(title: string, subject: string, topic?: string): Promise<ConversationItem> {
+    return this.request<ConversationItem>("/tutor/conversations", {
+      method: "POST",
+      body: JSON.stringify({ title, subject, topic }),
+    });
+  }
+
+  static async getConversationDetails(conversationId: string): Promise<{
+    id: string;
+    title: string;
+    subject: string;
+    topic?: string;
+    messages: ChatMessage[];
+  }> {
+    return this.request<any>(`/tutor/conversations/${conversationId}`);
+  }
+
+  static async sendTutorChat(data: {
+    conversation_id?: string;
+    prompt: string;
+    explanation_mode: string;
+    subject?: string;
+  }): Promise<{ conversation_id: string; message: ChatMessage }> {
+    return this.request<any>("/tutor/chat", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async streamTutorChat(
+    data: { conversation_id?: string; prompt: string; explanation_mode: string; subject?: string },
+    callbacks: {
+      onInit?: (data: { conversation_id: string; citations: Citation[] }) => void;
+      onChunk?: (chunk: string) => void;
+      onDone?: (messageId: string) => void;
+      onError?: (err: any) => void;
+    }
+  ) {
+    const token = this.getToken();
+    try {
+      const res = await fetch(`${API_BASE}/tutor/stream`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status}: ${res.statusText}`);
+      }
+
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("Stream response body reader unavailable");
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const jsonStr = line.slice(6).trim();
+            if (jsonStr) {
+              const event = JSON.parse(jsonStr);
+              if (event.type === "init" && callbacks.onInit) {
+                callbacks.onInit(event);
+              } else if (event.type === "chunk" && callbacks.onChunk) {
+                callbacks.onChunk(event.content);
+              } else if (event.type === "done" && callbacks.onDone) {
+                callbacks.onDone(event.message_id);
+              }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      if (callbacks.onError) callbacks.onError(err);
+    }
+  }
+
+  static async analyzeDiagram(formData: FormData): Promise<{ status: string; analysis: string }> {
+    return this.request<{ status: string; analysis: string }>("/tutor/analyze-image", {
+      method: "POST",
+      body: formData,
+    });
+  }
+
+  // --- Curriculum Hierarchy ---
+  static async getCurriculumExams(): Promise<{ exams: any[] }> {
+    return this.request<{ exams: any[] }>("/curriculum/exams");
+  }
+
+  static async getCurriculumSubjects(exam: string = "NEET"): Promise<{ exam: string; subjects: any[] }> {
+    return this.request<{ exam: string; subjects: any[] }>(`/curriculum/subjects?exam=${encodeURIComponent(exam)}`);
   }
 }

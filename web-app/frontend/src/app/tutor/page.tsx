@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   Bot,
@@ -14,6 +15,9 @@ import {
   FileText,
   CheckCircle2,
   ChevronDown,
+  Image as ImageIcon,
+  X,
+  Plus,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
@@ -21,95 +25,200 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-
-interface ChatMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  citations?: Array<{ title: string; page: number; excerpt: string }>;
-  relatedTopics?: string[];
-  recommendedAction?: { title: string; type: string };
-}
+import { ApiClient, ChatMessage, Citation, ConversationItem } from "@/lib/api";
 
 export default function TutorPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "m1",
-      role: "user",
-      content: "Explain Kirchhoff's current and voltage laws with competitive exam tips and common pitfalls.",
-    },
-    {
-      id: "m2",
-      role: "assistant",
-      content:
-        "### Kirchhoff's Circuit Laws\n\n" +
-        "**1. Kirchhoff's Current Law (KCL) — Junction Rule**\n" +
-        "• **Statement**: The algebraic sum of currents entering any node (junction) is zero ($\\sum I = 0$).\n" +
-        "• **Conservation Principle**: Conservation of electric charge.\n\n" +
-        "**2. Kirchhoff's Voltage Law (KVL) — Loop Rule**\n" +
-        "• **Statement**: The algebraic sum of potential differences around any closed circuit loop is zero ($\\sum V = 0$).\n" +
-        "• **Conservation Principle**: Conservation of energy.\n\n" +
-        "**Key Exam Pitfall & Tip**:\n" +
-        "When writing loop equations with capacitors and inductors, assign consistent sign conventions: going from $(-)$ to $(+)$ across a battery is $+E$, but traversing a resistor in the direction of current is $-IR$. For bridge circuits, prefer **Nodal Analysis** at the central junction to avoid three coupled loop equations.",
-      citations: [
-        {
-          title: "NCERT Physics Class 12 (Part 1)",
-          page: 102,
-          excerpt: "KCL reflects charge conservation at junction nodes.",
-        },
-      ],
-      relatedTopics: ["Nodal Analysis", "Wheatstone Bridge", "Superposition Theorem"],
-      recommendedAction: {
-        title: "Solve 3 Diagnostic KCL/KVL Problems",
-        type: "practice",
-      },
-    },
-  ]);
-
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
+  const [activeConvId, setActiveConvId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputPrompt, setInputPrompt] = useState("");
   const [explanationMode, setExplanationMode] = useState("Exam-oriented");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [activeCitation, setActiveCitation] = useState<Citation | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
-  const handleSend = () => {
-    if (!inputPrompt.trim()) return;
-    const userMsg: ChatMessage = {
-      id: Date.now().toString(),
-      role: "user",
-      content: inputPrompt,
-    };
-    setMessages((prev) => [...prev, userMsg]);
-    setInputPrompt("");
-    setIsLoading(true);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const chatBottomRef = useRef<HTMLDivElement>(null);
 
-    setTimeout(() => {
-      const assistantMsg: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: `### Pedagogical Analysis (${explanationMode} Mode)\n\nRegarding your question on **${userMsg.content}**:\n\n1. **Fundamental Principle**: Isolate the primary governing equation before substituting values.\n2. **Diagnostic Check**: Check whether any non-conservative forces (like friction) do work.\n3. **Quick Shortcut**: Dimensional analysis rules out 2 of the 4 standard exam options immediately.\n\nWould you like a diagnostic question to verify your understanding?`,
-        citations: [
-          {
-            title: "Physics Problem Solving Guide",
-            page: 45,
-            excerpt: "Energy conservation applies when non-conservative work is zero.",
-          },
-        ],
-        relatedTopics: ["Conservation of Energy", "Work-Energy Theorem"],
-        recommendedAction: {
-          title: "Generate Quick Quiz",
-          type: "practice",
+  const fetchConversations = async () => {
+    try {
+      const res = await ApiClient.getConversations();
+      setConversations(res.conversations);
+      if (res.conversations.length > 0 && !activeConvId) {
+        setActiveConvId(res.conversations[0].id);
+      }
+    } catch (err) {
+      console.error("Failed to load conversations:", err);
+    }
+  };
+
+  const loadMessages = async (convId: string) => {
+    try {
+      const res = await ApiClient.getConversationDetails(convId);
+      setMessages(res.messages);
+    } catch (err) {
+      console.error("Failed to load conversation details:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchConversations();
+  }, []);
+
+  useEffect(() => {
+    if (activeConvId) {
+      loadMessages(activeConvId);
+    } else {
+      // Default initial message if empty
+      setMessages([
+        {
+          id: "initial-1",
+          role: "assistant",
+          content:
+            "### Welcome to your Socratic AI Study Coach\n\n" +
+            "I am initialized with your syllabus knowledge and uploaded notes. Ask a question, paste a problem, or upload a circuit/geometry diagram.\n\n" +
+            "• **Socratic Scaffolding**: I will guide you with diagnostic hints.\n" +
+            "• **Grounded Citations**: Explanations cite your uploaded textbook pages.\n" +
+            "• **Custom Pedagogy**: Switch explanation styles above anytime.",
+          related_topics: ["Mechanics", "Electrostatics", "Organic Chemistry"],
         },
+      ]);
+    }
+  }, [activeConvId]);
+
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const handleNewSession = async () => {
+    try {
+      const newConv = await ApiClient.createConversation("New Study Session", "Physics");
+      setConversations((prev) => [newConv, ...prev]);
+      setActiveConvId(newConv.id);
+      setMessages([
+        {
+          id: "init",
+          role: "assistant",
+          content: "What concept or problem would you like to explore together today?",
+        },
+      ]);
+    } catch (err) {
+      console.error("Failed to create conversation:", err);
+    }
+  };
+
+  const handleSend = async () => {
+    if (!inputPrompt.trim() || isStreaming) return;
+    const userText = inputPrompt;
+    setInputPrompt("");
+
+    const userMsg: ChatMessage = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: userText,
+      explanation_mode: explanationMode,
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setIsStreaming(true);
+
+    const tempAsstId = `asst-${Date.now()}`;
+    let accumulatedText = "";
+    let currentCitations: Citation[] = [];
+
+    // Add empty placeholder assistant message
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: tempAsstId,
+        role: "assistant",
+        content: "",
+        explanation_mode: explanationMode,
+        citations: [],
+      },
+    ]);
+
+    await ApiClient.streamTutorChat(
+      {
+        conversation_id: activeConvId || undefined,
+        prompt: userText,
+        explanation_mode: explanationMode,
+        subject: "Physics",
+      },
+      {
+        onInit: (data) => {
+          if (!activeConvId && data.conversation_id) {
+            setActiveConvId(data.conversation_id);
+            fetchConversations();
+          }
+          currentCitations = data.citations || [];
+        },
+        onChunk: (chunk) => {
+          accumulatedText += chunk;
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === tempAsstId
+                ? {
+                    ...m,
+                    content: accumulatedText,
+                    citations: currentCitations,
+                  }
+                : m
+            )
+          );
+        },
+        onDone: (messageId) => {
+          setIsStreaming(false);
+          fetchConversations();
+        },
+        onError: (err) => {
+          console.error("Streaming error:", err);
+          setIsStreaming(false);
+        },
+      }
+    );
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("prompt", "Analyze this educational diagram, identify the physical principles, and guide me step-by-step.");
+
+    try {
+      const res = await ApiClient.analyzeDiagram(formData);
+      const userImgMsg: ChatMessage = {
+        id: `img-user-${Date.now()}`,
+        role: "user",
+        content: `[Attached Diagram: ${file.name}]`,
       };
-      setMessages((prev) => [...prev, assistantMsg]);
-      setIsLoading(false);
-    }, 600);
+      const asstImgMsg: ChatMessage = {
+        id: `img-asst-${Date.now()}`,
+        role: "assistant",
+        content: res.analysis,
+      };
+      setMessages((prev) => [...prev, userImgMsg, asstImgMsg]);
+    } catch (err: any) {
+      alert(err.message || "Failed to analyze image");
+    } finally {
+      setIsUploadingImage(false);
+      if (imageInputRef.current) imageInputRef.current.value = "";
+    }
+  };
+
+  const handleQuickAction = (actionText: string) => {
+    setInputPrompt(actionText);
   };
 
   const quickActions = [
     "Explain simpler",
     "Give realistic example",
     "Give practice question",
-    "Show formula sheet",
-    "Test me on this",
+    "Show formula derivation",
+    "Test me on this topic",
   ];
 
   return (
@@ -119,26 +228,41 @@ export default function TutorPage() {
         <div className="hidden lg:flex flex-col border border-ink-800/80 rounded-lg bg-ink-900/60 p-3 space-y-3">
           <div className="flex items-center justify-between px-1">
             <span className="text-xs font-semibold uppercase tracking-wider text-ink-400 font-mono">
-              Sessions
+              Study Sessions
             </span>
-            <Button variant="ghost" size="sm" className="text-[11px] h-6 px-2 text-academic-400">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleNewSession}
+              className="text-[11px] h-6 px-2 text-academic-400 hover:text-academic-300"
+            >
               + New
             </Button>
           </div>
 
           <div className="space-y-1 overflow-y-auto flex-1">
-            <div className="p-2.5 rounded-md bg-ink-800/90 border border-ink-700/50 text-xs font-medium text-white space-y-1">
-              <p className="truncate">Kirchhoff's Laws & Loops</p>
-              <p className="text-[10px] text-academic-400 font-mono">Physics · 2 min ago</p>
-            </div>
-            <div className="p-2.5 rounded-md text-xs text-ink-400 hover:text-ink-200 hover:bg-ink-800/40 cursor-pointer space-y-1">
-              <p className="truncate">Rotational Angular Momentum</p>
-              <p className="text-[10px] text-ink-500 font-mono">Physics · Yesterday</p>
-            </div>
-            <div className="p-2.5 rounded-md text-xs text-ink-400 hover:text-ink-200 hover:bg-ink-800/40 cursor-pointer space-y-1">
-              <p className="truncate">Markovnikov Addition</p>
-              <p className="text-[10px] text-ink-500 font-mono">Chemistry · 2d ago</p>
-            </div>
+            {conversations.length > 0 ? (
+              conversations.map((c) => (
+                <div
+                  key={c.id}
+                  onClick={() => setActiveConvId(c.id)}
+                  className={`p-2.5 rounded-md text-xs cursor-pointer transition-colors space-y-1 ${
+                    activeConvId === c.id
+                      ? "bg-ink-800 text-white font-medium border border-ink-700/60"
+                      : "text-ink-400 hover:text-ink-200 hover:bg-ink-800/40"
+                  }`}
+                >
+                  <p className="truncate font-medium">{c.title}</p>
+                  <p className="text-[10px] text-academic-400 font-mono">
+                    {c.subject} · {c.topic || "Session"}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="p-4 text-center text-xs text-ink-500 font-mono">
+                No previous sessions.
+              </div>
+            )}
           </div>
         </div>
 
@@ -150,7 +274,7 @@ export default function TutorPage() {
               <Bot className="h-4 w-4 text-academic-400" />
               <span className="text-xs font-semibold text-ink-100">Socratic AI Tutor</span>
               <Badge variant="academic" className="text-[10px] font-mono">
-                Gemini Powered
+                Gemini RAG Active
               </Badge>
             </div>
 
@@ -192,33 +316,43 @@ export default function TutorPage() {
                       : "bg-ink-950/90 border border-ink-800/90 text-ink-200 leading-relaxed"
                   }`}
                 >
-                  <div className="whitespace-pre-line">{msg.content}</div>
+                  <div className="whitespace-pre-line font-sans">{msg.content || (isStreaming ? "Thinking..." : "")}</div>
 
-                  {/* Citations Excerpt */}
+                  {/* Grounded Citations Excerpt Trigger */}
                   {msg.citations && msg.citations.length > 0 && (
                     <div className="p-2.5 rounded bg-ink-900 border border-ink-800 space-y-1 text-[11px] text-ink-300">
-                      <div className="flex items-center gap-1 text-academic-400 font-mono text-[10px]">
-                        <FileText className="h-3 w-3" />
-                        <span>Source Citation · {msg.citations[0].title} (p. {msg.citations[0].page})</span>
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-1 text-academic-400 font-mono text-[10px]">
+                          <FileText className="h-3 w-3" />
+                          Source Citation · {msg.citations[0].document_title} (p. {msg.citations[0].page})
+                        </span>
+                        <button
+                          onClick={() => setActiveCitation(msg.citations![0])}
+                          className="text-[10px] text-academic-400 font-semibold underline hover:text-white"
+                        >
+                          View Excerpt →
+                        </button>
                       </div>
-                      <p className="italic text-ink-400">"{msg.citations[0].excerpt}"</p>
+                      <p className="italic text-ink-400 line-clamp-2">"{msg.citations[0].excerpt}"</p>
                     </div>
                   )}
 
-                  {/* Recommended Next Action */}
-                  {msg.recommendedAction && (
+                  {/* Recommended Action */}
+                  {msg.recommended_action && (
                     <div className="pt-1 flex items-center justify-between border-t border-ink-800/60 text-[11px]">
-                      <span className="text-academic-400 font-medium">{msg.recommendedAction.title}</span>
-                      <Button variant="outline" size="sm" className="h-6 text-[10px] px-2 border-academic-700/60 text-academic-300">
-                        Launch Practice →
-                      </Button>
+                      <span className="text-academic-400 font-medium">{msg.recommended_action.title}</span>
+                      <Link href="/practice">
+                        <Button variant="outline" size="sm" className="h-6 text-[10px] px-2 border-academic-700/60 text-academic-300">
+                          Launch Practice →
+                        </Button>
+                      </Link>
                     </div>
                   )}
 
-                  {/* Helpful Feedback Actions */}
-                  {msg.role === "assistant" && (
+                  {/* Helpful Rating */}
+                  {msg.role === "assistant" && msg.content && (
                     <div className="flex items-center justify-between pt-1 text-ink-500 text-[10px] border-t border-ink-800/40">
-                      <span>Was this helpful?</span>
+                      <span>Was this pedagogical hint helpful?</span>
                       <div className="flex items-center gap-2">
                         <button className="hover:text-ink-200"><ThumbsUp className="h-3 w-3" /></button>
                         <button className="hover:text-ink-200"><ThumbsDown className="h-3 w-3" /></button>
@@ -228,12 +362,7 @@ export default function TutorPage() {
                 </div>
               </div>
             ))}
-            {isLoading && (
-              <div className="flex items-center gap-2 text-xs text-ink-400 p-2 font-mono">
-                <div className="h-3 w-3 animate-spin rounded-full border border-academic-500 border-t-transparent" />
-                <span>IntelliTutor is reasoning...</span>
-              </div>
-            )}
+            <div ref={chatBottomRef} />
           </div>
 
           {/* Quick Action Chips */}
@@ -241,9 +370,7 @@ export default function TutorPage() {
             {quickActions.map((action, i) => (
               <button
                 key={i}
-                onClick={() => {
-                  setInputPrompt(action);
-                }}
+                onClick={() => handleQuickAction(action)}
                 className="whitespace-nowrap px-2.5 py-1 rounded bg-ink-900 border border-ink-800 text-[11px] text-ink-400 hover:text-ink-200 hover:border-ink-700 transition-colors"
               >
                 {action}
@@ -253,6 +380,24 @@ export default function TutorPage() {
 
           {/* Chat Input Bar */}
           <div className="p-3 border-t border-ink-800/80 bg-ink-950/80 flex items-center gap-2">
+            <input
+              type="file"
+              ref={imageInputRef}
+              onChange={handleImageUpload}
+              accept="image/*"
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              type="button"
+              onClick={() => imageInputRef.current?.click()}
+              isLoading={isUploadingImage}
+              title="Upload circuit or physics diagram"
+              className="h-8 w-8 border-ink-700 text-ink-400 hover:text-ink-200 shrink-0"
+            >
+              <ImageIcon className="h-3.5 w-3.5" />
+            </Button>
             <input
               type="text"
               value={inputPrompt}
@@ -265,6 +410,7 @@ export default function TutorPage() {
               variant="academic"
               size="sm"
               onClick={handleSend}
+              isLoading={isStreaming}
               className="h-8 px-3 text-xs"
             >
               <Send className="h-3.5 w-3.5" />
@@ -275,37 +421,37 @@ export default function TutorPage() {
         {/* Right Column: Active Context Panel */}
         <div className="hidden lg:flex flex-col border border-ink-800/80 rounded-lg bg-ink-900/60 p-4 space-y-4">
           <span className="text-xs font-semibold uppercase tracking-wider text-ink-400 font-mono">
-            Topic Context
+            Topic Context & Mastery
           </span>
 
           <div className="space-y-3">
             <div>
-              <p className="text-xs font-medium text-ink-200">Current Electricity</p>
-              <p className="text-[11px] text-ink-500 font-mono">Physics · Chapter 3</p>
+              <p className="text-xs font-medium text-ink-200">Rotational Dynamics & Torque</p>
+              <p className="text-[11px] text-ink-500 font-mono">Physics · Chapter 5</p>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
                 <span className="text-ink-400">Mastery Level</span>
-                <span className="font-mono text-academic-400 font-semibold">74%</span>
+                <span className="font-mono text-amber-400 font-semibold">42%</span>
               </div>
-              <Progress value={74} />
+              <Progress value={42} colorClass="bg-red-500" />
             </div>
 
             <div className="pt-2 border-t border-ink-800/60 space-y-2">
-              <p className="text-[11px] font-semibold text-ink-300">Related Prerequisites</p>
+              <p className="text-[11px] font-semibold text-ink-300">Active Prerequisites</p>
               <div className="space-y-1 text-xs text-ink-400">
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-academic-400" />
-                  <span>Ohm's Law & Resistance (88%)</span>
+                  <span>Kinematics Equations (82%)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-academic-400" />
-                  <span>EMF & Internal Resistance (80%)</span>
+                  <span>Newton's Laws & Friction (74%)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-amber-400" />
-                  <span>Potentiometer Principles (58%)</span>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-red-400" />
+                  <span>Angular Momentum Vector (42%)</span>
                 </div>
               </div>
             </div>
@@ -314,12 +460,49 @@ export default function TutorPage() {
               <p className="text-[11px] font-semibold text-ink-300">Grounded Textbooks</p>
               <div className="p-2.5 rounded bg-ink-950 border border-ink-800 text-[11px] text-ink-400 space-y-1">
                 <p className="font-medium text-ink-200 truncate">NCERT Physics Part 1</p>
-                <p className="text-ink-500 font-mono">Chapter 3 · Pages 90-124</p>
+                <p className="text-ink-500 font-mono">Chapter 5 · Pages 140-172</p>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Citation Detail Modal */}
+      {activeCitation && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-lg bg-ink-900 border border-ink-800 rounded-lg shadow-elevated p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-ink-800 pb-3">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-academic-400" />
+                <h3 className="text-sm font-semibold text-ink-100">
+                  {activeCitation.document_title} (Page {activeCitation.page})
+                </h3>
+              </div>
+              <button
+                onClick={() => setActiveCitation(null)}
+                className="text-ink-400 hover:text-ink-200 p-1"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="p-4 rounded bg-ink-950 border border-ink-800 text-xs text-ink-200 font-mono leading-relaxed">
+              "{activeCitation.excerpt}"
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveCitation(null)}
+                className="text-xs h-8 border-ink-700"
+              >
+                Close Citation
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }

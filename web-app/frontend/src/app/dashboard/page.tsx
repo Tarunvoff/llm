@@ -18,6 +18,7 @@ import {
   Sparkles,
   TrendingUp,
   Zap,
+  X,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { useAuth } from "@/context/auth-context";
@@ -31,20 +32,48 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [data, setData] = useState<DashboardSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeDrilldownTopic, setActiveDrilldownTopic] = useState<any | null>(null);
+
+  const fetchDashboard = async () => {
+    try {
+      const res = await ApiClient.getDashboard();
+      setData(res);
+    } catch (err) {
+      console.error("Error fetching dashboard:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchDashboard() {
-      try {
-        const res = await ApiClient.getDashboard();
-        setData(res);
-      } catch (err) {
-        console.error("Error fetching dashboard:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
     fetchDashboard();
   }, []);
+
+  const handleToggleTask = async (taskId: string) => {
+    if (!data) return;
+    // Optimistic UI update
+    const updatedPlan = data.today_plan.map((item) => {
+      if (item.id === taskId) {
+        return { ...item, is_completed: !item.is_completed };
+      }
+      return item;
+    });
+    const completedCount = updatedPlan.filter((i) => i.is_completed).length;
+    const progressPct = Math.round((completedCount / (updatedPlan.length || 1)) * 100);
+
+    setData({
+      ...data,
+      today_plan: updatedPlan,
+      today_progress_percentage: progressPct,
+    });
+
+    try {
+      await ApiClient.toggleTask(taskId);
+    } catch (err) {
+      console.error("Failed to toggle task:", err);
+      fetchDashboard();
+    }
+  };
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -133,7 +162,7 @@ export default function DashboardPage() {
                   Today's Study Plan
                 </CardTitle>
                 <CardDescription>
-                  Adaptive schedule calibrated to your 45-day milestone.
+                  Click any checkbox to complete or reschedule your sessions.
                 </CardDescription>
               </div>
               <Badge variant="neutral" className="text-[11px] font-mono">
@@ -153,15 +182,17 @@ export default function DashboardPage() {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div
-                        className={`h-4 w-4 rounded-full border flex items-center justify-center ${
+                      <button
+                        onClick={() => handleToggleTask(item.id)}
+                        className={`h-4 w-4 rounded border flex items-center justify-center transition-colors ${
                           item.is_completed
                             ? "bg-academic-900 border-academic-600 text-academic-300"
-                            : "border-ink-600"
+                            : "border-ink-600 hover:border-academic-500"
                         }`}
+                        title={item.is_completed ? "Mark incomplete" : "Mark complete"}
                       >
-                        {item.is_completed && <CheckCircle2 className="h-3 w-3" />}
-                      </div>
+                        {item.is_completed && <CheckCircle2 className="h-3.5 w-3.5" />}
+                      </button>
                       <div>
                         <div className="flex items-center gap-2">
                           <p className={`text-xs font-medium ${item.is_completed ? "line-through text-ink-400" : "text-ink-100"}`}>
@@ -212,7 +243,7 @@ export default function DashboardPage() {
                   Needs Attention
                 </CardTitle>
                 <CardDescription>
-                  Topics with cognitive mastery below 65% based on recent quizzes.
+                  Topics with cognitive mastery below 65%. Click any topic for diagnostic remediation.
                 </CardDescription>
               </div>
               <Link href="/analytics" className="text-xs text-academic-400 hover:underline font-mono">
@@ -222,7 +253,11 @@ export default function DashboardPage() {
 
             <CardContent className="space-y-3">
               {data?.weak_topics && data.weak_topics.map((wt, idx) => (
-                <div key={idx} className="p-3 rounded-md bg-ink-950/80 border border-ink-800 space-y-2">
+                <div
+                  key={idx}
+                  onClick={() => setActiveDrilldownTopic(wt)}
+                  className="p-3 rounded-md bg-ink-950/80 border border-ink-800 hover:border-ink-700 cursor-pointer transition-colors space-y-2"
+                >
                   <div className="flex items-center justify-between text-xs">
                     <div>
                       <span className="text-ink-400 font-mono text-[10px]">{wt.subject} · </span>
@@ -277,7 +312,7 @@ export default function DashboardPage() {
 
               <div className="space-y-1.5 pt-1">
                 <div className="flex items-center justify-between text-xs text-ink-400">
-                  <span>Accuracy</span>
+                  <span>Test Accuracy</span>
                   <span className="font-mono text-ink-200">{data?.accuracy_percentage || 82.4}%</span>
                 </div>
                 <Progress value={data?.accuracy_percentage || 82.4} />
@@ -346,6 +381,57 @@ export default function DashboardPage() {
           </Card>
         </div>
       </div>
+
+      {/* Topic Drilldown Modal */}
+      {activeDrilldownTopic && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md bg-ink-900 border border-ink-800 rounded-lg shadow-elevated p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-ink-800 pb-3">
+              <div>
+                <Badge variant="academic" className="text-[10px] font-mono uppercase">
+                  {activeDrilldownTopic.subject}
+                </Badge>
+                <h3 className="text-base font-semibold text-ink-100 mt-1">
+                  {activeDrilldownTopic.topic}
+                </h3>
+              </div>
+              <button
+                onClick={() => setActiveDrilldownTopic(null)}
+                className="text-ink-400 hover:text-ink-200 p-1"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-ink-400">Current BKT Mastery:</span>
+                <span className="font-mono text-academic-400 font-bold">{activeDrilldownTopic.mastery_percentage}%</span>
+              </div>
+              <Progress value={activeDrilldownTopic.mastery_percentage} />
+              <p className="text-ink-300 leading-relaxed">
+                You have recorded {activeDrilldownTopic.mistake_count} recent errors on this topic. We recommend reviewing the foundational derivations and attempting a targeted 3-question diagnostic quiz.
+              </p>
+            </div>
+
+            <div className="pt-2 flex items-center gap-2 justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveDrilldownTopic(null)}
+                className="text-xs h-8 border-ink-700"
+              >
+                Close
+              </Button>
+              <Link href="/tutor">
+                <Button variant="academic" size="sm" className="text-xs h-8">
+                  Ask AI Tutor →
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
