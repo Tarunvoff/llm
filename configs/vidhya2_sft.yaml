@@ -47,7 +47,7 @@ data:
   train_jsonl: "data/sft/v2_reasoning_boost/train.jsonl"
   val_jsonl: "data/sft/v2_reasoning_boost/val.jsonl"
   test_jsonl: "data/sft/v2_reasoning_boost/test.jsonl"
-  max_seq_length: 8192
+  max_seq_length: 4096
   pad_to_multiple_of: 8
   dynamic_padding: true
 
