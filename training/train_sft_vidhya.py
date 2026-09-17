@@ -171,8 +171,6 @@ def train_sft(config_path: str, dry_run: bool = False):
     else:
         model_kwargs["torch_dtype"] = torch.float32
 
-    model_kwargs["attn_implementation"] = "sdpa"
-
     model = AutoModelForCausalLM.from_pretrained(
         model_cfg["name"],
         **model_kwargs,
