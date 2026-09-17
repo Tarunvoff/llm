@@ -53,7 +53,24 @@ tracking = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.pyright]
+include = [
+    ".",
+    "src",
+    "scripts",
+    "backend",
+    "web-app/backend",
+    "tests"
+]
+extraPaths = [
+    ".",
+    "src",
+    "web-app/backend"
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
+
+

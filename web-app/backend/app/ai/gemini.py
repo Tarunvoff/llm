@@ -175,14 +175,28 @@ class GeminiService(AIService):
                 "question_type": "MCQ"
             }
             return schema.model_validate(data)
-        elif "TutorResponse" in schema_name:
+        elif "GeneratedQuizResponse" in schema_name or "QuizResponse" in schema_name:
             data = {
-                "answer": "Kirchhoff's Current Law (KCL) states that the algebraic sum of currents entering a junction is zero (conservation of charge). Kirchhoff's Voltage Law (KVL) states that the sum of potential differences around any closed loop is zero (conservation of energy).",
-                "sources": [
-                    {"document_title": "Physics Notes Class 12", "page": 42, "excerpt": "KCL reflects charge conservation at nodal points."}
-                ],
-                "related_topics": ["Ohm's Law", "Nodal Analysis", "Wheatstone Bridge"],
-                "recommended_action": {"title": "Test KVL / KCL Practice", "action_type": "practice", "payload": {"topic": "Current Electricity"}}
+                "questions": [
+                    {
+                        "question_text": "A uniform disk of mass M and radius R rotates about its central axis. What is its moment of inertia?",
+                        "options": ["(1/2) M R²", "M R²", "(2/5) M R²", "(1/4) M R²"],
+                        "correct_answer": "(1/2) M R²",
+                        "explanation": "By integration of thin concentric rings, I = 1/2 M R².",
+                        "topic": "Rotational Dynamics",
+                        "difficulty": "Medium",
+                        "question_type": "MCQ"
+                    },
+                    {
+                        "question_text": "When net external torque on a rigid body is zero, which quantity is conserved?",
+                        "options": ["Angular Momentum", "Linear Momentum", "Rotational Kinetic Energy", "Angular Acceleration"],
+                        "correct_answer": "Angular Momentum",
+                        "explanation": "From tau = dL/dt, tau = 0 implies L is constant.",
+                        "topic": "Conservation of Momentum",
+                        "difficulty": "Easy",
+                        "question_type": "MCQ"
+                    }
+                ]
             }
             return schema.model_validate(data)
         
