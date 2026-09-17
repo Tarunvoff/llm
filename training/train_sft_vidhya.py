@@ -171,6 +171,8 @@ def train_sft(config_path: str, dry_run: bool = False):
     else:
         model_kwargs["torch_dtype"] = torch.float32
 
+    model_kwargs["attn_implementation"] = "sdpa"
+
     model = AutoModelForCausalLM.from_pretrained(
         model_cfg["name"],
         **model_kwargs,
@@ -208,7 +210,7 @@ def train_sft(config_path: str, dry_run: bool = False):
 
     if dry_run:
         logger.info("=== DRY RUN MODE: Validating Batch Collation & Model Forward/Backward Pass ===")
-        sample_batch = [train_dataset[i] for i in range(min(2, len(train_dataset)))]
+        sample_batch = [train_dataset[0]]
         batch_out = collator(sample_batch)
         logger.info(f"Batch shape - input_ids: {batch_out['input_ids'].shape}")
         logger.info(f"Batch shape - labels: {batch_out['labels'].shape}")
