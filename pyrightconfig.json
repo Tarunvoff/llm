@@ -1,0 +1,17 @@
+{
+  "include": [
+    ".",
+    "src",
+    "scripts",
+    "backend",
+    "web-app/backend",
+    "tests"
+  ],
+  "extraPaths": [
+    ".",
+    "src",
+    "web-app/backend"
+  ],
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": false
+}

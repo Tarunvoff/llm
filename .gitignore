@@ -92,7 +92,7 @@ web-app/frontend/node_modules/
 web-app/frontend/.next/
 web-app/frontend/out/
 web-app/backend/intellitutor.db
-web-app/backend/*.db
+web-app/backend/*.db*
 web-app/backend/*.sqlite*
 dist/
 *.tsbuildinfo

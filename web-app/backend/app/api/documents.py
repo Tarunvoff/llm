@@ -82,8 +82,8 @@ async def upload_document(
     db.commit()
     db.refresh(doc)
     
-    # Process document in background
-    background_tasks.add_task(RAGService.process_and_index_document, db, doc)
+    # Process document in background with isolated session
+    background_tasks.add_task(RAGService.process_and_index_document, doc.id)
     
     return {
         "status": "success",

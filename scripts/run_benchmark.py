@@ -15,6 +15,10 @@ from datetime import datetime
 from pathlib import Path
 import yaml
 
+# Ensure project root is in sys.path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+
 
 def load_config(config_path: str = "configs/model.yaml") -> dict:
     path = Path(config_path)

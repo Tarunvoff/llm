@@ -274,20 +274,29 @@ async def stream_chat(
             full_text += chunk
             yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
             
-        # Save assistant message in DB
-        asst_msg = Message(
-            conversation_id=conv.id,
-            role="assistant",
-            content=full_text,
-            explanation_mode=req.explanation_mode,
-            citations=citations,
-            related_topics=["Core Mechanics", "Prerequisites"],
-            recommended_action={"title": "Take Diagnostic Quiz", "type": "practice"}
-        )
-        db.add(asst_msg)
-        db.commit()
+        # Save assistant message in DB using isolated session
+        from app.core.database import SessionLocal
+        save_db = SessionLocal()
+        try:
+            asst_msg = Message(
+                conversation_id=conv.id,
+                role="assistant",
+                content=full_text,
+                explanation_mode=req.explanation_mode,
+                citations=citations,
+                related_topics=["Core Concepts", "Prerequisites", "Derivations"],
+                recommended_action={"title": f"Take 3-Question Practice on {req.subject or 'Physics'}", "type": "practice"}
+            )
+            save_db.add(asst_msg)
+            save_db.commit()
+            msg_id = asst_msg.id
+        except Exception as e:
+            save_db.rollback()
+            msg_id = "generated_msg"
+        finally:
+            save_db.close()
         
-        yield f"data: {json.dumps({'type': 'done', 'message_id': asst_msg.id})}\n\n"
+        yield f"data: {json.dumps({'type': 'done', 'message_id': msg_id})}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 

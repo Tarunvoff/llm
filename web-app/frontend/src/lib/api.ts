@@ -120,7 +120,7 @@ export interface DashboardSummary {
 export class ApiClient {
   public static getToken(): string | null {
     if (typeof window === "undefined") return null;
-    return localStorage.getItem("intellitutor_token");
+    return localStorage.getItem("intellitutor_token") || localStorage.getItem("access_token");
   }
 
   private static async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -331,4 +331,182 @@ export class ApiClient {
   static async getCurriculumSubjects(exam: string = "NEET"): Promise<{ exam: string; subjects: any[] }> {
     return this.request<{ exam: string; subjects: any[] }>(`/curriculum/subjects?exam=${encodeURIComponent(exam)}`);
   }
+
+  // --- Phase 5: Practice & Quizzes ---
+  static async generateQuiz(data: {
+    subject: string;
+    chapter?: string;
+    topic?: string;
+    difficulty: string;
+    question_type: string;
+    question_count: number;
+  }): Promise<any> {
+    return this.request<any>("/quizzes/generate", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async submitQuiz(quizId: string, data: { answers: any[]; time_taken_seconds: number }): Promise<any> {
+    return this.request<any>(`/quizzes/${quizId}/submit`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  // --- Phase 5: Mistake Notebook ---
+  static async getMistakes(params?: { subject?: string; mistake_type?: string; is_resolved?: boolean }): Promise<any> {
+    const query = new URLSearchParams();
+    if (params?.subject) query.append("subject", params.subject);
+    if (params?.mistake_type) query.append("mistake_type", params.mistake_type);
+    if (params?.is_resolved !== undefined) query.append("is_resolved", String(params.is_resolved));
+    const qs = query.toString();
+    return this.request<any>(`/mistakes${qs ? `?${qs}` : ""}`);
+  }
+
+  static async toggleResolveMistake(mistakeId: string): Promise<any> {
+    return this.request<any>(`/mistakes/${mistakeId}/toggle-resolve`, {
+      method: "POST",
+    });
+  }
+
+  static async retestMistakes(subject?: string): Promise<any> {
+    return this.request<any>("/mistakes/retest", {
+      method: "POST",
+      body: JSON.stringify({ subject }),
+    });
+  }
+
+  // --- Phase 6: Spaced Repetition Revision ---
+  static async getRevisionSchedule(): Promise<any> {
+    return this.request<any>("/revision");
+  }
+
+  static async completeRevisionItem(itemId: string): Promise<any> {
+    return this.request<any>(`/revision/${itemId}/complete`, {
+      method: "POST",
+    });
+  }
+
+  static async generateRevisionSchedule(): Promise<any> {
+    return this.request<any>("/revision/generate", {
+      method: "POST",
+    });
+  }
+
+  // --- Phase 6: Study Planner ---
+  static async getWeeklyPlan(): Promise<any> {
+    return this.request<any>("/planner/week");
+  }
+
+  static async togglePlannerItem(itemId: string): Promise<any> {
+    return this.request<any>(`/planner/items/${itemId}/toggle`, {
+      method: "POST",
+    });
+  }
+
+  static async addPlannerItem(data: any): Promise<any> {
+    return this.request<any>("/planner/items", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async reoptimizePlan(): Promise<any> {
+    return this.request<any>("/planner/generate", {
+      method: "POST",
+    });
+  }
+
+  // --- Phase 6: Mock Tests ---
+  static async getMockTests(): Promise<any> {
+    return this.request<any>("/mock-tests");
+  }
+
+  static async generateMockTest(data: any): Promise<any> {
+    return this.request<any>("/mock-tests/generate", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async getMockTest(id: string): Promise<any> {
+    return this.request<any>(`/mock-tests/${id}`);
+  }
+
+  // --- Phase 6: Analytics ---
+  static async getAnalyticsOverview(): Promise<any> {
+    return this.request<any>("/analytics/overview");
+  }
+
+  static async getMasteryTree(): Promise<any> {
+    return this.request<any>("/analytics/mastery-tree");
+  }
+
+  // --- Phase 7: Study Goals & Milestones ---
+  static async getGoals(): Promise<{ goals: any[] }> {
+    return this.request<{ goals: any[] }>("/goals");
+  }
+
+  static async createGoal(data: {
+    title: string;
+    target_metric: string;
+    current_metric?: string;
+    progress_percentage?: number;
+    due_date_str?: string;
+    variant?: string;
+  }): Promise<any> {
+    return this.request<any>("/goals", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async toggleGoal(goalId: string): Promise<any> {
+    return this.request<any>(`/goals/${goalId}/toggle`, {
+      method: "POST",
+    });
+  }
+
+  static async deleteGoal(goalId: string): Promise<any> {
+    return this.request<any>(`/goals/${goalId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // --- Phase 8: Gamification & Achievements ---
+  static async getAchievements(): Promise<any> {
+    return this.request<any>("/achievements");
+  }
+
+  static async claimAchievement(badgeId: string): Promise<any> {
+    return this.request<any>(`/achievements/${badgeId}/claim`, {
+      method: "POST",
+    });
+  }
+
+  // --- Phase 9: Settings & Data Export ---
+  static async getSettings(): Promise<{ settings: any }> {
+    return this.request<{ settings: any }>("/settings");
+  }
+
+  static async updateSettings(data: any): Promise<any> {
+    return this.request<any>("/settings", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async exportUserData(): Promise<any> {
+    return this.request<any>("/settings/export-data", {
+      method: "POST",
+    });
+  }
+
+  static async resetHistory(): Promise<any> {
+    return this.request<any>("/settings/reset-history", {
+      method: "POST",
+    });
+  }
 }
+

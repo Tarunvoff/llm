@@ -79,16 +79,24 @@ class RAGService:
         return chunks
 
     @staticmethod
-    def process_and_index_document(db: Session, document: Document):
+    def process_and_index_document(document_id: str):
         """
         Full ingestion pipeline:
-        1. Extract text from disk
-        2. Chunk text with page tracking
-        3. Extract syllabus topics via Gemini
-        4. Save chunks to database
-        5. Mark document as Ready
+        1. Open isolated DB session
+        2. Extract text from disk (PDF, TXT, etc.)
+        3. Chunk text with page tracking
+        4. Extract syllabus topics via Gemini AI
+        5. Save chunks to database
+        6. Mark document as Ready
         """
+        from app.core.database import SessionLocal
+        db = SessionLocal()
         try:
+            document = db.query(Document).filter(Document.id == document_id).first()
+            if not document:
+                logger.error(f"Document {document_id} not found for indexing.")
+                return
+
             document.status = "processing"
             db.commit()
             
@@ -103,8 +111,6 @@ class RAGService:
             db.query(DocumentChunk).filter(DocumentChunk.document_id == document.id).delete()
             
             # 4. Insert chunks
-            sample_text_for_topics = " ".join([c["content"] for c in chunks_data[:4]])[:1500]
-            
             for c in chunks_data:
                 chunk_obj = DocumentChunk(
                     document_id=document.id,
@@ -118,17 +124,46 @@ class RAGService:
                 )
                 db.add(chunk_obj)
             
-            # 5. Topic extraction
-            extracted_topics = ["Fundamental Definitions", "Core Principles", "Derivations", "Problem Applications"]
+            # 5. Dynamic Topic extraction with Gemini AI
+            sample_text = " ".join([c["content"] for c in chunks_data[:4]])[:2000]
+            extracted_topics = ["Foundational Concepts", "Key Definitions", "Problem Applications"]
+            
+            if sample_text.strip():
+                try:
+                    import asyncio
+                    prompt = (
+                        f"Analyze the following textbook/notes excerpt and extract exactly 4 to 6 key academic topics/subtopics "
+                        f"covered in this material. Return ONLY a comma-separated list of short topic titles (e.g. 'Coulomb's Law, Electric Field Lines, Gauss's Theorem, Capacitance').\n\n"
+                        f"Excerpt:\n{sample_text}"
+                    )
+                    # We can use direct synchronous generation with Gemini or async loop
+                    import google.generativeai as genai
+                    from app.core.config import settings
+                    if settings.GEMINI_API_KEY:
+                        model = genai.GenerativeModel(settings.GEMINI_MODEL)
+                        response = model.generate_content(prompt)
+                        if response and response.text:
+                            raw_topics = [t.strip().strip("-").strip("•").strip() for t in response.text.replace("\n", ",").split(",") if t.strip()]
+                            if len(raw_topics) >= 2:
+                                extracted_topics = raw_topics[:6]
+                except Exception as ai_err:
+                    logger.warning(f"Gemini topic extraction fallback: {ai_err}")
+
             document.extracted_topics = extracted_topics
             document.status = "ready"
             db.commit()
-            db.refresh(document)
-            logger.info(f"Document {document.id} processed successfully with {len(chunks_data)} chunks.")
+            logger.info(f"Document {document.id} processed successfully with {len(chunks_data)} chunks. Topics: {extracted_topics}")
         except Exception as e:
-            logger.error(f"Failed to process document {document.id}: {e}")
-            document.status = "failed"
-            db.commit()
+            logger.error(f"Failed to process document {document_id}: {e}")
+            try:
+                document = db.query(Document).filter(Document.id == document_id).first()
+                if document:
+                    document.status = "failed"
+                    db.commit()
+            except Exception:
+                pass
+        finally:
+            db.close()
 
     @staticmethod
     def retrieve_relevant_chunks(db: Session, user_id: str, query: str, top_k: int = 3) -> List[Dict[str, Any]]:
