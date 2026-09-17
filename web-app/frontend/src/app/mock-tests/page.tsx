@@ -36,59 +36,62 @@ export default function MockTestsPage() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-ink-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8E6DE]">
           <div>
-            <h2 className="text-xl font-semibold text-ink-50">Full-Length Mock Tests</h2>
-            <p className="text-xs text-ink-400">
-              Personalized exam simulations weighted against your weak topics, historical mistakes, and target syllabus.
+            <h2 className="text-2xl sm:text-3xl font-display font-bold text-[#151515]">Full-Length Mock Tests</h2>
+            <p className="text-xs sm:text-sm text-[#555555] mt-0.5">
+              Personalized exam simulations calibrated to your syllabus, historical mistakes, and target exam.
             </p>
           </div>
 
-          <Button variant="academic" size="sm" className="text-xs h-8 gap-1.5 font-medium">
-            <Sparkles className="h-3.5 w-3.5" />
+          <Button variant="primary" size="sm" className="text-xs h-9 gap-2 font-bold shadow-sm">
+            <Sparkles className="h-4 w-4" />
             <span>Generate Adaptive Mock Paper</span>
           </Button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           {tests.map((t) => (
-            <Card key={t.id} className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge variant="academic" className="text-[10px] font-mono uppercase">{t.exam}</Badge>
-                  <span className="text-[11px] text-ink-500 font-mono">{t.date}</span>
+            <div
+              key={t.id}
+              className="bg-white border-2 border-[#151515] rounded-3xl p-6 sm:p-7 shadow-[4px_4px_0px_0px_#151515] space-y-4"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#EFEFE8]">
+                <div className="flex items-center gap-2.5">
+                  <Badge variant="coral" className="text-xs font-bold uppercase">{t.exam}</Badge>
+                  <span className="text-xs text-[#707070] font-medium">{t.date}</span>
                 </div>
-                <Badge variant={t.status === "Completed" ? "academic" : "warning"} className="text-[10px] font-mono">
+                <Badge variant={t.status === "Completed" ? "academic" : "yellow"} className="text-xs font-bold self-start sm:self-auto">
                   {t.status}
                 </Badge>
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-ink-100">{t.title}</h3>
-                <p className="text-xs text-ink-400 mt-0.5">
-                  {t.questions} Questions · {t.duration} Duration
+                <h3 className="text-base font-display font-bold text-[#151515]">{t.title}</h3>
+                <p className="text-xs text-[#555555] mt-0.5">
+                  {t.questions} Questions • {t.duration} Duration
                 </p>
               </div>
 
               {t.status === "Completed" ? (
-                <div className="grid grid-cols-2 gap-3 p-3 rounded bg-ink-950 border border-ink-800 text-xs">
+                <div className="grid grid-cols-2 gap-4 p-4 rounded-2xl bg-[#FAF9F5] border border-[#E8E6DE] text-xs">
                   <div>
-                    <span className="text-ink-500 text-[10px] font-mono uppercase">Score</span>
-                    <p className="text-base font-bold font-mono text-academic-400">{t.score}</p>
+                    <span className="text-[#707070] text-[11px] font-bold uppercase">Score</span>
+                    <p className="text-xl font-display font-bold text-[#166534] mt-0.5">{t.score}</p>
                   </div>
                   <div>
-                    <span className="text-ink-500 text-[10px] font-mono uppercase">Accuracy</span>
-                    <p className="text-base font-bold font-mono text-ink-100">{t.accuracy}</p>
+                    <span className="text-[#707070] text-[11px] font-bold uppercase">Accuracy</span>
+                    <p className="text-xl font-display font-bold text-[#151515] mt-0.5">{t.accuracy}</p>
                   </div>
                 </div>
               ) : (
                 <div className="pt-2 flex justify-end">
-                  <Button variant="academic" size="sm" className="text-xs h-8">
-                    Start Mock Test <Play className="h-3 w-3 ml-1 fill-current" />
+                  <Button variant="primary" size="sm" className="text-xs h-9 font-bold">
+                    Start Mock Test <Play className="h-3.5 w-3.5 ml-1.5 fill-white" />
                   </Button>
                 </div>
               )}
-            </Card>
+            </div>
           ))}
         </div>
       </div>

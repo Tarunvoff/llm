@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { CheckCircle2, Sparkles, Check } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,82 +36,82 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-ink-950 text-ink-100 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#F7F7F2] text-[#151515] flex flex-col md:flex-row">
       {/* Left Column: Brand & Educational Statement */}
-      <div className="md:w-1/2 p-8 md:p-16 flex flex-col justify-between border-b md:border-b-0 md:border-r border-ink-800/80 bg-ink-950/60">
+      <div className="md:w-1/2 p-8 md:p-16 flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#E8E6DE] bg-white">
         <div className="space-y-6">
-          <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-academic-700 text-white font-mono text-sm font-bold shadow-sm ring-1 ring-academic-500/50">
+          <Link href="/" className="inline-flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#FF5734] text-white font-display text-base font-bold shadow-sm">
               IT
             </div>
             <div className="flex flex-col">
-              <span className="font-semibold text-sm tracking-wider uppercase text-ink-100">
-                IntelliTutor AI
+              <span className="font-display font-bold text-base tracking-tight text-[#151515]">
+                INTELLITUTOR <span className="text-[#FF5734]">AI</span>
               </span>
-              <span className="text-[11px] text-academic-400 font-mono">
+              <span className="text-[11px] text-[#707070] font-medium">
                 Personal Study Coach
               </span>
             </div>
           </Link>
 
-          <div className="pt-12 space-y-3">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-ink-50">
+          <div className="pt-10 space-y-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-[#151515] leading-tight">
               Start your personalized study journey.
             </h2>
-            <p className="text-xs sm:text-sm text-ink-400 leading-relaxed max-w-md font-normal">
-              Create an account to configure your target exam, upload textbooks, track cognitive mastery, and get Socratic AI tutoring.
+            <p className="text-sm sm:text-base text-[#555555] leading-relaxed max-w-md">
+              Create an account to configure your target exam, upload notes, track cognitive mastery, and get Socratic AI tutoring.
             </p>
           </div>
         </div>
 
-        <div className="pt-12 space-y-3 text-xs text-ink-500 font-mono">
-          <div className="flex items-center gap-2 text-ink-400">
-            <CheckCircle2 className="h-4 w-4 text-academic-400 shrink-0" />
-            <span>Multi-modal textbook & PDF RAG analysis</span>
+        <div className="pt-10 space-y-3 text-xs text-[#555555]">
+          <div className="flex items-center gap-2.5">
+            <Check className="h-4 w-4 text-[#16A34A] shrink-0" />
+            <span className="font-semibold text-[#151515]">Multi-modal textbook & PDF RAG analysis</span>
           </div>
-          <div className="flex items-center gap-2 text-ink-400">
-            <CheckCircle2 className="h-4 w-4 text-academic-400 shrink-0" />
-            <span>Mistake categorization & Bayesian knowledge tracing</span>
+          <div className="flex items-center gap-2.5">
+            <Check className="h-4 w-4 text-[#16A34A] shrink-0" />
+            <span className="font-semibold text-[#151515]">Mistake categorization & Bayesian knowledge tracing</span>
           </div>
-          <p className="pt-4 text-[11px]">© 2026 IntelliTutor AI. All rights reserved.</p>
+          <p className="pt-6 text-[11px] text-[#707070]">© {new Date().getFullYear()} IntelliTutor AI. All rights reserved.</p>
         </div>
       </div>
 
       {/* Right Column: Register Card */}
-      <div className="md:w-1/2 p-8 md:p-16 flex items-center justify-center bg-ink-900/30">
+      <div className="md:w-1/2 p-8 md:p-16 flex items-center justify-center bg-[#FAF9F5]">
         <div className="w-full max-w-sm space-y-6">
-          <div className="space-y-1.5">
-            <h3 className="text-xl font-semibold text-ink-100">Create Account</h3>
-            <p className="text-xs text-ink-400">
+          <div className="space-y-1">
+            <h3 className="text-2xl font-display font-bold text-[#151515]">Create Account</h3>
+            <p className="text-xs sm:text-sm text-[#555555]">
               Set up your profile and proceed to academic onboarding.
             </p>
           </div>
 
           {error && (
-            <div className="p-3 rounded-md bg-red-950/60 border border-red-800/60 text-xs text-red-300">
+            <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 font-semibold">
               {error}
             </div>
           )}
 
           {/* Quick Demo Option */}
-          <div className="p-3 rounded-lg bg-academic-950/40 border border-academic-700/40 flex items-center justify-between">
+          <div className="p-3.5 rounded-2xl bg-[#FFF3F0] border border-[#FFC8BC] flex items-center justify-between">
             <div className="text-xs">
-              <span className="text-academic-300 font-medium">Want to test right away?</span>
+              <span className="text-[#BD3012] font-semibold">Want to explore instantly?</span>
             </div>
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={handleDemoClick}
-              className="text-xs h-7 border-academic-700/60 text-academic-300 hover:text-white"
+              className="text-xs h-7 font-bold border-[#FFC8BC] text-[#BD3012] hover:bg-white"
             >
               1-Click Demo
             </Button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-ink-300">Full Name</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#151515]">Full Name</label>
               <Input
                 type="text"
                 required
@@ -121,8 +121,8 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-ink-300">Email Address</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#151515]">Email Address</label>
               <Input
                 type="email"
                 required
@@ -132,8 +132,8 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-ink-300">Password (min 6 characters)</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#151515]">Password (min 6 characters)</label>
               <Input
                 type="password"
                 required
@@ -146,18 +146,18 @@ export default function RegisterPage() {
 
             <Button
               type="submit"
-              variant="academic"
+              variant="primary"
               size="md"
               isLoading={isLoading}
-              className="w-full h-9 text-xs font-semibold"
+              className="w-full h-11 text-xs sm:text-sm font-bold"
             >
               Create Account & Onboard
             </Button>
           </form>
 
-          <p className="text-center text-xs text-ink-400">
+          <p className="text-center text-xs text-[#555555]">
             Already have an account?{" "}
-            <Link href="/login" className="text-academic-400 hover:underline font-medium">
+            <Link href="/login" className="text-[#FF5734] hover:underline font-bold">
               Log in
             </Link>
           </p>

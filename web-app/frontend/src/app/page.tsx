@@ -1,38 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowRight,
+  ChevronDown,
+  ChevronRight,
   BookOpen,
-  Bot,
-  BrainCircuit,
-  CheckCircle2,
-  Clock,
-  Compass,
-  FileSpreadsheet,
-  Flame,
-  HelpCircle,
-  Layers,
-  RotateCcw,
-  Sparkles,
-  Target,
-  TrendingUp,
-  Zap,
-  AlertTriangle,
   FileText,
-  Play,
+  UploadCloud,
+  GraduationCap,
+  FileSpreadsheet,
+  Lightbulb,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/auth-context";
+
+import { BrandLogo } from "@/components/brand/logo";
 
 export default function LandingPage() {
   const router = useRouter();
   const { demoLogin, isAuthenticated } = useAuth();
-  const [activeTab, setActiveTab] = useState<"tutor" | "library" | "practice" | "mistakes" | "revision">("tutor");
 
   const handleDemoClick = async () => {
     if (isAuthenticated) {
@@ -43,528 +31,530 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-ink-950 text-ink-100 flex flex-col selection:bg-academic-700/40 selection:text-white">
-      {/* Navigation Bar */}
-      <nav className="border-b border-ink-800/80 bg-ink-950/90 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-7 w-7 items-center justify-center rounded bg-academic-700 text-white font-mono text-xs font-bold shadow-sm ring-1 ring-academic-500/50">
-              IT
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold text-xs tracking-wider uppercase text-ink-100">
-                IntelliTutor AI
-              </span>
-              <span className="text-[10px] text-academic-400 font-mono leading-none">
-                Personal Study Coach
-              </span>
-            </div>
+    <div className="min-h-screen w-full bg-[#F7F7F5] text-[#151515] flex flex-col selection:bg-coral-100 selection:text-coral-700">
+      
+      {/* 1. CLEAN NEAT TOP NAVIGATION */}
+      <nav className="w-full bg-[#F7F7F5] border-b border-[#E8E6DE]/80 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 sm:px-12 h-20 flex items-center justify-between">
+          
+          {/* Brand Logo with Image 1 Icon */}
+          <BrandLogo size="md" showSubtitle={false} href="/" />
+
+          {/* Navigation Links */}
+          <div className="hidden lg:flex items-center gap-8 text-sm font-semibold text-[#151515]">
+            <a href="#how-it-works" className="flex items-center gap-1 hover:text-[#ff5734] transition-colors py-1">
+              Subjects <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+            </a>
+            <a href="#workspace" className="flex items-center gap-1 hover:text-[#ff5734] transition-colors py-1">
+              Courses <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+            </a>
+            <a href="#mistakes" className="hover:text-[#ff5734] transition-colors py-1">
+              Mistake Intelligence
+            </a>
+            <a href="#spaced-repetition" className="hover:text-[#ff5734] transition-colors py-1">
+              Spaced Repetition
+            </a>
           </div>
 
-          <div className="hidden md:flex items-center gap-6 text-xs text-ink-400">
-            <a href="#how-it-works" className="hover:text-ink-200 transition-colors">How It Works</a>
-            <a href="#system" className="hover:text-ink-200 transition-colors">Study Workspace</a>
-            <a href="#pedagogy" className="hover:text-ink-200 transition-colors">Mistake Intelligence</a>
-            <a href="#spaced-repetition" className="hover:text-ink-200 transition-colors">Spaced Repetition</a>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
+          {/* Action Buttons */}
+          <div className="flex items-center gap-5">
+            <button
               onClick={handleDemoClick}
-              className="text-xs h-8 border-ink-700/60 text-ink-200 hover:text-white"
+              className="hidden sm:inline-block text-sm font-bold text-[#151515] hover:text-[#ff5734] transition-colors"
             >
               Demo Workspace
-            </Button>
-            <Link href="/login">
-              <Button variant="ghost" size="sm" className="text-xs h-8 text-ink-300 hover:text-white">
-                Log in
-              </Button>
+            </button>
+            <Link href="/login" className="text-sm font-bold text-[#151515] hover:text-[#ff5734] transition-colors">
+              Sign in
             </Link>
             <Link href="/register">
-              <Button variant="academic" size="sm" className="text-xs h-8 font-medium">
+              <button className="bg-[#ff5734] hover:bg-[#e64320] text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-full transition-all active:scale-95 shadow-sm">
                 Start Learning
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="pt-20 pb-16 px-6 relative overflow-hidden border-b border-ink-800/60">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ink-900 border border-ink-800 text-academic-400 text-xs font-mono tracking-wide">
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>PERSONALIZED LEARNING SYSTEM</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-ink-50 leading-[1.12]">
-            Study smarter.<br />
-            <span className="text-ink-300 font-normal">Because your learning should be personal.</span>
-          </h1>
-
-          <p className="max-w-2xl mx-auto text-sm sm:text-base text-ink-400 leading-relaxed font-normal">
-            IntelliTutor continuously diagnoses what you study, where you struggle, and what you should do next. No generic chatbots—just a dedicated personal study system.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Link href="/register">
-              <Button variant="academic" size="lg" className="h-11 px-6 text-sm font-semibold">
-                Start Learning
-                <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={handleDemoClick}
-              className="h-11 px-6 text-sm border border-ink-700/60 bg-ink-900 text-ink-200 hover:text-white"
-            >
-              <Play className="h-3.5 w-3.5 mr-2 fill-current" />
-              Explore Live Demo
-            </Button>
-          </div>
-
-          {/* Key Metric Badges */}
-          <div className="pt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-ink-400 font-mono">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-academic-400" />
-              <span>Document-Grounded RAG</span>
+      {/* 2. HERO SECTION */}
+      <section className="w-full max-w-7xl mx-auto px-6 sm:px-12 pt-8 sm:pt-12 pb-16 relative">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          
+          {/* Left Column: Headlines & CTA */}
+          <div className="lg:col-span-6 space-y-6 z-10">
+            {/* Pill Tag */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFF3F0] border border-[#FFC8BC] text-[#BD3012] text-xs font-bold tracking-wide uppercase">
+              ✨ YOUR PERSONAL STUDY SYSTEM
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-academic-400" />
-              <span>Socratic Diagnosis</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-academic-400" />
-              <span>Bayesian Mastery Tracking</span>
-            </div>
-          </div>
-        </div>
 
-        {/* Sophisticated Study Workspace Preview */}
-        <div className="max-w-5xl mx-auto mt-14 rounded-xl border border-ink-800 bg-ink-900/90 shadow-elevated p-6 overflow-hidden">
-          {/* Mock App Header */}
-          <div className="flex items-center justify-between pb-5 border-b border-ink-800/80 text-xs">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1.5">
-                <div className="h-2.5 w-2.5 rounded-full bg-ink-700" />
-                <div className="h-2.5 w-2.5 rounded-full bg-ink-700" />
-                <div className="h-2.5 w-2.5 rounded-full bg-ink-700" />
-              </div>
-              <span className="text-ink-400 font-mono">Workspace / Aarav Sharma (NEET Aspirant)</span>
-            </div>
-            <div className="flex items-center gap-3 text-ink-400 font-mono">
-              <span className="flex items-center gap-1 text-amber-400">
-                <Flame className="h-3.5 w-3.5 fill-amber-400/20" /> 7d streak
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-bold text-[#151515] leading-[1.08] tracking-tight">
+              Study smarter. <br />
+              Know what to{" "}
+              <span className="relative inline-block text-[#ff5734]">
+                learn
+                <svg className="absolute left-0 -bottom-1 w-full h-2 text-[#ff5734]" viewBox="0 0 100 12" preserveAspectRatio="none" fill="none">
+                  <path d="M0 6 Q 12.5 0, 25 6 T 50 6 T 75 6 T 100 6" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
+                </svg>
               </span>
-              <span className="flex items-center gap-1 text-academic-400">
-                <Zap className="h-3.5 w-3.5" /> 580 XP
+              <br />
+              <span className="relative inline-block text-[#ff5734]">
+                next.
+                <svg className="absolute left-0 -bottom-1 w-full h-2 text-[#ff5734]" viewBox="0 0 100 12" preserveAspectRatio="none" fill="none">
+                  <path d="M0 6 Q 12.5 0, 25 6 T 50 6 T 75 6 T 100 6" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
+                </svg>
               </span>
+            </h1>
+
+            <p className="text-base sm:text-lg text-[#555555] max-w-lg font-medium leading-relaxed">
+              IntelliTutor learns what you study, where you struggle, and what you should practice, revise, and master next.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <Link href="/register">
+                <button className="bg-[#ff5734] hover:bg-[#e64320] text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-full transition-all active:scale-95 shadow-sm inline-flex items-center gap-2">
+                  Start Learning <span>→</span>
+                </button>
+              </Link>
+              <button
+                onClick={handleDemoClick}
+                className="bg-white hover:bg-[#FAF9F5] border-2 border-[#151515] text-[#151515] font-bold text-sm sm:text-base px-7 py-3.5 rounded-full transition-all active:scale-95 shadow-sm inline-flex items-center gap-2"
+              >
+                Explore Workspace <span>→</span>
+              </button>
+            </div>
+
+            {/* Calibrated bottom note */}
+            <div className="pt-4 flex items-center gap-3">
+              <div className="flex items-center -space-x-2">
+                <div className="h-8 w-8 rounded-full bg-[#FFF9D6] border-2 border-white flex items-center justify-center font-bold text-[11px] text-[#8F6E00]">
+                  AI
+                </div>
+                <div className="h-8 w-8 rounded-full bg-[#F0E9FD] border-2 border-white flex items-center justify-center font-bold text-[11px] text-[#6C38D4]">
+                  IIT
+                </div>
+                <div className="h-8 w-8 rounded-full bg-[#FFF3F0] border-2 border-white flex items-center justify-center font-bold text-[10px] text-[#BD3012]">
+                  MED
+                </div>
+                <div className="h-8 w-8 rounded-full bg-[#fccc42] border-2 border-white flex items-center justify-center font-bold text-[10px] text-[#151515]">
+                  50k+
+                </div>
+              </div>
+              <div className="text-xs">
+                <p className="font-bold text-[#151515]">Calibrated with NCERT, PYQs & Syllabi</p>
+                <p className="text-[#707070] text-[11px]">For NEET, JEE, UPSC, GATE, CAT & University</p>
+              </div>
             </div>
           </div>
 
-          {/* Dashboard Preview Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 text-left">
-            {/* Column 1: Today's Plan */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-wider text-ink-400 font-mono">
-                  Today's Study Agenda
+          {/* Right Column: Live Session Interactive Preview Box */}
+          <div className="lg:col-span-6 relative">
+            <div className="bg-white border-2 border-[#151515] rounded-[2rem] shadow-[8px_8px_0px_0px_#151515] p-6 sm:p-7 space-y-5 transition-transform hover:-translate-y-1">
+              
+              {/* Header inside card */}
+              <div className="flex justify-end">
+                <span className="font-mono text-[11px] font-semibold text-[#555555] bg-[#F7F7F2] px-3 py-1 rounded-md border border-[#E8E6DE]">
+                  active_session.live
+                </span>
+              </div>
+
+              {/* 1. Tutor Speech Box (Lavender) */}
+              <div className="bg-[#F0E9FD] border border-[#E0D1FB] p-4 sm:p-5 rounded-2xl flex items-start gap-3.5">
+                <div className="h-9 w-9 rounded-full bg-[#BE94F5] flex-shrink-0 flex items-center justify-center text-white font-bold text-xs">
+                  IT
+                </div>
+                <div className="space-y-1">
+                  <div className="text-[11px] font-bold text-[#6C38D4] tracking-wider uppercase">
+                    Personal Tutor
+                  </div>
+                  <p className="text-xs sm:text-sm font-semibold text-[#151515] leading-snug">
+                    &ldquo;Great job on Torque! Let&apos;s conquer <span className="font-bold">Angular Momentum</span> next before tomorrow&apos;s revision.&rdquo;
+                  </p>
+                </div>
+              </div>
+
+              {/* 2. Topic Mastery Card */}
+              <div className="bg-[#FAF9F5] border border-[#E8E6DE] p-4 sm:p-5 rounded-2xl flex items-center justify-between">
+                <div className="space-y-1.5">
+                  <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FFF3F0] text-[#BD3012] border border-[#FFC8BC]">
+                    PHYSICS • CH 07
+                  </span>
+                  <h4 className="font-bold text-[#151515] text-sm sm:text-base leading-tight">
+                    Rotational Dynamics
+                  </h4>
+                  <p className="text-xs text-[#707070]">
+                    Conservation of Angular Momentum
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-display font-bold text-[#ff5734]">
+                    82%
+                  </div>
+                  <div className="text-[10px] font-bold text-[#707070] uppercase tracking-wider">
+                    Topic Mastery
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Diagnostic Question Card */}
+              <div className="bg-white border border-[#E8E6DE] p-4 sm:p-5 rounded-2xl space-y-3 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#151515]">
+                    Diagnostic Question 04
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#FFF9D6] text-[#8F6E00] border border-[#FFF1A3]">
+                    Medium
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-[#444444] leading-relaxed">
+                  A rigid body rotates with constant angular acceleration. If its initial velocity is doubled...
                 </p>
-                <Badge variant="academic" className="text-[10px] font-mono">1/3 Done</Badge>
-              </div>
-
-              <div className="space-y-2">
-                <div className="p-3 rounded-md bg-ink-950/80 border border-ink-800/80 flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <p className="text-xs font-medium text-ink-200">Biology · Cell Division</p>
-                    <p className="text-[11px] text-ink-500 font-mono">08:00 (45 min)</p>
-                  </div>
-                  <Badge variant="academic" className="text-[10px]">Completed</Badge>
-                </div>
-
-                <div className="p-3 rounded-md bg-ink-950/80 border border-academic-700/40 flex items-center justify-between ring-1 ring-academic-700/20">
-                  <div className="space-y-0.5">
-                    <p className="text-xs font-medium text-ink-100">Physics · Kinematics Set</p>
-                    <p className="text-[11px] text-academic-400 font-mono">10:30 (60 min) · Up Next</p>
-                  </div>
-                  <Badge variant="outline" className="text-[10px]">Practice</Badge>
-                </div>
-
-                <div className="p-3 rounded-md bg-ink-950/80 border border-ink-800/80 flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <p className="text-xs font-medium text-ink-300">Physics · Mistake Review</p>
-                    <p className="text-[11px] text-ink-500 font-mono">18:00 (30 min)</p>
-                  </div>
-                  <Badge variant="warning" className="text-[10px]">Revision</Badge>
-                </div>
-              </div>
-            </div>
-
-            {/* Column 2: Weak Topics & Attention */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-wider text-ink-400 font-mono">
-                  Needs Attention
-                </p>
-                <span className="text-[11px] text-ink-500 font-mono">Diagnostic BKT</span>
-              </div>
-
-              <div className="space-y-2">
-                <div className="p-3 rounded-md bg-ink-950/80 border border-red-900/40 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-red-300">Rotational Motion</span>
-                    <span className="font-mono text-red-400 font-semibold">42%</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-ink-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-red-500 w-[42%]" />
-                  </div>
-                  <p className="text-[10px] text-ink-500">3 repeated calculation & conceptual errors</p>
-                </div>
-
-                <div className="p-3 rounded-md bg-ink-950/80 border border-amber-900/40 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-amber-300">Organic Reactions</span>
-                    <span className="font-mono text-amber-400 font-semibold">48%</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-ink-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-500 w-[48%]" />
-                  </div>
-                  <p className="text-[10px] text-ink-500">Markovnikov addition misconception</p>
-                </div>
-
-                <div className="p-3 rounded-md bg-ink-950/80 border border-amber-900/40 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-amber-300">Cell Division</span>
-                    <span className="font-mono text-amber-400 font-semibold">51%</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-ink-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-500 w-[51%]" />
-                  </div>
-                  <p className="text-[10px] text-ink-500">Crossing over in Prophase I</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Column 3: AI Recommendation & Spaced Repetition */}
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-academic-400 font-mono">
-                AI Coach Recommendation
-              </p>
-
-              <div className="p-3.5 rounded-md bg-academic-950/60 border border-academic-700/50 space-y-2">
-                <div className="flex items-center gap-1.5 text-academic-300 text-xs font-semibold">
-                  <Bot className="h-4 w-4" />
-                  <span>Targeted Remediation</span>
-                </div>
-                <p className="text-xs text-ink-300 leading-relaxed">
-                  "You've made the same conceptual mistake in <strong className="text-ink-100">Rotational Motion</strong> three times. Review angular momentum for 20 minutes before attempting another problem set."
-                </p>
-                <div className="pt-1">
-                  <span className="inline-block text-[11px] font-medium text-academic-400 underline underline-offset-4">
-                    Open Recommended Review →
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0]">
+                    ✓ Concept Diagnosed
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#FFF3F0] text-[#BD3012] border border-[#FFC8BC]">
+                    Spaced Review Set
                   </span>
                 </div>
               </div>
 
-              <div className="p-3 rounded-md bg-ink-950/80 border border-ink-800 space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-ink-400 font-mono text-[11px] uppercase">Revision Due</span>
-                  <span className="text-amber-400 font-mono text-[11px]">2 due today</span>
+              {/* Footer status line inside preview card */}
+              <div className="flex items-center justify-between pt-1 text-[11px] text-[#707070] font-medium border-t border-[#E8E6DE]/60">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-[#16A34A] animate-pulse"></span>
+                  <span>Real-time adaptive diagnosis</span>
                 </div>
-                <p className="text-xs text-ink-200 font-medium truncate">
-                  • Conservation of Angular Momentum
-                </p>
-                <p className="text-xs text-ink-200 font-medium truncate">
-                  • Mitosis vs Meiosis Stages
-                </p>
+                <span className="font-mono text-[10px] text-[#707070]">
+                  SM-2 Spaced Algorithm
+                </span>
               </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        {/* 3. BOTTOM 3 STAT CARDS */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-10">
+          
+          {/* Card 1: White Card with Education pill */}
+          <div className="bg-white border-2 border-[#151515] p-6 sm:p-7 rounded-[1.75rem] shadow-[4px_4px_0px_0px_#151515] flex flex-col justify-between space-y-4 transition-transform hover:-translate-y-1">
+            <div className="self-start">
+              <span className="inline-block px-3.5 py-1 rounded-xl text-xs font-bold bg-[#be94f5]/30 text-[#6C38D4] border border-[#be94f5]/60">
+                Education
+              </span>
+            </div>
+            <div>
+              <p className="text-xs text-[#707070] font-semibold">subjects</p>
+              <p className="text-4xl sm:text-5xl font-display font-bold text-[#151515] tracking-tight mt-0.5">+40</p>
+            </div>
+          </div>
+
+          {/* Card 2: Lavender Card with Online pill */}
+          <div className="bg-[#be94f5] border-2 border-[#151515] p-6 sm:p-7 rounded-[1.75rem] shadow-[4px_4px_0px_0px_#151515] flex flex-col justify-between space-y-4 transition-transform hover:-translate-y-1">
+            <div className="self-start">
+              <span className="inline-block px-3.5 py-1 rounded-xl text-xs font-bold bg-[#fccc42] text-[#151515] border border-[#151515]/20">
+                Online
+              </span>
+            </div>
+            <div>
+              <p className="text-xs text-[#151515]/80 font-bold">courses & topics</p>
+              <p className="text-4xl sm:text-5xl font-display font-bold text-[#151515] tracking-tight mt-0.5">+120</p>
+            </div>
+          </div>
+
+          {/* Card 3: Yellow Card with Stars & 5.0 pill */}
+          <div className="bg-[#fccc42] border-2 border-[#151515] p-6 sm:p-7 rounded-[1.75rem] shadow-[4px_4px_0px_0px_#151515] flex flex-col justify-between space-y-4 transition-transform hover:-translate-y-1">
+            <div className="self-start inline-flex items-center gap-2 px-3.5 py-1 rounded-xl bg-white border border-[#151515]/20 text-xs font-bold text-[#151515]">
+              <div className="flex text-[#ff5734] text-xs">
+                ★ ★ ★ ★ ★
+              </div>
+              <span>5.0</span>
+            </div>
+            <div>
+              <p className="text-xs text-[#151515]/80 font-bold">learner reviews</p>
+              <p className="text-4xl sm:text-5xl font-display font-bold text-[#151515] tracking-tight mt-0.5">+180k</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 3. SECTION 2 — EDITORIAL CONTRAST */}
+      <section id="how-it-works" className="w-full py-24 px-6 sm:px-12 bg-white border-t border-[#E8E6DE]">
+        <div className="max-w-6xl mx-auto space-y-14">
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-[#151515] leading-tight">
+              Most platforms give you <span className="text-[#707070] line-through decoration-coral decoration-2">more to study.</span><br />
+              <span className="text-[#ff5734]">IntelliTutor tells you what matters next.</span>
+            </h2>
+            <p className="text-base text-[#555555]">
+              You don't need another massive 800-page book or 50 hours of generic video lectures. You need a precision loop that diagnoses where you leak marks.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+            {/* Traditional Learning */}
+            <div className="bg-[#FAF9F5] border border-[#E8E6DE] rounded-3xl p-8 space-y-6">
+              <div className="flex items-center justify-between pb-4 border-b border-[#E8E6DE]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#707070]">Traditional Approach</span>
+                <span className="text-xs font-semibold text-red-600 bg-red-50 px-2.5 py-1 rounded-full border border-red-200">Overwhelming</span>
+              </div>
+              <ul className="space-y-4 text-sm text-[#555555]">
+                <li className="flex items-start gap-3">
+                  <div className="h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold shrink-0">✕</div>
+                  <span><strong>Endless Passive Videos:</strong> Hours spent watching without retaining core problem-solving intuition.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold shrink-0">✕</div>
+                  <span><strong>Static PDFs & Question Banks:</strong> Solving random questions that don't target your specific weak concepts.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold shrink-0">✕</div>
+                  <span><strong>Forgotten Mistakes:</strong> Errors made in mock tests get buried in notebooks rather than scheduled for retesting.</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* IntelliTutor Active Cycle */}
+            <div className="bg-[#FFF3F0] border-2 border-[#151515] shadow-[6px_6px_0px_0px_#151515] rounded-3xl p-8 space-y-6">
+              <div className="flex items-center justify-between pb-4 border-b border-[#FFC8BC]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#BD3012]">The IntelliTutor Cycle</span>
+                <span className="text-xs font-semibold text-[#166534] bg-[#F0FDF4] px-2.5 py-1 rounded-full border border-[#BBF7D0]">Personalized</span>
+              </div>
+              <div className="grid grid-cols-5 gap-2 text-center">
+                <div className="bg-white p-2.5 rounded-xl border border-[#FFC8BC]">
+                  <span className="text-[10px] font-bold text-[#BD3012]">01</span>
+                  <p className="text-xs font-bold text-[#151515] mt-1">Understand</p>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-[#FFC8BC]">
+                  <span className="text-[10px] font-bold text-[#BD3012]">02</span>
+                  <p className="text-xs font-bold text-[#151515] mt-1">Practice</p>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-[#FFC8BC]">
+                  <span className="text-[10px] font-bold text-[#BD3012]">03</span>
+                  <p className="text-xs font-bold text-[#151515] mt-1">Analyse</p>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-[#FFC8BC]">
+                  <span className="text-[10px] font-bold text-[#BD3012]">04</span>
+                  <p className="text-xs font-bold text-[#151515] mt-1">Revise</p>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-[#FFC8BC]">
+                  <span className="text-[10px] font-bold text-[#BD3012]">05</span>
+                  <p className="text-xs font-bold text-[#151515] mt-1">Improve</p>
+                </div>
+              </div>
+              <ul className="space-y-4 text-sm text-[#151515]">
+                <li className="flex items-start gap-3">
+                  <div className="h-6 w-6 rounded-full bg-[#16A34A] text-white flex items-center justify-center text-xs font-bold shrink-0">✓</div>
+                  <span><strong>AI Socratic Grounding:</strong> Answers grounded directly in your uploaded textbooks and notes with exact page citations.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="h-6 w-6 rounded-full bg-[#16A34A] text-white flex items-center justify-center text-xs font-bold shrink-0">✓</div>
+                  <span><strong>Root-Cause Mistake Intelligence:</strong> Categorizes errors into Conceptual, Calculation, Careless, or Memory lapses.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="h-6 w-6 rounded-full bg-[#16A34A] text-white flex items-center justify-center text-xs font-bold shrink-0">✓</div>
+                  <span><strong>Automated Spaced Repetition:</strong> Prompts you to review before the forgetting curve erases your understanding.</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Personalization Story Section */}
-      <section id="how-it-works" className="py-20 px-6 border-b border-ink-800/60">
-        <div className="max-w-5xl mx-auto space-y-12">
+      {/* 4. SECTION 3 — STUDY WORKSPACE SHOWCASE */}
+      <section id="workspace" className="w-full py-24 px-6 sm:px-12 bg-[#F7F7F5] border-t border-[#E8E6DE]">
+        <div className="max-w-6xl mx-auto space-y-10">
           <div className="text-center space-y-3">
-            <p className="text-xs font-mono uppercase tracking-wider text-academic-400">
-              The Pedagogical Difference
-            </p>
-            <h2 className="text-3xl font-semibold tracking-tight text-ink-50">
-              Moving from Static Content to Adaptive Intelligence
+            <Badge variant="coral">ALL-IN-ONE PLATFORM</Badge>
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-[#151515]">
+              Your entire study system. One workspace.
             </h2>
-            <p className="text-sm text-ink-400 max-w-2xl mx-auto">
-              Most platforms dump content onto students. IntelliTutor models your cognitive mastery, diagnoses error types, and personalizes every subsequent problem.
+            <p className="text-sm sm:text-base text-[#555555] max-w-xl mx-auto">
+              Everything you study, practice, analyze, and revise lives in one unified, distraction-free environment.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Traditional Platforms */}
-            <div className="p-6 rounded-lg bg-ink-900/50 border border-ink-800/80 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono uppercase text-ink-500 font-semibold">Traditional Platforms</span>
-                <Badge variant="outline" className="text-ink-500">Passive</Badge>
+          {/* Framed Product Showcase */}
+          <div className="bg-white rounded-3xl border-2 border-[#151515] shadow-[8px_8px_0px_0px_#151515] p-6 sm:p-10 space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E8E6DE]">
+              <div className="space-y-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#FF5734]">TODAY'S TARGET • NEET 2026</span>
+                <h3 className="text-2xl font-display font-bold text-[#151515]">Good morning, Aarav.</h3>
+                <p className="text-xs text-[#555555]">Here is your high-priority study plan for today.</p>
               </div>
-              <div className="p-3 bg-ink-950 rounded border border-ink-800 font-mono text-xs text-ink-400 flex items-center justify-between">
-                <span>Generic Textbook / Video</span>
-                <span>→</span>
-                <span>All Students</span>
-              </div>
-              <ul className="space-y-2 text-xs text-ink-400">
-                <li className="flex items-start gap-2">
-                  <span className="text-red-400">✕</span> Same repetitive explanations regardless of previous mistakes
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-400">✕</span> Provides direct answers immediately without guiding the student
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-400">✕</span> No memory of conceptual vs calculation errors
-                </li>
-              </ul>
-            </div>
-
-            {/* IntelliTutor Platform */}
-            <div className="p-6 rounded-lg bg-academic-950/40 border border-academic-700/50 space-y-4 ring-1 ring-academic-600/20">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono uppercase text-academic-300 font-semibold">IntelliTutor System</span>
-                <Badge variant="academic">Continuous Loop</Badge>
-              </div>
-              <div className="p-3 bg-ink-950 rounded border border-academic-700/40 font-mono text-xs text-academic-300 flex items-center justify-between">
-                <span>Student</span>
-                <span>→</span>
-                <span>Diagnose</span>
-                <span>→</span>
-                <span>Practice</span>
-                <span>→</span>
-                <span>Adapt</span>
-              </div>
-              <ul className="space-y-2 text-xs text-ink-200">
-                <li className="flex items-start gap-2">
-                  <span className="text-academic-400">✓</span> RAG grounded strictly in your syllabus and uploaded notes
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-academic-400">✓</span> Socratic hints that guide without spoiling the answer
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-academic-400">✓</span> Mistake Journal with automated spaced-repetition retests
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive System Capabilities Tabs */}
-      <section id="system" className="py-20 px-6 border-b border-ink-800/60 bg-ink-900/30">
-        <div className="max-w-5xl mx-auto space-y-10">
-          <div className="text-center space-y-3">
-            <p className="text-xs font-mono uppercase tracking-wider text-academic-400">
-              Core Capabilities
-            </p>
-            <h2 className="text-3xl font-semibold tracking-tight text-ink-50">
-              A Complete Academic Workspace
-            </h2>
-          </div>
-
-          {/* Tabs Navigation */}
-          <div className="flex flex-wrap items-center justify-center gap-2 border-b border-ink-800 pb-4">
-            {[
-              { id: "tutor", label: "AI Tutor", icon: Bot },
-              { id: "library", label: "Study Library", icon: BookOpen },
-              { id: "practice", label: "Adaptive Practice", icon: HelpCircle },
-              { id: "mistakes", label: "Mistake Intelligence", icon: AlertTriangle },
-              { id: "revision", label: "Spaced Repetition", icon: RotateCcw },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
-                    isActive
-                      ? "bg-ink-800 text-white border border-ink-700 font-semibold"
-                      : "text-ink-400 hover:text-ink-200 hover:bg-ink-900"
-                  }`}
-                >
-                  <Icon className={`h-3.5 w-3.5 ${isActive ? "text-academic-400" : ""}`} />
-                  <span>{tab.label}</span>
+              <div className="flex items-center gap-2">
+                <button onClick={handleDemoClick} className="bg-[#ff5734] text-white font-bold text-xs px-5 py-2.5 rounded-full hover:bg-[#e64320] flex items-center gap-1">
+                  Launch Interactive Demo
+                  <ChevronRight className="h-3.5 w-3.5" />
                 </button>
-              );
-            })}
-          </div>
-
-          {/* Tab Content Display */}
-          <div className="rounded-xl border border-ink-800 bg-ink-900/80 p-6 md:p-8">
-            {activeTab === "tutor" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-ink-800 pb-3">
-                  <div className="flex items-center gap-2">
-                    <Bot className="h-4 w-4 text-academic-400" />
-                    <span className="text-xs font-semibold text-ink-200">Socratic Physics Dialogue</span>
-                  </div>
-                  <Badge variant="neutral" className="text-[10px]">Exam-Oriented Mode</Badge>
-                </div>
-                <div className="space-y-3 text-xs">
-                  <div className="p-3 bg-ink-950 rounded border border-ink-800 text-ink-200">
-                    <strong className="text-academic-400 font-mono">Student:</strong> "Explain Kirchhoff's current and voltage laws with a competitive exam tip."
-                  </div>
-                  <div className="p-4 bg-ink-950/60 rounded border border-academic-900/60 text-ink-200 space-y-2">
-                    <p><strong>1. Kirchhoff's Current Law (KCL):</strong> The algebraic sum of currents meeting at any junction is zero. This is a direct consequence of the <em>Conservation of Charge</em>.</p>
-                    <p><strong>2. Kirchhoff's Voltage Law (KVL):</strong> The algebraic sum of changes in potential around any closed loop is zero. This is a direct consequence of the <em>Conservation of Energy</em>.</p>
-                    <div className="p-2.5 rounded bg-ink-900 border border-academic-800/40 text-[11px] text-academic-300">
-                      <strong>Exam Tip:</strong> In complex bridge circuits, choose the node with the maximum connected branches as reference zero potential (nodal analysis) to avoid solving 3x3 simultaneous loop equations.
-                    </div>
-                  </div>
-                </div>
               </div>
-            )}
+            </div>
 
-            {activeTab === "library" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-ink-800 pb-3">
-                  <span className="text-xs font-semibold text-ink-200">Multi-Modal Knowledge Ingestion</span>
-                  <Badge variant="academic" className="text-[10px]">RAG Ready</Badge>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-7 bg-[#FFF3F0] border-2 border-[#151515] rounded-2xl p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#BD3012] bg-white px-3 py-1 rounded-full border border-[#FFC8BC]">
+                    TODAY'S FOCUS
+                  </span>
+                  <span className="text-xs font-mono font-bold text-[#BD3012]">20 min practice</span>
                 </div>
-                <p className="text-xs text-ink-400">
-                  Upload textbooks, handwritten lecture notes, and mock papers (PDF, DOCX, Images). The ingestion engine extracts topics, computes embeddings, and indexes every formula with page-level citations.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                  <div className="p-3 rounded bg-ink-950 border border-ink-800 space-y-1 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-ink-200">NCERT Physics Class 12.pdf</span>
-                      <Badge variant="academic" className="text-[9px]">420 Pages</Badge>
-                    </div>
-                    <p className="text-[11px] text-ink-500 font-mono">Topics indexed: Electrostatics, Current, Optics</p>
+                <div>
+                  <h4 className="font-display font-bold text-xl text-[#151515]">Physics: Rotational Motion</h4>
+                  <p className="text-xs text-[#555555] mt-1">Angular momentum conservation and rolling without slipping.</p>
+                </div>
+                <div className="bg-white p-4 rounded-xl border border-[#FFC8BC] space-y-2">
+                  <div className="flex justify-between text-xs font-semibold">
+                    <span>Current Topic Mastery</span>
+                    <span className="text-[#FF5734]">42%</span>
                   </div>
-                  <div className="p-3 rounded bg-ink-950 border border-ink-800 space-y-1 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-ink-200">Organic Mechanisms Lecture Notes.pdf</span>
-                      <Badge variant="academic" className="text-[9px]">64 Pages</Badge>
-                    </div>
-                    <p className="text-[11px] text-ink-500 font-mono">Topics indexed: Nucleophilic & Electrophilic</p>
+                  <div className="h-2 w-full bg-[#FFE4DE] rounded-full overflow-hidden">
+                    <div className="h-full bg-[#FF5734] rounded-full" style={{ width: "42%" }} />
                   </div>
                 </div>
-              </div>
-            )}
-
-            {activeTab === "practice" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-ink-800 pb-3">
-                  <span className="text-xs font-semibold text-ink-200">Adaptive Diagnostic Generation</span>
-                  <Badge variant="warning" className="text-[10px]">Hard / Exam Level</Badge>
-                </div>
-                <div className="p-4 bg-ink-950 rounded border border-ink-800 space-y-3 text-xs">
-                  <p className="font-medium text-ink-100">
-                    A cylinder of mass M and radius R rolls without slipping down an inclined plane of inclination θ. What is the acceleration of the cylinder?
+                <div className="bg-white/80 p-3.5 rounded-xl border border-[#FFC8BC] flex items-start gap-2.5">
+                  <Lightbulb className="h-4 w-4 text-[#FF5734] shrink-0 mt-0.5" />
+                  <p className="text-xs text-[#151515]">
+                    <strong>AI Recommendation:</strong> "Review angular momentum before attempting your next diagnostic problem set."
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-ink-300">
-                    <div className="p-2 rounded bg-ink-900 border border-ink-800">A) (1/2) g sin θ</div>
-                    <div className="p-2 rounded bg-academic-950 border border-academic-600 text-academic-300 font-semibold">B) (2/3) g sin θ (Correct)</div>
-                    <div className="p-2 rounded bg-ink-900 border border-ink-800">C) (3/4) g sin θ</div>
-                    <div className="p-2 rounded bg-ink-900 border border-ink-800">D) g sin θ</div>
-                  </div>
                 </div>
               </div>
-            )}
 
-            {activeTab === "mistakes" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-ink-800 pb-3">
-                  <span className="text-xs font-semibold text-ink-200">Root-Cause Error Classification</span>
-                  <Badge variant="danger" className="text-[10px]">Conceptual Error</Badge>
-                </div>
-                <div className="p-4 bg-ink-950 rounded border border-red-900/40 space-y-2 text-xs">
+              <div className="lg:col-span-5 space-y-4">
+                <div className="bg-[#F0E9FD] border-2 border-[#151515] rounded-2xl p-5 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-red-300">Markovnikov Carbocation Intermediate</span>
-                    <span className="text-ink-500 font-mono text-[10px]">Retest Scheduled</span>
+                    <span className="text-xs font-bold text-[#6C38D4] uppercase">Revision Due</span>
+                    <span className="text-xs font-bold bg-white px-2 py-0.5 rounded-full border border-[#E0D1FB]">3 Topics</span>
                   </div>
-                  <p className="text-ink-400">
-                    <strong>Mistake:</strong> Selected primary carbocation instead of the secondary 2-propyl cation during hydration of propene.
-                  </p>
-                  <p className="text-ink-300 text-[11px]">
-                    <strong>Remedy:</strong> Carbocation stability order (3° &gt; 2° &gt; 1°) dictates preferential proton addition to the least substituted carbon.
-                  </p>
+                  <p className="text-sm font-display font-bold text-[#151515]">Thermodynamics & Cell Cycle</p>
+                  <p className="text-xs text-[#555555]">Spaced interval reached optimal recall point.</p>
                 </div>
-              </div>
-            )}
 
-            {activeTab === "revision" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-ink-800 pb-3">
-                  <span className="text-xs font-semibold text-ink-200">Ebbinghaus Forgetting Curve Timeline</span>
-                  <Badge variant="academic" className="text-[10px]">Optimal Decay Prevention</Badge>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-                  <div className="p-3 bg-ink-950 rounded border border-amber-800/60 space-y-1">
-                    <p className="font-mono text-[10px] text-amber-400 uppercase">Today (Stage 1)</p>
-                    <p className="font-medium text-ink-200">Angular Momentum</p>
+                <div className="bg-[#FFF9D6] border-2 border-[#151515] rounded-2xl p-5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#8F6E00] uppercase">Adaptive Practice</span>
+                    <span className="text-xs font-bold bg-white px-2 py-0.5 rounded-full border border-[#FFF1A3]">20 Questions</span>
                   </div>
-                  <div className="p-3 bg-ink-950 rounded border border-ink-800 space-y-1">
-                    <p className="font-mono text-[10px] text-ink-500 uppercase">In 3 Days (Stage 2)</p>
-                    <p className="font-medium text-ink-300">Carbocation Rules</p>
-                  </div>
-                  <div className="p-3 bg-ink-950 rounded border border-ink-800 space-y-1">
-                    <p className="font-mono text-[10px] text-ink-500 uppercase">In 7 Days (Stage 3)</p>
-                    <p className="font-medium text-ink-300">Mitosis Prophase I</p>
-                  </div>
-                  <div className="p-3 bg-ink-950 rounded border border-ink-800 space-y-1">
-                    <p className="font-mono text-[10px] text-ink-500 uppercase">In 30 Days (Stage 4)</p>
-                    <p className="font-medium text-ink-300">Thermodynamics</p>
-                  </div>
+                  <p className="text-sm font-display font-bold text-[#151515]">Targeted Error Correction</p>
+                  <p className="text-xs text-[#555555]">Calibrated to eliminate your common careless mistakes.</p>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Final Call To Action */}
-      <section className="py-20 px-6 text-center border-b border-ink-800/60 bg-ink-950">
-        <div className="max-w-2xl mx-auto space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-ink-50">
-            Stop studying everything.<br />
-            <span className="text-academic-400 font-normal">Start studying what matters.</span>
-          </h2>
-
-          <p className="text-sm text-ink-400">
-            Join thousands of competitive aspirants maximizing retention, eliminating recurring mistakes, and preparing systematically with IntelliTutor AI.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Link href="/register">
-              <Button variant="academic" size="lg" className="h-11 px-6 font-semibold text-sm">
-                Get Started Now
-                <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
+      {/* 5. SECTION 4 — PERSONAL STUDY LIBRARY */}
+      <section id="library" className="w-full py-24 px-6 sm:px-12 bg-white border-t border-[#E8E6DE]">
+        <div className="max-w-6xl mx-auto space-y-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-3 max-w-xl">
+              <Badge variant="lavender">KNOWLEDGE BASE</Badge>
+              <h2 className="text-3xl sm:text-4xl font-display font-bold text-[#151515]">
+                Turn your notes into your own knowledge base.
+              </h2>
+              <p className="text-sm sm:text-base text-[#555555]">
+                Upload your textbooks, coaching modules, hand-written notes, and PYQ collections. IntelliTutor indexes every formula and diagram.
+              </p>
+            </div>
+            <Link href="/library">
+              <button className="bg-white border-2 border-[#151515] font-bold text-xs sm:text-sm px-6 py-3 rounded-full hover:bg-[#FAF9F5] flex items-center gap-2">
+                <UploadCloud className="h-4 w-4 text-[#ff5734]" />
+                Upload Notes
+              </button>
             </Link>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={handleDemoClick}
-              className="h-11 px-6 text-sm border-ink-700/60 text-ink-300 hover:text-white"
-            >
-              Open Instant Demo
-            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-[#FAF9F5] border-2 border-[#151515] shadow-[4px_4px_0px_0px_#151515] rounded-2xl p-5 space-y-4 hover:-translate-y-1 transition-transform">
+              <div className="h-32 rounded-xl bg-[#FFF3F0] border border-[#FFC8BC] flex flex-col justify-between p-3.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#BD3012] bg-white px-2 py-0.5 rounded-md self-start border border-[#FFC8BC]">
+                  PHYSICS
+                </span>
+                <BookOpen className="h-8 w-8 text-[#FF5734] self-end opacity-80" />
+                <span className="text-xs font-bold text-[#BD3012]">NCERT Class 11</span>
+              </div>
+              <div>
+                <h4 className="font-display font-bold text-sm text-[#151515]">Rotational Dynamics</h4>
+                <p className="text-xs text-[#707070] mt-0.5">PDF • 42 pages • Fully Indexed</p>
+              </div>
+            </div>
+
+            <div className="bg-[#FAF9F5] border-2 border-[#151515] shadow-[4px_4px_0px_0px_#151515] rounded-2xl p-5 space-y-4 hover:-translate-y-1 transition-transform">
+              <div className="h-32 rounded-xl bg-[#F0E9FD] border border-[#E0D1FB] flex flex-col justify-between p-3.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#6C38D4] bg-white px-2 py-0.5 rounded-md self-start border border-[#E0D1FB]">
+                  CHEMISTRY
+                </span>
+                <FileText className="h-8 w-8 text-[#B99AF5] self-end opacity-80" />
+                <span className="text-xs font-bold text-[#6C38D4]">Organic Mechanisms</span>
+              </div>
+              <div>
+                <h4 className="font-display font-bold text-sm text-[#151515]">Aldehydes & Ketones</h4>
+                <p className="text-xs text-[#707070] mt-0.5">PDF • 28 pages • 84 Concepts</p>
+              </div>
+            </div>
+
+            <div className="bg-[#FAF9F5] border-2 border-[#151515] shadow-[4px_4px_0px_0px_#151515] rounded-2xl p-5 space-y-4 hover:-translate-y-1 transition-transform">
+              <div className="h-32 rounded-xl bg-[#FFF9D6] border border-[#FFF1A3] flex flex-col justify-between p-3.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#8F6E00] bg-white px-2 py-0.5 rounded-md self-start border border-[#FFF1A3]">
+                  BIOLOGY
+                </span>
+                <GraduationCap className="h-8 w-8 text-[#FFCC42] self-end opacity-80" />
+                <span className="text-xs font-bold text-[#8F6E00]">Human Physiology</span>
+              </div>
+              <div>
+                <h4 className="font-display font-bold text-sm text-[#151515]">Endocrine System</h4>
+                <p className="text-xs text-[#707070] mt-0.5">PDF • 36 pages • High Yield</p>
+              </div>
+            </div>
+
+            <div className="bg-[#FAF9F5] border-2 border-[#151515] shadow-[4px_4px_0px_0px_#151515] rounded-2xl p-5 space-y-4 hover:-translate-y-1 transition-transform">
+              <div className="h-32 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] flex flex-col justify-between p-3.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#166534] bg-white px-2 py-0.5 rounded-md self-start border border-[#BBF7D0]">
+                  ARCHIVE
+                </span>
+                <FileSpreadsheet className="h-8 w-8 text-[#16A34A] self-end opacity-80" />
+                <span className="text-xs font-bold text-[#166534]">10-Year PYQ Bank</span>
+              </div>
+              <div>
+                <h4 className="font-display font-bold text-sm text-[#151515]">NEET & JEE Questions</h4>
+                <p className="text-xs text-[#707070] mt-0.5">Vetted • 1,500+ Questions</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Minimal Academic Footer */}
-      <footer className="py-8 px-6 border-t border-ink-800/80 bg-ink-950 text-xs text-ink-500 font-mono">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* 6. FINAL CTA & FOOTER */}
+      <section className="w-full py-24 px-6 sm:px-12 bg-[#fccc42] border-t-2 border-[#151515]">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <h2 className="text-3xl sm:text-5xl font-display font-bold text-[#151515] leading-tight">
+            Stop studying everything.<br />
+            Start studying what matters.
+          </h2>
+          <p className="text-base sm:text-lg text-[#151515]/80 max-w-xl mx-auto font-medium">
+            Build an intelligent study system that adapts to your brain, tracks every error, and guides you to exam success.
+          </p>
+          <div className="pt-2">
+            <Link href="/register">
+              <button className="bg-[#151515] text-white hover:bg-[#2B2B2B] h-13 px-8 py-3.5 rounded-2xl text-base font-bold shadow-lg transition-all active:scale-95">
+                Start Learning Now →
+              </button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <footer className="w-full bg-white border-t border-[#E8E6DE] py-12 px-6 sm:px-12 text-xs text-[#555555]">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-ink-300">INTELLITUTOR AI</span>
-            <span>· Pedagogically Aligned Study System</span>
+            <span className="font-display font-bold text-base text-[#151515]">Intelli<span className="text-[#ff5734]">Tutor</span> AI</span>
           </div>
-          <div>
-            Built with Next.js, FastAPI & Google Gemini API
-          </div>
+          <p className="text-[#707070]">© {new Date().getFullYear()} IntelliTutor AI. Personal Study Coach & Adaptive Learning Platform.</p>
         </div>
       </footer>
+
     </div>
   );
 }

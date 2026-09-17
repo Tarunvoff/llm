@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { RotateCcw, CheckCircle2, Clock, Calendar, ArrowRight } from "lucide-react";
+import { RotateCcw, CheckCircle2, Clock, Calendar, ArrowRight, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ export default function RevisionPage() {
       stage: "Stage 1 (Today)",
       desc: "Immediate active recall after 24h",
       count: 2,
+      variant: "coral",
       topics: [
         { subject: "Physics", topic: "Conservation of Angular Momentum", interval: "24h Interval" },
         { subject: "Biology", topic: "Cell Division (Mitosis vs Meiosis)", interval: "24h Interval" },
@@ -22,6 +23,7 @@ export default function RevisionPage() {
       stage: "Stage 2 (Tomorrow)",
       desc: "3-Day memory stabilization interval",
       count: 1,
+      variant: "yellow",
       topics: [
         { subject: "Chemistry", topic: "Markovnikov Addition & Carbocations", interval: "3d Interval" },
       ],
@@ -30,16 +32,18 @@ export default function RevisionPage() {
       stage: "Stage 3 (In 7 Days)",
       desc: "Weekly consolidation interval",
       count: 3,
+      variant: "lavender",
       topics: [
         { subject: "Physics", topic: "Work-Energy Theorem in Non-Conservative Fields", interval: "7d Interval" },
-        { subject: "Biology", topic: "Enzyme Kinetics and Michaelis Constant", interval: "7d Interval" },
+        { subject: "Biology", topic: "Enzyme Kinetics & Michaelis Constant", interval: "7d Interval" },
         { subject: "Chemistry", topic: "Thermodynamics & Enthalpy Calculation", interval: "7d Interval" },
       ],
     },
     {
       stage: "Stage 4 (In 30 Days)",
-      desc: "Long-term permanent memory interval",
-      count: 4,
+      desc: "Long-term permanent memory lock",
+      count: 2,
+      variant: "academic",
       topics: [
         { subject: "Physics", topic: "Kinematics 2D Projectile Equations", interval: "30d Interval" },
         { subject: "Chemistry", topic: "Periodic Trends & Electronegativity", interval: "30d Interval" },
@@ -50,15 +54,15 @@ export default function RevisionPage() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-ink-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8E6DE]">
           <div>
-            <h2 className="text-xl font-semibold text-ink-50">Spaced Repetition Schedule</h2>
-            <p className="text-xs text-ink-400">
-              Ebbinghaus decay curve optimization. Review topics at expanding intervals to lock them into long-term memory.
+            <h2 className="text-2xl sm:text-3xl font-display font-bold text-[#151515]">Spaced Repetition</h2>
+            <p className="text-xs sm:text-sm text-[#555555] mt-0.5">
+              Ebbinghaus forgetting-curve prevention. Review topics at expanding intervals to lock concepts into permanent memory.
             </p>
           </div>
 
-          <Button variant="academic" size="sm" className="text-xs h-8">
+          <Button variant="primary" size="sm" className="text-xs h-9 font-bold shadow-sm">
             Start Today's Review (2)
           </Button>
         </div>
@@ -66,32 +70,42 @@ export default function RevisionPage() {
         {/* Timeline Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {revisionBuckets.map((bucket, idx) => (
-            <Card key={idx} className="space-y-3">
-              <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <div
+              key={idx}
+              className="bg-white border-2 border-[#151515] rounded-3xl p-6 sm:p-7 shadow-[4px_4px_0px_0px_#151515] space-y-4"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-[#EFEFE8]">
                 <div>
-                  <CardTitle className="text-xs font-semibold uppercase tracking-wider text-ink-200 font-mono">
+                  <h3 className="font-display font-bold text-base text-[#151515]">
                     {bucket.stage}
-                  </CardTitle>
-                  <p className="text-[11px] text-ink-500">{bucket.desc}</p>
+                  </h3>
+                  <p className="text-xs text-[#707070] mt-0.5">{bucket.desc}</p>
                 </div>
-                <Badge variant={bucket.stage.includes("Today") ? "warning" : "neutral"} className="text-[10px] font-mono">
+                <Badge
+                  variant={bucket.stage.includes("Today") ? "coral" : bucket.stage.includes("Tomorrow") ? "yellow" : "lavender"}
+                  className="text-xs font-bold"
+                >
                   {bucket.count} Topics
                 </Badge>
-              </CardHeader>
-              <CardContent className="space-y-2">
+              </div>
+
+              <div className="space-y-3">
                 {bucket.topics.map((t, tIdx) => (
-                  <div key={tIdx} className="p-3 rounded-md bg-ink-950/80 border border-ink-800 flex items-center justify-between text-xs">
+                  <div
+                    key={tIdx}
+                    className="p-3.5 rounded-2xl bg-[#FAF9F5] border border-[#E8E6DE] flex items-center justify-between text-xs transition-all hover:bg-white hover:border-[#D2CFC2]"
+                  >
                     <div>
-                      <p className="font-medium text-ink-100">{t.topic}</p>
-                      <p className="text-[10px] text-ink-500 font-mono">{t.subject} · {t.interval}</p>
+                      <p className="font-bold text-[#151515]">{t.topic}</p>
+                      <p className="text-[11px] text-[#707070] mt-0.5 font-medium">{t.subject} • {t.interval}</p>
                     </div>
-                    <Button variant="outline" size="sm" className="h-6 text-[10px] px-2 border-ink-700">
+                    <Button variant="outline" size="sm" className="h-8 text-xs font-bold border-[#E4E2D8] text-[#151515] hover:bg-[#FAF9F5]">
                       Review →
                     </Button>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       </div>

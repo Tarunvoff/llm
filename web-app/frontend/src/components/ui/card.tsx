@@ -3,17 +3,23 @@ import { cn } from "@/lib/utils";
 
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { variant?: "default" | "subtle" | "interactive" }
+  React.HTMLAttributes<HTMLDivElement> & {
+    variant?: "default" | "subtle" | "interactive" | "lavender" | "yellow" | "coral" | "framed";
+  }
 >(({ className, variant = "default", ...props }, ref) => {
   const variants = {
-    default: "bg-ink-900/90 border border-ink-800/80 shadow-subtle text-ink-100",
-    subtle: "bg-ink-900/40 border border-ink-800/40 text-ink-200",
-    interactive: "bg-ink-900/90 border border-ink-800/80 hover:border-ink-700/80 transition-all duration-150 text-ink-100 cursor-pointer",
+    default: "bg-white border border-[#E8E6DE] shadow-subtle text-[#151515]",
+    subtle: "bg-[#FAF9F5] border border-[#E8E6DE] text-[#151515]",
+    interactive: "bg-white border border-[#E8E6DE] hover:border-[#FF5734]/50 hover:shadow-card transition-all duration-200 text-[#151515] cursor-pointer",
+    lavender: "bg-[#F0E9FD] border border-[#E0D1FB] text-[#151515]",
+    yellow: "bg-[#FFF9D6] border border-[#FFF1A3] text-[#151515]",
+    coral: "bg-[#FFF3F0] border border-[#FFC8BC] text-[#151515]",
+    framed: "bg-white border-2 border-[#151515] shadow-[4px_4px_0px_0px_#151515] text-[#151515]",
   };
   return (
     <div
       ref={ref}
-      className={cn("rounded-lg p-5", variants[variant], className)}
+      className={cn("rounded-2xl p-6 transition-all", variants[variant], className)}
       {...props}
     />
   );
@@ -26,7 +32,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 pb-4 border-b border-ink-800/40", className)}
+    className={cn("flex flex-col space-y-1.5 pb-4 border-b border-[#EFEFE8]", className)}
     {...props}
   />
 ));
@@ -38,7 +44,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("font-medium text-base text-ink-100 tracking-tight", className)}
+    className={cn("font-display font-semibold text-lg text-[#151515] tracking-tight", className)}
     {...props}
   />
 ));
@@ -50,7 +56,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-xs text-ink-400 font-normal leading-relaxed", className)}
+    className={cn("text-xs text-[#555555] font-normal leading-relaxed", className)}
     {...props}
   />
 ));

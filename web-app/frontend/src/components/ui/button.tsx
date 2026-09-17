@@ -3,29 +3,31 @@ import { cn } from "@/lib/utils";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "academic" | "danger";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "academic" | "danger" | "yellow" | "lavender";
   size?: "sm" | "md" | "lg" | "icon";
   isLoading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading, children, disabled, ...props }, ref) => {
-    const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-academic-500 disabled:pointer-events-none disabled:opacity-50 select-none";
+    const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-400 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer";
     
     const variants = {
-      primary: "bg-ink-900 text-ink-50 hover:bg-ink-800 active:scale-[0.99] border border-ink-700/60 shadow-sm",
-      secondary: "bg-ink-800 text-ink-100 hover:bg-ink-700 active:scale-[0.99] border border-ink-700/40",
-      outline: "border border-ink-700/50 bg-transparent text-ink-200 hover:bg-ink-800/60 hover:text-white active:scale-[0.99]",
-      ghost: "text-ink-400 hover:text-ink-100 hover:bg-ink-800/40 active:scale-[0.99]",
-      academic: "bg-academic-700 text-white hover:bg-academic-600 active:scale-[0.99] border border-academic-600 shadow-sm",
-      danger: "bg-red-900/40 text-red-300 border border-red-800/60 hover:bg-red-900/60",
+      primary: "bg-[#FF5734] text-white hover:bg-[#E64320] active:scale-[0.98] shadow-sm font-semibold",
+      secondary: "bg-[#B99AF5] text-[#151515] hover:bg-[#A37EF0] active:scale-[0.98] shadow-sm font-semibold",
+      yellow: "bg-[#FFCC42] text-[#151515] hover:bg-[#E5B125] active:scale-[0.98] shadow-sm font-semibold",
+      lavender: "bg-[#F0E9FD] text-[#6C38D4] border border-[#E0D1FB] hover:bg-[#E0D1FB] active:scale-[0.98]",
+      outline: "border border-[#E4E2D8] bg-white text-[#151515] hover:bg-[#FAF9F5] hover:border-[#D2CFC2] active:scale-[0.98] shadow-subtle",
+      ghost: "text-[#151515] hover:bg-[#EFEFE8] hover:text-[#151515] active:scale-[0.98]",
+      academic: "bg-[#16A34A] text-white hover:bg-[#15803D] active:scale-[0.98] shadow-sm font-semibold",
+      danger: "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100",
     };
 
     const sizes = {
-      sm: "h-8 px-3 text-xs rounded-md gap-1.5",
-      md: "h-9 px-4 text-sm rounded-md gap-2",
-      lg: "h-11 px-6 text-sm rounded-md gap-2.5 font-semibold",
-      icon: "h-9 w-9 p-0 rounded-md",
+      sm: "h-8 px-3.5 text-xs rounded-full gap-1.5",
+      md: "h-10 px-5 text-sm rounded-full gap-2",
+      lg: "h-12 px-7 text-sm sm:text-base rounded-full gap-2.5 font-semibold",
+      icon: "h-9 w-9 p-0 rounded-full",
     };
 
     return (

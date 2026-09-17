@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Calendar as CalendarIcon, Clock, CheckCircle2, ChevronLeft, ChevronRight, Plus, Sparkles } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, CheckCircle2, ChevronLeft, ChevronRight, Plus, Sparkles, Check } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,88 +27,97 @@ export default function PlannerPage() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-ink-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8E6DE]">
           <div>
-            <h2 className="text-xl font-semibold text-ink-50">Study Planner</h2>
-            <p className="text-xs text-ink-400">
-              Personalized 45-day roadmap automatically adjusted for syllabus coverage and upcoming revision triggers.
+            <h2 className="text-2xl sm:text-3xl font-display font-bold text-[#151515]">Study Planner</h2>
+            <p className="text-xs sm:text-sm text-[#555555] mt-0.5">
+              Personalized roadmap automatically synchronized with your exam target and spaced repetition triggers.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="text-xs h-8 border-ink-700">
-              <Sparkles className="h-3.5 w-3.5 mr-1 text-academic-400" />
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" className="text-xs h-9 font-bold border-[#E4E2D8]">
+              <Sparkles className="h-3.5 w-3.5 mr-1.5 text-[#FF5734]" />
               Re-optimize Plan
             </Button>
-            <Button variant="academic" size="sm" className="text-xs h-8">
+            <Button variant="primary" size="sm" className="text-xs h-9 font-bold">
               + Add Session
             </Button>
           </div>
         </div>
 
         {/* Days Ribbon */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
           {days.map((d, i) => (
             <div
               key={i}
-              className={`p-3 rounded-lg border text-center transition-all ${
+              className={`p-4 rounded-2xl border-2 text-center transition-all cursor-pointer ${
                 d.isToday
-                  ? "bg-academic-950/60 border-academic-600 text-white ring-1 ring-academic-600"
-                  : "bg-ink-900/60 border-ink-800 text-ink-400"
+                  ? "bg-[#FFCC42] border-[#151515] text-[#151515] shadow-[4px_4px_0px_0px_#151515] font-bold"
+                  : "bg-white border-[#E8E6DE] text-[#555555] hover:border-[#151515] hover:bg-[#FAF9F5]"
               }`}
             >
-              <p className="text-xs font-semibold">{d.name}</p>
-              <p className="text-[10px] font-mono text-ink-500 mt-0.5">{d.date}</p>
-              {d.isToday && <Badge variant="academic" className="text-[9px] mt-1.5 py-0 px-1">Today</Badge>}
+              <p className="text-sm font-display font-bold">{d.name}</p>
+              <p className="text-xs mt-0.5 opacity-80">{d.date}</p>
+              {d.isToday && (
+                <span className="inline-block text-[10px] uppercase font-bold bg-[#151515] text-white px-2 py-0.5 rounded-full mt-2">
+                  Today
+                </span>
+              )}
             </div>
           ))}
         </div>
 
         {/* Schedule List */}
-        <Card className="space-y-3">
-          <CardHeader className="pb-3 border-b border-ink-800">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-ink-300 font-mono">
+        <div className="bg-white border-2 border-[#151515] rounded-3xl p-6 sm:p-8 shadow-[4px_4px_0px_0px_#151515] space-y-4">
+          <div className="flex items-center justify-between pb-4 border-b border-[#EFEFE8]">
+            <h3 className="font-display font-bold text-base text-[#151515]">
               Monday Study Timeline (3.5h Planned)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+            </h3>
+            <span className="text-xs text-[#707070] font-semibold">5 sessions</span>
+          </div>
+
+          <div className="space-y-3">
             {planSessions.map((s, idx) => (
               <div
                 key={idx}
-                className={`p-3.5 rounded-md border flex items-center justify-between text-xs transition-colors ${
+                className={`p-4 rounded-2xl border flex items-center justify-between text-xs transition-all ${
                   s.completed
-                    ? "bg-ink-950/40 border-ink-800/40 opacity-60"
-                    : "bg-ink-950/90 border-ink-800 hover:border-ink-700"
+                    ? "bg-[#FAF9F5] border-[#E8E6DE] opacity-60"
+                    : "bg-white border-[#E8E6DE] hover:border-[#D2CFC2] shadow-subtle"
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3.5">
                   <div
-                    className={`h-4 w-4 rounded-full border flex items-center justify-center ${
-                      s.completed ? "bg-academic-900 border-academic-600 text-academic-300" : "border-ink-600"
+                    className={`h-5 w-5 rounded-lg border-2 flex items-center justify-center transition-colors ${
+                      s.completed ? "bg-[#16A34A] border-[#16A34A] text-white" : "border-[#D2CFC2] bg-white"
                     }`}
                   >
-                    {s.completed && <CheckCircle2 className="h-3 w-3" />}
+                    {s.completed && <Check className="h-3.5 w-3.5" />}
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[11px] text-ink-400">{s.time}</span>
-                      <span className={`font-medium ${s.completed ? "line-through text-ink-400" : "text-ink-100"}`}>
-                        {s.subject} · {s.topic}
+                    <div className="flex items-center gap-2.5">
+                      <span className="font-bold text-xs text-[#FF5734]">{s.time}</span>
+                      <span className={`font-bold text-sm ${s.completed ? "line-through text-[#707070]" : "text-[#151515]"}`}>
+                        {s.subject} • {s.topic}
                       </span>
                     </div>
-                    <p className="text-[10px] text-ink-500 font-mono mt-0.5">
-                      Duration: {s.duration} · Type: {s.type}
+                    <p className="text-xs text-[#707070] mt-0.5 font-medium">
+                      Duration: {s.duration} • Type: {s.type}
                     </p>
                   </div>
                 </div>
 
-                <Badge variant={s.type === "Revision" ? "warning" : s.type === "Practice" ? "outline" : "neutral"} className="text-[10px]">
+                <Badge
+                  variant={s.type === "Revision" ? "yellow" : s.type === "Practice" ? "coral" : "lavender"}
+                  className="text-xs font-bold"
+                >
                   {s.type}
                 </Badge>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </AppShell>
   );

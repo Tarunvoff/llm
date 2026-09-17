@@ -14,37 +14,35 @@ export default function SettingsPage() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-ink-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8E6DE]">
           <div>
-            <h2 className="text-xl font-semibold text-ink-50">Settings & AI Configurations</h2>
-            <p className="text-xs text-ink-400">
-              Manage LLM provider parameters, pedagogical thresholds, and application preferences.
+            <h2 className="text-2xl sm:text-3xl font-display font-bold text-[#151515]">Settings & Configurations</h2>
+            <p className="text-xs sm:text-sm text-[#555555] mt-0.5">
+              Manage AI intelligence provider parameters, memory persistence, and system preferences.
             </p>
           </div>
         </div>
 
         {/* AI Provider Section */}
-        <Card className="space-y-4">
-          <CardHeader className="pb-3 border-b border-ink-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-sm font-semibold text-ink-100 flex items-center gap-2">
-                  <Key className="h-4 w-4 text-academic-400" />
-                  AI Intelligence Provider
-                </CardTitle>
-                <CardDescription>
-                  Current backend implementation: <strong>Google Gemini API</strong> (with pluggable AIService architecture for HuggingFace).
-                </CardDescription>
-              </div>
-              <Badge variant="academic" className="text-[10px] font-mono">
-                gemini-2.5-flash
-              </Badge>
+        <div className="bg-white border-2 border-[#151515] rounded-3xl p-6 sm:p-8 shadow-[4px_4px_0px_0px_#151515] space-y-6">
+          <div className="flex items-center justify-between pb-4 border-b border-[#EFEFE8]">
+            <div>
+              <h3 className="font-display font-bold text-base text-[#151515] flex items-center gap-2">
+                <Key className="h-4 w-4 text-[#FF5734]" />
+                AI Intelligence Provider
+              </h3>
+              <p className="text-xs text-[#555555] mt-0.5">
+                Current backend implementation: <strong>Google Gemini API</strong> (with pluggable AIService architecture for HuggingFace).
+              </p>
             </div>
-          </CardHeader>
+            <Badge variant="coral" className="text-xs font-bold">
+              gemini-2.5-flash
+            </Badge>
+          </div>
 
-          <CardContent className="space-y-4">
+          <div className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-ink-300">Gemini API Key (Configured on Backend)</label>
+              <label className="text-xs font-bold uppercase text-[#707070]">Gemini API Key (Configured on Backend)</label>
               <Input
                 type="password"
                 value={apiKey}
@@ -52,56 +50,57 @@ export default function SettingsPage() {
                 placeholder="AIzaSy..."
                 disabled
               />
-              <p className="text-[11px] text-ink-500 font-mono">
-                API keys are securely held on the FastAPI backend and never exposed to the frontend client.
+              <p className="text-xs text-[#707070] mt-1">
+                API keys are securely maintained on the FastAPI backend and never exposed to the client.
               </p>
             </div>
 
             <div className="pt-2 flex justify-end">
-              <Button variant="academic" size="sm" className="text-xs h-8">
+              <Button variant="primary" size="sm" className="text-xs h-9 font-bold">
                 Save AI Configuration
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Knowledge Tracing & Memory */}
-        <Card className="space-y-4">
-          <CardHeader className="pb-3 border-b border-ink-800">
-            <CardTitle className="text-sm font-semibold text-ink-100 flex items-center gap-2">
-              <Database className="h-4 w-4 text-academic-400" />
+        <div className="bg-white border-2 border-[#151515] rounded-3xl p-6 sm:p-8 shadow-[4px_4px_0px_0px_#151515] space-y-6">
+          <div className="pb-4 border-b border-[#EFEFE8]">
+            <h3 className="font-display font-bold text-base text-[#151515] flex items-center gap-2">
+              <Database className="h-4 w-4 text-[#B99AF5]" />
               Cognitive Tracing & Memory Policy
-            </CardTitle>
-            <CardDescription>
+            </h3>
+            <p className="text-xs text-[#555555] mt-0.5">
               Control how mistake patterns, topic decay, and session history are stored.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 text-xs">
-            <div className="flex items-center justify-between py-2 border-b border-ink-800/60">
+            </p>
+          </div>
+
+          <div className="space-y-3 text-xs sm:text-sm">
+            <div className="flex items-center justify-between py-3 border-b border-[#EFEFE8]">
               <div>
-                <p className="font-medium text-ink-100">Bayesian Knowledge Tracing</p>
-                <p className="text-[11px] text-ink-400">Dynamically update topic mastery after each quiz attempt.</p>
+                <p className="font-bold text-[#151515]">Bayesian Knowledge Tracing (BKT)</p>
+                <p className="text-xs text-[#707070]">Dynamically update topic mastery after each quiz attempt.</p>
               </div>
               <Badge variant="academic">Active</Badge>
             </div>
 
-            <div className="flex items-center justify-between py-2 border-b border-ink-800/60">
+            <div className="flex items-center justify-between py-3 border-b border-[#EFEFE8]">
               <div>
-                <p className="font-medium text-ink-100">Spaced Repetition Scheduler</p>
-                <p className="text-[11px] text-ink-400">Auto-queue 1d, 3d, 7d, 30d review items on mistake detection.</p>
+                <p className="font-bold text-[#151515]">Spaced Repetition Scheduler</p>
+                <p className="text-xs text-[#707070]">Auto-queue 1d, 3d, 7d, 30d review items upon mistake detection.</p>
               </div>
               <Badge variant="academic">Active</Badge>
             </div>
 
-            <div className="flex items-center justify-between py-2">
+            <div className="flex items-center justify-between py-3">
               <div>
-                <p className="font-medium text-ink-100">Strict Document Grounding</p>
-                <p className="text-[11px] text-ink-400">Prevent hallucinations by strictly requiring citations for textbook questions.</p>
+                <p className="font-bold text-[#151515]">Strict Document Grounding</p>
+                <p className="text-xs text-[#707070]">Require citations for textbook questions to eliminate hallucinations.</p>
               </div>
               <Badge variant="academic">Enabled</Badge>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </AppShell>
   );

@@ -45,130 +45,130 @@ export default function ProfilePage() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-ink-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8E6DE]">
           <div>
-            <h2 className="text-xl font-semibold text-ink-50">Student Profile</h2>
-            <p className="text-xs text-ink-400">
-              Your academic identity, goal parameters, and calibrated learning settings.
+            <h2 className="text-2xl sm:text-3xl font-display font-bold text-[#151515]">Student Profile</h2>
+            <p className="text-xs sm:text-sm text-[#555555] mt-0.5">
+              Your personal study coach settings, target milestones, and pedagogical preferences.
             </p>
           </div>
 
           <Button
-            variant="outline"
+            variant="primary"
             size="sm"
             onClick={() => setIsEditing(true)}
-            className="text-xs h-8 gap-1.5 border-ink-700"
+            className="text-xs h-9 gap-1.5 font-bold shadow-sm"
           >
-            <Edit3 className="h-3.5 w-3.5 text-academic-400" />
+            <Edit3 className="h-3.5 w-3.5" />
             <span>Edit Profile Preferences</span>
           </Button>
         </div>
 
         {/* Profile Card Header */}
-        <Card className="p-6 bg-ink-900/90 border-ink-800">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-academic-700 text-white flex items-center justify-center text-xl font-bold font-mono">
+        <div className="bg-white border-2 border-[#151515] rounded-3xl p-6 sm:p-8 shadow-[4px_4px_0px_0px_#151515]">
+          <div className="flex flex-col sm:flex-row items-center gap-5">
+            <div className="h-16 w-16 rounded-2xl bg-[#FFCC42] border-2 border-[#151515] flex items-center justify-center font-display font-bold text-2xl text-[#151515] shrink-0">
               {user?.full_name?.charAt(0) || "A"}
             </div>
             <div className="space-y-1 text-center sm:text-left">
-              <h3 className="text-lg font-semibold text-ink-100">{user?.full_name || "Aarav Sharma"}</h3>
-              <p className="text-xs text-ink-400">{user?.email || "student@intellitutor.ai"}</p>
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
-                <Badge variant="academic" className="text-[10px] font-mono uppercase">
+              <h3 className="text-xl font-display font-bold text-[#151515]">{user?.full_name || "Aarav Sharma"}</h3>
+              <p className="text-xs text-[#707070]">{user?.email || "student@intellitutor.ai"}</p>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1.5">
+                <Badge variant="coral" className="text-xs font-bold uppercase">
                   {profile?.target_exam || "NEET"} Aspirant
                 </Badge>
-                <Badge variant="neutral" className="text-[10px] font-mono">
+                <Badge variant="yellow" className="text-xs font-bold">
                   {profile?.current_grade_level || "Class 12 / Aspirant"}
                 </Badge>
               </div>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Academic Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Card className="p-4 space-y-1">
-            <div className="flex items-center gap-1.5 text-amber-400 text-xs">
-              <Flame className="h-4 w-4 fill-amber-400/20" />
-              <span className="font-mono uppercase text-[10px]">Study Streak</span>
+          <div className="bg-[#FFF9D6] border-2 border-[#151515] p-5 rounded-3xl shadow-[3px_3px_0px_0px_#151515] space-y-1">
+            <div className="flex items-center gap-1.5 text-[#8F6E00] text-xs">
+              <Flame className="h-4 w-4 fill-[#FFCC42] text-[#FFCC42]" />
+              <span className="font-bold uppercase text-[10px]">Study Streak</span>
             </div>
-            <p className="text-xl font-bold font-mono text-ink-100">{profile?.streak_days || 7} Days</p>
-          </Card>
+            <p className="text-2xl font-display font-bold text-[#151515]">{profile?.streak_days || 12} Days</p>
+          </div>
 
-          <Card className="p-4 space-y-1">
-            <div className="flex items-center gap-1.5 text-academic-400 text-xs">
-              <Zap className="h-4 w-4" />
-              <span className="font-mono uppercase text-[10px]">XP Accumulated</span>
+          <div className="bg-[#F0E9FD] border-2 border-[#151515] p-5 rounded-3xl shadow-[3px_3px_0px_0px_#151515] space-y-1">
+            <div className="flex items-center gap-1.5 text-[#6C38D4] text-xs">
+              <Zap className="h-4 w-4 fill-[#B99AF5] text-[#B99AF5]" />
+              <span className="font-bold uppercase text-[10px]">XP Earned</span>
             </div>
-            <p className="text-xl font-bold font-mono text-ink-100">{profile?.xp || 580}</p>
-          </Card>
+            <p className="text-2xl font-display font-bold text-[#151515]">{profile?.xp || 580}</p>
+          </div>
 
-          <Card className="p-4 space-y-1">
-            <div className="flex items-center gap-1.5 text-ink-300 text-xs">
+          <div className="bg-[#FFF3F0] border-2 border-[#151515] p-5 rounded-3xl shadow-[3px_3px_0px_0px_#151515] space-y-1">
+            <div className="flex items-center gap-1.5 text-[#BD3012] text-xs">
               <Clock className="h-4 w-4" />
-              <span className="font-mono uppercase text-[10px]">Total Study Time</span>
+              <span className="font-bold uppercase text-[10px]">Study Time</span>
             </div>
-            <p className="text-xl font-bold font-mono text-ink-100">{Math.round((profile?.total_study_minutes || 2450) / 60)} Hours</p>
-          </Card>
+            <p className="text-2xl font-display font-bold text-[#151515]">{Math.round((profile?.total_study_minutes || 2450) / 60)} Hours</p>
+          </div>
 
-          <Card className="p-4 space-y-1">
-            <div className="flex items-center gap-1.5 text-ink-300 text-xs">
-              <CheckCircle2 className="h-4 w-4 text-academic-400" />
-              <span className="font-mono uppercase text-[10px]">Questions Solved</span>
+          <div className="bg-[#F0FDF4] border-2 border-[#151515] p-5 rounded-3xl shadow-[3px_3px_0px_0px_#151515] space-y-1">
+            <div className="flex items-center gap-1.5 text-[#166534] text-xs">
+              <CheckCircle2 className="h-4 w-4" />
+              <span className="font-bold uppercase text-[10px]">Questions Solved</span>
             </div>
-            <p className="text-xl font-bold font-mono text-ink-100">{profile?.questions_solved || 210}</p>
-          </Card>
+            <p className="text-2xl font-display font-bold text-[#151515]">{profile?.questions_solved || 210}</p>
+          </div>
         </div>
 
         {/* Configuration Summary */}
-        <Card className="space-y-3">
-          <CardHeader className="pb-3 border-b border-ink-800">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-ink-300 font-mono">
+        <div className="bg-white border-2 border-[#151515] rounded-3xl p-6 sm:p-8 shadow-[4px_4px_0px_0px_#151515] space-y-4">
+          <div className="pb-3 border-b border-[#EFEFE8]">
+            <h3 className="font-display font-bold text-base text-[#151515]">
               Calibrated Learning Parameters
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-xs">
-            <div className="flex justify-between py-1.5 border-b border-ink-800/50">
-              <span className="text-ink-400">Target Exam Timeline</span>
-              <span className="text-ink-100 font-medium">{profile?.target_exam_date || "May 2027"}</span>
+            </h3>
+          </div>
+          <div className="space-y-3 text-xs sm:text-sm">
+            <div className="flex justify-between py-2 border-b border-[#EFEFE8]">
+              <span className="text-[#707070]">Target Exam Timeline</span>
+              <span className="text-[#151515] font-bold">{profile?.target_exam_date || "May 2027"}</span>
             </div>
-            <div className="flex justify-between py-1.5 border-b border-ink-800/50">
-              <span className="text-ink-400">Daily Study Target</span>
-              <span className="text-ink-100 font-medium">{profile?.daily_study_hours || 3.5} Hours / Day</span>
+            <div className="flex justify-between py-2 border-b border-[#EFEFE8]">
+              <span className="text-[#707070]">Daily Study Target</span>
+              <span className="text-[#151515] font-bold">{profile?.daily_study_hours || 3.5} Hours / Day</span>
             </div>
-            <div className="flex justify-between py-1.5 border-b border-ink-800/50">
-              <span className="text-ink-400">AI Explanation Preference</span>
-              <span className="text-academic-400 font-medium">{profile?.explanation_preference || "Exam-oriented"}</span>
+            <div className="flex justify-between py-2 border-b border-[#EFEFE8]">
+              <span className="text-[#707070]">AI Explanation Preference</span>
+              <span className="text-[#FF5734] font-bold">{profile?.explanation_preference || "Exam-oriented"}</span>
             </div>
-            <div className="flex justify-between py-1.5">
-              <span className="text-ink-400">Focus Subjects</span>
-              <span className="text-ink-100 font-medium">
+            <div className="flex justify-between py-2">
+              <span className="text-[#707070]">Focus Subjects</span>
+              <span className="text-[#151515] font-bold">
                 {(profile?.selected_subjects || ["Physics", "Chemistry", "Biology"]).join(", ")}
               </span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Edit Profile Preferences Modal */}
       {isEditing && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-md bg-ink-900 border border-ink-800 rounded-lg shadow-elevated p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-ink-800 pb-3">
-              <h3 className="text-base font-semibold text-ink-100">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md bg-white border-2 border-[#151515] rounded-3xl shadow-[8px_8px_0px_0px_#151515] p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-[#E8E6DE] pb-4">
+              <h3 className="text-lg font-display font-bold text-[#151515]">
                 Edit Learning Parameters
               </h3>
               <button
                 onClick={() => setIsEditing(false)}
-                className="text-ink-400 hover:text-ink-200 p-1"
+                className="text-[#707070] hover:text-[#151515] p-1.5 rounded-full hover:bg-[#FAF9F5]"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-4 text-xs">
-              <div className="space-y-1">
-                <label className="font-medium text-ink-300">Full Name</label>
+            <form onSubmit={handleSave} className="space-y-4 text-xs sm:text-sm">
+              <div className="space-y-1.5">
+                <label className="font-bold text-[#151515]">Full Name</label>
                 <Input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -176,12 +176,12 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="font-medium text-ink-300">Target Exam</label>
+              <div className="space-y-1.5">
+                <label className="font-bold text-[#151515]">Target Exam</label>
                 <select
                   value={targetExam}
                   onChange={(e) => setTargetExam(e.target.value)}
-                  className="w-full h-9 bg-ink-950 border border-ink-700 rounded-md px-3 text-xs text-ink-100 focus:outline-none focus:border-academic-500 font-mono"
+                  className="w-full h-10 bg-white border border-[#E4E2D8] rounded-xl px-3 text-xs sm:text-sm font-semibold text-[#151515] focus:outline-none focus:border-[#FF5734]"
                 >
                   <option value="NEET">NEET (Medical)</option>
                   <option value="JEE">JEE (Engineering)</option>
@@ -192,8 +192,8 @@ export default function ProfilePage() {
                 </select>
               </div>
 
-              <div className="space-y-1">
-                <label className="font-medium text-ink-300">Target Exam Timeline</label>
+              <div className="space-y-1.5">
+                <label className="font-bold text-[#151515]">Target Exam Timeline</label>
                 <Input
                   value={targetExamDate}
                   onChange={(e) => setTargetExamDate(e.target.value)}
@@ -201,10 +201,10 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <label className="font-medium text-ink-300">Daily Study Target</label>
-                  <span className="font-mono text-academic-400">{dailyHours} Hours</span>
+              <div className="space-y-1.5">
+                <div className="flex justify-between font-bold text-[#151515]">
+                  <label>Daily Study Target</label>
+                  <span className="text-[#FF5734]">{dailyHours} Hours</span>
                 </div>
                 <input
                   type="range"
@@ -213,16 +213,16 @@ export default function ProfilePage() {
                   step="0.5"
                   value={dailyHours}
                   onChange={(e) => setDailyHours(parseFloat(e.target.value))}
-                  className="w-full accent-academic-500 bg-ink-800"
+                  className="w-full accent-[#FF5734]"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="font-medium text-ink-300">AI Explanation Preference</label>
+              <div className="space-y-1.5">
+                <label className="font-bold text-[#151515]">AI Explanation Preference</label>
                 <select
                   value={explanationPref}
                   onChange={(e) => setExplanationPref(e.target.value)}
-                  className="w-full h-9 bg-ink-950 border border-ink-700 rounded-md px-3 text-xs text-ink-100 focus:outline-none focus:border-academic-500 font-mono"
+                  className="w-full h-10 bg-white border border-[#E4E2D8] rounded-xl px-3 text-xs sm:text-sm font-semibold text-[#151515] focus:outline-none focus:border-[#FF5734]"
                 >
                   <option value="Exam-oriented">Exam-oriented</option>
                   <option value="Intermediate">Structured & Balanced</option>
@@ -232,22 +232,22 @@ export default function ProfilePage() {
                 </select>
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2 border-t border-ink-800">
+              <div className="pt-3 flex items-center justify-end gap-2 border-t border-[#E8E6DE]">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => setIsEditing(false)}
-                  className="h-8 text-xs border-ink-700"
+                  className="h-9 text-xs font-bold border-[#E4E2D8]"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  variant="academic"
+                  variant="primary"
                   size="sm"
                   isLoading={isSaving}
-                  className="h-8 text-xs font-medium"
+                  className="h-9 text-xs font-bold"
                 >
                   Save Changes
                 </Button>
