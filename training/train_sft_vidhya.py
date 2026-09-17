@@ -248,6 +248,7 @@ def train_sft(config_path: str, dry_run: bool = False):
     training_args = TrainingArguments(
         output_dir=output_dir,
         num_train_epochs=train_cfg.get("num_train_epochs", 3),
+        max_steps=train_cfg.get("max_steps", -1),
         per_device_train_batch_size=train_cfg.get("per_device_train_batch_size", 1),
         per_device_eval_batch_size=train_cfg.get("per_device_eval_batch_size", 1),
         gradient_accumulation_steps=train_cfg.get("gradient_accumulation_steps", 16),
