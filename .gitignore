@@ -84,10 +84,16 @@ secrets.yaml
 .coverage
 htmlcov/
 
-# Node / Frontend
+# Node / Frontend / Web-App
 node_modules/
 frontend/node_modules/
 frontend/dist/
+web-app/frontend/node_modules/
+web-app/frontend/.next/
+web-app/frontend/out/
+web-app/backend/intellitutor.db
+web-app/backend/*.db
+web-app/backend/*.sqlite*
 dist/
 *.tsbuildinfo
 
