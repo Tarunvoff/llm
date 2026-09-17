@@ -18,11 +18,11 @@ model:
   tokenizer_path: "model/aryabhata-2.0"
   torch_dtype: "bfloat16"
   trust_remote_code: true
-  use_4bit: true
+  use_4bit: false
   bnb_4bit_compute_dtype: "bfloat16"
   bnb_4bit_quant_type: "nf4"
   use_nested_quant: true
-  device_map: "auto"
+  device_map: null
 
 lora:
   r: 64
@@ -53,11 +53,11 @@ data:
 
 training:
   output_dir: "outputs/vidhya2_reasoning_sft"
-  num_train_epochs: 3
+  num_train_epochs: 2
   per_device_train_batch_size: 1
   per_device_eval_batch_size: 1
   gradient_accumulation_steps: 16
-  learning_rate: 1.0e-4
+  learning_rate: 5.0e-5
   lr_scheduler_type: "cosine"
   warmup_ratio: 0.03
   weight_decay: 0.01

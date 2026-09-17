@@ -136,25 +136,12 @@ def train_sft(config_path: str, dry_run: bool = False):
         pad_to_multiple_of=data_cfg.get("pad_to_multiple_of", 8),
     )
 
-    if dry_run:
-        logger.info("=== DRY RUN MODE: Validating Batch Collation on 4 Samples ===")
-        sample_batch = [train_dataset[i] for i in range(min(4, len(train_dataset)))]
-        batch_out = collator(sample_batch)
-        logger.info(f"Batch shape - input_ids: {batch_out['input_ids'].shape}")
-        logger.info(f"Batch shape - attention_mask: {batch_out['attention_mask'].shape}")
-        logger.info(f"Batch shape - labels: {batch_out['labels'].shape}")
-        active_tokens = (batch_out["labels"] != -100).sum().item()
-        total_tokens = batch_out["labels"].numel()
-        logger.info(f"Loss-active tokens in sample batch: {active_tokens:,} / {total_tokens:,} ({active_tokens/total_tokens*100:.1f}%)")
-        logger.info("Dry run check passed successfully.")
-        return
-
     # 3. Model Loading & Quantization
     torch_dtype = torch.bfloat16 if model_cfg.get("torch_dtype") == "bfloat16" and torch.cuda.is_bf16_supported() else (
         torch.float16 if torch.cuda.is_available() else torch.float32
     )
 
-    use_4bit = model_cfg.get("use_4bit", True) and torch.cuda.is_available()
+    use_4bit = model_cfg.get("use_4bit", False) and torch.cuda.is_available()
     bnb_config = None
     if use_4bit:
         try:
@@ -174,7 +161,9 @@ def train_sft(config_path: str, dry_run: bool = False):
         "trust_remote_code": model_cfg.get("trust_remote_code", True),
     }
     if torch.cuda.is_available():
-        model_kwargs["device_map"] = model_cfg.get("device_map", "auto")
+        device_map_cfg = model_cfg.get("device_map")
+        if device_map_cfg is not None:
+            model_kwargs["device_map"] = device_map_cfg
         if bnb_config is not None:
             model_kwargs["quantization_config"] = bnb_config
         else:
@@ -216,6 +205,27 @@ def train_sft(config_path: str, dry_run: bool = False):
         f"Trainable params: {trainable_params:,} || All params: {all_param:,} "
         f"|| Trainable ratio: {100 * trainable_params / all_param:.3f}%"
     )
+
+    if dry_run:
+        logger.info("=== DRY RUN MODE: Validating Batch Collation & Model Forward/Backward Pass ===")
+        sample_batch = [train_dataset[i] for i in range(min(2, len(train_dataset)))]
+        batch_out = collator(sample_batch)
+        logger.info(f"Batch shape - input_ids: {batch_out['input_ids'].shape}")
+        logger.info(f"Batch shape - labels: {batch_out['labels'].shape}")
+
+        if torch.cuda.is_available():
+            device = torch.device(f"cuda:{os.environ.get('LOCAL_RANK', 0)}")
+            model = model.to(device)
+            batch_gpu = {k: v.to(device) for k, v in batch_out.items()}
+            outputs = model(**batch_gpu)
+            loss = outputs.loss
+            logger.info(f"Initial loss: {loss.item():.4f}")
+            loss.backward()
+            logger.info(f"Backward pass succeeded. Peak VRAM: {torch.cuda.max_memory_allocated() / (1024**3):.2f} GB")
+        else:
+            logger.info("CPU environment detected — verified collator & model architecture.")
+        logger.info("=== DRY RUN PASSED SUCCESSFULLY ===")
+        return
 
     # 5. Training Arguments
     training_args = TrainingArguments(

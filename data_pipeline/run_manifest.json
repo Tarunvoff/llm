@@ -1000,6 +1000,40 @@
         "truncated_log_file": "D:\\LLM_Project\\llm\\data_pipeline\\tokenize\\truncated_examples.jsonl",
         "tokenized_output_dir": "D:\\LLM_Project\\llm\\data\\sft\\v2_reasoning_boost\\tokenized"
       }
+    },
+    {
+      "stage": "tokenization",
+      "timestamp_utc": "2026-09-17T15:28:24.637983+00:00",
+      "data": {
+        "max_seq_length": 8192,
+        "hard_max_length": 24000,
+        "split_tokenization_summary": {
+          "train": {
+            "input_rows": 10210,
+            "kept_rows": 10208,
+            "dropped_rows": 2,
+            "truncated_rows": 774,
+            "max_seq_length": 8192
+          },
+          "val": {
+            "input_rows": 567,
+            "kept_rows": 567,
+            "dropped_rows": 0,
+            "truncated_rows": 38,
+            "max_seq_length": 8192
+          },
+          "test": {
+            "input_rows": 567,
+            "kept_rows": 567,
+            "dropped_rows": 0,
+            "truncated_rows": 45,
+            "max_seq_length": 8192
+          }
+        },
+        "total_log_records": 859,
+        "truncated_log_file": "C:\\Users\\ANUMITHA\\OneDrive\\Desktop\\LLM-scratch\\llm\\data_pipeline\\tokenize\\truncated_examples.jsonl",
+        "tokenized_output_dir": "C:\\Users\\ANUMITHA\\OneDrive\\Desktop\\LLM-scratch\\llm\\data\\sft\\v2_reasoning_boost\\tokenized"
+      }
     }
   ]
 }
