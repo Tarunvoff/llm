@@ -21,6 +21,9 @@ from app.api.planner import router as planner_router
 from app.api.analytics import router as analytics_router
 from app.api.mock_tests import router as mock_tests_router
 from app.api.feedback import router as feedback_router
+from app.api.goals import router as goals_router
+from app.api.achievements import router as achievements_router
+from app.api.settings import router as settings_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("intellitutor")
@@ -104,6 +107,10 @@ app.include_router(planner_router, prefix="/api")
 app.include_router(analytics_router, prefix="/api")
 app.include_router(mock_tests_router, prefix="/api")
 app.include_router(feedback_router, prefix="/api")
+app.include_router(goals_router, prefix="/api")
+app.include_router(achievements_router, prefix="/api")
+app.include_router(settings_router, prefix="/api")
+
 
 @app.get("/api/health", tags=["Health"])
 def health_check():

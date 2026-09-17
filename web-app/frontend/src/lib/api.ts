@@ -442,4 +442,71 @@ export class ApiClient {
   static async getMasteryTree(): Promise<any> {
     return this.request<any>("/analytics/mastery-tree");
   }
+
+  // --- Phase 7: Study Goals & Milestones ---
+  static async getGoals(): Promise<{ goals: any[] }> {
+    return this.request<{ goals: any[] }>("/goals");
+  }
+
+  static async createGoal(data: {
+    title: string;
+    target_metric: string;
+    current_metric?: string;
+    progress_percentage?: number;
+    due_date_str?: string;
+    variant?: string;
+  }): Promise<any> {
+    return this.request<any>("/goals", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async toggleGoal(goalId: string): Promise<any> {
+    return this.request<any>(`/goals/${goalId}/toggle`, {
+      method: "POST",
+    });
+  }
+
+  static async deleteGoal(goalId: string): Promise<any> {
+    return this.request<any>(`/goals/${goalId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // --- Phase 8: Gamification & Achievements ---
+  static async getAchievements(): Promise<any> {
+    return this.request<any>("/achievements");
+  }
+
+  static async claimAchievement(badgeId: string): Promise<any> {
+    return this.request<any>(`/achievements/${badgeId}/claim`, {
+      method: "POST",
+    });
+  }
+
+  // --- Phase 9: Settings & Data Export ---
+  static async getSettings(): Promise<{ settings: any }> {
+    return this.request<{ settings: any }>("/settings");
+  }
+
+  static async updateSettings(data: any): Promise<any> {
+    return this.request<any>("/settings", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async exportUserData(): Promise<any> {
+    return this.request<any>("/settings/export-data", {
+      method: "POST",
+    });
+  }
+
+  static async resetHistory(): Promise<any> {
+    return this.request<any>("/settings/reset-history", {
+      method: "POST",
+    });
+  }
 }
+
