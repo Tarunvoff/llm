@@ -208,7 +208,7 @@ def train_sft(config_path: str, dry_run: bool = False):
 
     if dry_run:
         logger.info("=== DRY RUN MODE: Validating Batch Collation & Model Forward/Backward Pass ===")
-        sample_batch = [train_dataset[0]]
+        sample_batch = [train_dataset[1]]
         batch_out = collator(sample_batch)
         logger.info(f"Batch shape - input_ids: {batch_out['input_ids'].shape}")
         logger.info(f"Batch shape - labels: {batch_out['labels'].shape}")
