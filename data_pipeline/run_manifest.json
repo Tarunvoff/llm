@@ -1,0 +1,1005 @@
+{
+  "stages": [
+    {
+      "stage": "download",
+      "timestamp_utc": "2026-09-17T06:52:29.580567+00:00",
+      "data": {
+        "datasets_processed": 1,
+        "summary": [
+          {
+            "hf_id": "Abc8264/Jee-Chemistry-dataset-with-COT",
+            "safe_id": "Abc8264__Jee-Chemistry-dataset-with-COT",
+            "subject": "chemistry",
+            "role": "train",
+            "status": "success",
+            "total_rows": 3372,
+            "splits": {
+              "train": 3372
+            },
+            "storage_path": "D:\\LLM_Project\\llm\\data_pipeline\\raw\\Abc8264__Jee-Chemistry-dataset-with-COT"
+          }
+        ]
+      }
+    },
+    {
+      "stage": "download",
+      "timestamp_utc": "2026-09-17T07:04:15.824155+00:00",
+      "data": {
+        "datasets_processed": 1,
+        "summary": [
+          {
+            "hf_id": "Reja1/jee-neet-benchmark",
+            "safe_id": "Reja1__jee-neet-benchmark",
+            "subject": "mixed",
+            "role": "eval_only",
+            "status": "success",
+            "total_rows": 860,
+            "splits": {
+              "test": 860
+            },
+            "storage_path": "D:\\LLM_Project\\llm\\data_pipeline\\eval_holdout\\Reja1__jee-neet-benchmark"
+          }
+        ]
+      }
+    },
+    {
+      "stage": "download",
+      "timestamp_utc": "2026-09-17T07:04:39.994513+00:00",
+      "data": {
+        "datasets_processed": 1,
+        "summary": [
+          {
+            "hf_id": "ByteDance-Seed/ScienceOlympiad",
+            "safe_id": "ByteDance-Seed__ScienceOlympiad",
+            "subject": "physics",
+            "role": "eval_only",
+            "status": "success",
+            "total_rows": 204,
+            "splits": {
+              "test": 204
+            },
+            "storage_path": "D:\\LLM_Project\\llm\\data_pipeline\\eval_holdout\\ByteDance-Seed__ScienceOlympiad"
+          }
+        ]
+      }
+    },
+    {
+      "stage": "download",
+      "timestamp_utc": "2026-09-17T07:04:55.999496+00:00",
+      "data": {
+        "datasets_processed": 1,
+        "summary": [
+          {
+            "hf_id": "eQOURSE/jee-main-questions",
+            "role": "train_with_care",
+            "status": "failed",
+            "error": "Config name is missing.\nPlease pick one among the available configs: ['chemistry', 'physics', 'mathematics']\nExample of usage:\n\t`load_dataset('eQOURSE/jee-main-questions', 'chemistry')`",
+            "total_rows": 0,
+            "splits": {}
+          }
+        ]
+      }
+    },
+    {
+      "stage": "download",
+      "timestamp_utc": "2026-09-17T07:05:40.057319+00:00",
+      "data": {
+        "datasets_processed": 1,
+        "summary": [
+          {
+            "hf_id": "eQOURSE/jee-main-questions",
+            "safe_id": "eQOURSE__jee-main-questions",
+            "subject": "mixed",
+            "role": "train_with_care",
+            "status": "success",
+            "total_rows": 2307,
+            "splits": {
+              "chemistry_train": 627,
+              "chemistry_test": 111,
+              "physics_train": 652,
+              "physics_test": 116,
+              "mathematics_train": 680,
+              "mathematics_test": 121
+            },
+            "storage_path": "D:\\LLM_Project\\llm\\data_pipeline\\raw\\eQOURSE__jee-main-questions"
+          }
+        ]
+      }
+    },
+    {
+      "stage": "download",
+      "timestamp_utc": "2026-09-17T07:06:42.292602+00:00",
+      "data": {
+        "datasets_processed": 1,
+        "summary": [
+          {
+            "hf_id": "FreedomIntelligence/medical-o1-reasoning-SFT",
+            "safe_id": "FreedomIntelligence__medical-o1-reasoning-SFT",
+            "subject": "biology",
+            "role": "train",
+            "status": "success",
+            "total_rows": 90120,
+            "splits": {
+              "en_train": 19704,
+              "zh_train": 20171,
+              "en_mix_train": 24887,
+              "zh_mix_train": 25358
+            },
+            "storage_path": "D:\\LLM_Project\\llm\\data_pipeline\\raw\\FreedomIntelligence__medical-o1-reasoning-SFT"
+          }
+        ]
+      }
+    },
+    {
+      "stage": "normalize",
+      "timestamp_utc": "2026-09-17T07:15:25.647357+00:00",
+      "data": {
+        "sources_processed": 1,
+        "summary": [
+          {
+            "source": "Abc8264__Jee-Chemistry-dataset-with-COT",
+            "normalized": 3372,
+            "dropped": 0,
+            "status": "success"
+          }
+        ]
+      }
+    },
+    {
+      "stage": "normalize",
+      "timestamp_utc": "2026-09-17T07:18:02.267012+00:00",
+      "data": {
+        "sources_processed": 6,
+        "summary": [
+          {
+            "source": "169Pi__exambench",
+            "normalized": 0,
+            "dropped": 0,
+            "status": "no_mapper"
+          },
+          {
+            "source": "Abc8264__Jee-Chemistry-dataset-with-COT",
+            "normalized": 3372,
+            "dropped": 0,
+            "status": "success"
+          },
+          {
+            "source": "camel-ai__physics",
+            "normalized": 0,
+            "dropped": 0,
+            "status": "no_mapper"
+          },
+          {
+            "source": "eQOURSE__jee-main-questions",
+            "normalized": 2299,
+            "dropped": 8,
+            "status": "success"
+          },
+          {
+            "source": "farhananis005__jee-sft-v1",
+            "normalized": 0,
+            "dropped": 0,
+            "status": "no_mapper"
+          },
+          {
+            "source": "FreedomIntelligence__medical-o1-reasoning-SFT",
+            "normalized": 90120,
+            "dropped": 0,
+            "status": "success"
+          }
+        ]
+      }
+    },
+    {
+      "stage": "verify",
+      "timestamp_utc": "2026-09-17T07:19:49.486933+00:00",
+      "data": {
+        "files_processed": 1,
+        "summary": [
+          {
+            "source": "Abc8264__Jee-Chemistry-dataset-with-COT",
+            "total_rows": 3372,
+            "verified_correct_true": 2339,
+            "verified_correct_false": 1033,
+            "no_ground_truth": 878,
+            "pass_rate_pct": 69.37
+          }
+        ]
+      }
+    },
+    {
+      "stage": "verify",
+      "timestamp_utc": "2026-09-17T07:27:11.239067+00:00",
+      "data": {
+        "files_processed": 1,
+        "summary": [
+          {
+            "source": "eQOURSE__jee-main-questions",
+            "total_rows": 2299,
+            "verified_correct_true": 1652,
+            "verified_correct_false": 647,
+            "no_ground_truth": 647,
+            "pass_rate_pct": 71.86
+          }
+        ]
+      }
+    },
+    {
+      "stage": "verify",
+      "timestamp_utc": "2026-09-17T07:29:06.477708+00:00",
+      "data": {
+        "files_processed": 1,
+        "summary": [
+          {
+            "source": "FreedomIntelligence__medical-o1-reasoning-SFT",
+            "total_rows": 90120,
+            "verified_correct_true": 43635,
+            "verified_correct_false": 46485,
+            "no_ground_truth": 0,
+            "pass_rate_pct": 48.42
+          }
+        ]
+      }
+    },
+    {
+      "stage": "dedup",
+      "timestamp_utc": "2026-09-17T07:41:18.308489+00:00",
+      "data": {
+        "initial_pool_size": 2000,
+        "exact_dropped": 44,
+        "semantic_dropped": 36,
+        "total_dropped": 80,
+        "final_pool_size": 1920,
+        "threshold": 0.92
+      }
+    },
+    {
+      "stage": "decontaminate",
+      "timestamp_utc": "2026-09-17T07:46:37.223348+00:00",
+      "data": {
+        "total_removed": 0,
+        "eval_matches": {}
+      }
+    },
+    {
+      "stage": "decontaminate",
+      "timestamp_utc": "2026-09-17T07:47:25.871859+00:00",
+      "data": {
+        "total_removed": 0,
+        "eval_matches": {}
+      }
+    },
+    {
+      "stage": "decontaminate",
+      "timestamp_utc": "2026-09-17T07:48:52.047145+00:00",
+      "data": {
+        "total_removed": 0,
+        "eval_matches": {}
+      }
+    },
+    {
+      "stage": "decontaminate",
+      "timestamp_utc": "2026-09-17T07:51:06.467487+00:00",
+      "data": {
+        "initial_pool_size": 1920,
+        "clean_pool_size": 1920,
+        "total_removed": 0,
+        "eval_source_breakdown": {},
+        "sim_threshold": 0.9
+      }
+    },
+    {
+      "stage": "balance_analysis",
+      "timestamp_utc": "2026-09-17T07:52:08.157072+00:00",
+      "data": {
+        "total_clean_rows": 1920,
+        "subject_distribution": {
+          "biology": 1774,
+          "chemistry": 96,
+          "math": 24,
+          "physics": 26
+        },
+        "difficulty_distribution": {
+          "neet": 1774,
+          "jee_main": 146
+        },
+        "source_distribution": {
+          "FreedomIntelligence/medical-o1-reasoning-SFT": 1774,
+          "Abc8264/Jee-Chemistry-dataset-with-COT": 76,
+          "eQOURSE/jee-main-questions": 70
+        },
+        "underrepresented_subjects": [
+          {
+            "subject": "math",
+            "count": 24,
+            "percentage": 1.25
+          },
+          {
+            "subject": "physics",
+            "count": 26,
+            "percentage": 1.35
+          }
+        ],
+        "dominant_sources": [
+          {
+            "source": "FreedomIntelligence/medical-o1-reasoning-SFT",
+            "count": 1774,
+            "percentage": 92.4
+          }
+        ]
+      }
+    },
+    {
+      "stage": "dedup",
+      "timestamp_utc": "2026-09-17T08:50:41.639432+00:00",
+      "data": {
+        "initial_pool_size": 47626,
+        "exact_dropped": 23088,
+        "semantic_dropped": 1923,
+        "total_dropped": 25011,
+        "final_pool_size": 22615,
+        "threshold": 0.92
+      }
+    },
+    {
+      "stage": "decontaminate",
+      "timestamp_utc": "2026-09-17T08:56:24.847076+00:00",
+      "data": {
+        "initial_pool_size": 22615,
+        "clean_pool_size": 22612,
+        "total_removed": 3,
+        "eval_source_breakdown": {
+          "ByteDance-Seed__ScienceOlympiad": 3
+        },
+        "sim_threshold": 0.9
+      }
+    },
+    {
+      "stage": "balance_analysis",
+      "timestamp_utc": "2026-09-17T08:56:42.749049+00:00",
+      "data": {
+        "total_clean_rows": 22612,
+        "subject_distribution": {
+          "chemistry": 2736,
+          "math": 547,
+          "physics": 472,
+          "biology": 18857
+        },
+        "difficulty_distribution": {
+          "jee_main": 3755,
+          "neet": 18857
+        },
+        "source_distribution": {
+          "Abc8264/Jee-Chemistry-dataset-with-COT": 2254,
+          "eQOURSE/jee-main-questions": 1501,
+          "FreedomIntelligence/medical-o1-reasoning-SFT": 18857
+        },
+        "underrepresented_subjects": [
+          {
+            "subject": "math",
+            "count": 547,
+            "percentage": 2.42
+          },
+          {
+            "subject": "physics",
+            "count": 472,
+            "percentage": 2.09
+          }
+        ],
+        "dominant_sources": [
+          {
+            "source": "FreedomIntelligence/medical-o1-reasoning-SFT",
+            "count": 18857,
+            "percentage": 83.39
+          }
+        ]
+      }
+    },
+    {
+      "stage": "balance_analysis",
+      "timestamp_utc": "2026-09-17T08:58:34.758785+00:00",
+      "data": {
+        "total_clean_rows": 6755,
+        "subject_distribution": {
+          "chemistry": 2736,
+          "biology": 3000,
+          "physics": 472,
+          "math": 547
+        },
+        "difficulty_distribution": {
+          "jee_main": 3755,
+          "neet": 3000
+        },
+        "source_distribution": {
+          "Abc8264/Jee-Chemistry-dataset-with-COT": 2254,
+          "FreedomIntelligence/medical-o1-reasoning-SFT": 3000,
+          "eQOURSE/jee-main-questions": 1501
+        },
+        "underrepresented_subjects": [],
+        "dominant_sources": []
+      }
+    },
+    {
+      "stage": "balance_downsampling",
+      "timestamp_utc": "2026-09-17T08:58:34.764499+00:00",
+      "data": {
+        "initial_total": 22612,
+        "final_total": 6755,
+        "source_breakdown": {
+          "Abc8264/Jee-Chemistry-dataset-with-COT": {
+            "initial": 2254,
+            "final": 2254,
+            "dropped": 0
+          },
+          "eQOURSE/jee-main-questions": {
+            "initial": 1501,
+            "final": 1501,
+            "dropped": 0
+          },
+          "FreedomIntelligence/medical-o1-reasoning-SFT": {
+            "initial": 18857,
+            "final": 3000,
+            "dropped": 15857
+          }
+        },
+        "seed": 42
+      }
+    },
+    {
+      "stage": "splits",
+      "timestamp_utc": "2026-09-17T08:59:02.407793+00:00",
+      "data": {
+        "total_pool_rows": 6755,
+        "unique_problem_clusters": 6755,
+        "split_counts": {
+          "train": 6079,
+          "val": 338,
+          "test": 338
+        },
+        "split_percentages": {
+          "train": 89.99,
+          "val": 5.0,
+          "test": 5.0
+        },
+        "subject_breakdown_by_split": {
+          "train": {
+            "biology": 2700,
+            "chemistry": 2462,
+            "physics": 424,
+            "math": 493
+          },
+          "val": {
+            "chemistry": 137,
+            "math": 27,
+            "biology": 150,
+            "physics": 24
+          },
+          "test": {
+            "biology": 150,
+            "chemistry": 137,
+            "math": 27,
+            "physics": 24
+          }
+        },
+        "files_generated": {
+          "train": "D:\\LLM_Project\\llm\\data_pipeline\\split\\train.jsonl",
+          "val": "D:\\LLM_Project\\llm\\data_pipeline\\split\\val.jsonl",
+          "test": "D:\\LLM_Project\\llm\\data_pipeline\\split\\test.jsonl"
+        }
+      }
+    },
+    {
+      "stage": "normalize",
+      "timestamp_utc": "2026-09-17T09:50:07.726580+00:00",
+      "data": {
+        "sources_processed": 12,
+        "summary": [
+          {
+            "source": "169Pi__exambench",
+            "normalized": 1787,
+            "dropped": 0,
+            "status": "success"
+          },
+          {
+            "source": "Abc8264__Jee-Chemistry-dataset-with-COT",
+            "normalized": 3372,
+            "dropped": 0,
+            "status": "success"
+          },
+          {
+            "source": "camel-ai__biology",
+            "normalized": 20000,
+            "dropped": 0,
+            "status": "success"
+          },
+          {
+            "source": "camel-ai__chemistry",
+            "normalized": 20000,
+            "dropped": 0,
+            "status": "success"
+          },
+          {
+            "source": "camel-ai__math",
+            "normalized": 50000,
+            "dropped": 0,
+            "status": "success"
+          },
+          {
+            "source": "camel-ai__physics",
+            "normalized": 20000,
+            "dropped": 0,
+            "status": "success"
+          },
+          {
+            "source": "eQOURSE__jee-main-questions",
+            "normalized": 2299,
+            "dropped": 8,
+            "status": "success"
+          },
+          {
+            "source": "farhananis005__jee-sft-v1",
+            "normalized": 0,
+            "dropped": 0,
+            "status": "no_mapper"
+          },
+          {
+            "source": "FreedomIntelligence__medical-o1-reasoning-SFT",
+            "normalized": 90120,
+            "dropped": 0,
+            "status": "success"
+          },
+          {
+            "source": "nvidia__OpenMathReasoning",
+            "normalized": 50000,
+            "dropped": 0,
+            "status": "success"
+          },
+          {
+            "source": "openlifescienceai__medmcqa",
+            "normalized": 182822,
+            "dropped": 0,
+            "status": "success"
+          },
+          {
+            "source": "PRIME-RL__Eurus-2-SFT-Data",
+            "normalized": 0,
+            "dropped": 229763,
+            "status": "success"
+          }
+        ]
+      }
+    },
+    {
+      "stage": "normalize",
+      "timestamp_utc": "2026-09-17T09:51:30.223101+00:00",
+      "data": {
+        "sources_processed": 1,
+        "summary": [
+          {
+            "source": "PRIME-RL__Eurus-2-SFT-Data",
+            "normalized": 229763,
+            "dropped": 0,
+            "status": "success"
+          }
+        ]
+      }
+    },
+    {
+      "stage": "verify",
+      "timestamp_utc": "2026-09-17T10:02:08.472052+00:00",
+      "data": {
+        "files_processed": 11,
+        "summary": [
+          {
+            "source": "169Pi__exambench",
+            "total_rows": 1787,
+            "verified_correct_true": 0,
+            "verified_correct_false": 1787,
+            "no_ground_truth": 0,
+            "pass_rate_pct": 0.0
+          },
+          {
+            "source": "Abc8264__Jee-Chemistry-dataset-with-COT",
+            "total_rows": 3372,
+            "verified_correct_true": 2339,
+            "verified_correct_false": 1033,
+            "no_ground_truth": 878,
+            "pass_rate_pct": 69.37
+          },
+          {
+            "source": "camel-ai__biology",
+            "total_rows": 20000,
+            "verified_correct_true": 0,
+            "verified_correct_false": 20000,
+            "no_ground_truth": 0,
+            "pass_rate_pct": 0.0
+          },
+          {
+            "source": "camel-ai__chemistry",
+            "total_rows": 20000,
+            "verified_correct_true": 0,
+            "verified_correct_false": 20000,
+            "no_ground_truth": 0,
+            "pass_rate_pct": 0.0
+          },
+          {
+            "source": "camel-ai__math",
+            "total_rows": 50000,
+            "verified_correct_true": 0,
+            "verified_correct_false": 50000,
+            "no_ground_truth": 0,
+            "pass_rate_pct": 0.0
+          },
+          {
+            "source": "camel-ai__physics",
+            "total_rows": 20000,
+            "verified_correct_true": 0,
+            "verified_correct_false": 20000,
+            "no_ground_truth": 0,
+            "pass_rate_pct": 0.0
+          },
+          {
+            "source": "eQOURSE__jee-main-questions",
+            "total_rows": 2299,
+            "verified_correct_true": 1652,
+            "verified_correct_false": 647,
+            "no_ground_truth": 647,
+            "pass_rate_pct": 71.86
+          },
+          {
+            "source": "FreedomIntelligence__medical-o1-reasoning-SFT",
+            "total_rows": 90120,
+            "verified_correct_true": 43635,
+            "verified_correct_false": 46485,
+            "no_ground_truth": 0,
+            "pass_rate_pct": 48.42
+          },
+          {
+            "source": "nvidia__OpenMathReasoning",
+            "total_rows": 50000,
+            "verified_correct_true": 46313,
+            "verified_correct_false": 3687,
+            "no_ground_truth": 15,
+            "pass_rate_pct": 92.63
+          },
+          {
+            "source": "openlifescienceai__medmcqa",
+            "total_rows": 182822,
+            "verified_correct_true": 182822,
+            "verified_correct_false": 0,
+            "no_ground_truth": 0,
+            "pass_rate_pct": 100.0
+          },
+          {
+            "source": "PRIME-RL__Eurus-2-SFT-Data",
+            "total_rows": 229763,
+            "verified_correct_true": 180679,
+            "verified_correct_false": 49084,
+            "no_ground_truth": 49,
+            "pass_rate_pct": 78.64
+          }
+        ]
+      }
+    },
+    {
+      "stage": "dedup",
+      "timestamp_utc": "2026-09-17T11:56:25.646375+00:00",
+      "data": {
+        "initial_pool_size": 457440,
+        "exact_dropped": 37022,
+        "semantic_dropped": 3520,
+        "total_dropped": 40542,
+        "final_pool_size": 416898,
+        "exact_dropped_by_source": {
+          "eQOURSE/jee-main-questions": 66,
+          "FreedomIntelligence/medical-o1-reasoning-SFT": 23022,
+          "nvidia/OpenMathReasoning": 5371,
+          "openlifescienceai/medmcqa": 33,
+          "PRIME-RL/Eurus-2-SFT-Data": 8530
+        },
+        "semantic_dropped_by_source": {
+          "eQOURSE/jee-main-questions": 14,
+          "PRIME-RL/Eurus-2-SFT-Data": 1495,
+          "nvidia/OpenMathReasoning": 81,
+          "openlifescienceai/medmcqa": 1864,
+          "FreedomIntelligence/medical-o1-reasoning-SFT": 66
+        },
+        "source_retention_summary": {
+          "Abc8264/Jee-Chemistry-dataset-with-COT": {
+            "verified_in": 2339,
+            "exact_dropped": 0,
+            "semantic_dropped": 0,
+            "total_dropped": 0,
+            "final_kept": 2339,
+            "retention_pct": 100.0
+          },
+          "eQOURSE/jee-main-questions": {
+            "verified_in": 1652,
+            "exact_dropped": 66,
+            "semantic_dropped": 14,
+            "total_dropped": 80,
+            "final_kept": 1572,
+            "retention_pct": 95.16
+          },
+          "FreedomIntelligence/medical-o1-reasoning-SFT": {
+            "verified_in": 43635,
+            "exact_dropped": 23022,
+            "semantic_dropped": 66,
+            "total_dropped": 23088,
+            "final_kept": 20547,
+            "retention_pct": 47.09
+          },
+          "nvidia/OpenMathReasoning": {
+            "verified_in": 46313,
+            "exact_dropped": 5371,
+            "semantic_dropped": 81,
+            "total_dropped": 5452,
+            "final_kept": 40861,
+            "retention_pct": 88.23
+          },
+          "openlifescienceai/medmcqa": {
+            "verified_in": 182822,
+            "exact_dropped": 33,
+            "semantic_dropped": 1864,
+            "total_dropped": 1897,
+            "final_kept": 180925,
+            "retention_pct": 98.96
+          },
+          "PRIME-RL/Eurus-2-SFT-Data": {
+            "verified_in": 180679,
+            "exact_dropped": 8530,
+            "semantic_dropped": 1495,
+            "total_dropped": 10025,
+            "final_kept": 170654,
+            "retention_pct": 94.45
+          }
+        },
+        "threshold": 0.85,
+        "elapsed_seconds": 54.71
+      }
+    },
+    {
+      "stage": "decontaminate",
+      "timestamp_utc": "2026-09-17T11:57:37.085701+00:00",
+      "data": {
+        "initial_pool_size": 416898,
+        "clean_pool_size": 416325,
+        "total_removed": 573,
+        "eval_source_breakdown": {
+          "ByteDance-Seed__ScienceOlympiad": 573
+        },
+        "sim_threshold": 0.9,
+        "elapsed_seconds": 30.15
+      }
+    },
+    {
+      "stage": "balance_analysis",
+      "timestamp_utc": "2026-09-17T11:57:51.828022+00:00",
+      "data": {
+        "total_clean_rows": 416325,
+        "subject_distribution": {
+          "chemistry": 2828,
+          "math": 211510,
+          "physics": 516,
+          "biology": 201471
+        },
+        "difficulty_distribution": {
+          "jee_main": 3910,
+          "olympiad": 40826,
+          "jee_advanced": 170118,
+          "neet": 201471
+        },
+        "source_distribution": {
+          "Abc8264/Jee-Chemistry-dataset-with-COT": 2339,
+          "eQOURSE/jee-main-questions": 1571,
+          "nvidia/OpenMathReasoning": 40826,
+          "PRIME-RL/Eurus-2-SFT-Data": 170118,
+          "FreedomIntelligence/medical-o1-reasoning-SFT": 20546,
+          "openlifescienceai/medmcqa": 180925
+        },
+        "underrepresented_subjects": [
+          {
+            "subject": "chemistry",
+            "count": 2828,
+            "percentage": 0.68
+          },
+          {
+            "subject": "physics",
+            "count": 516,
+            "percentage": 0.12
+          }
+        ],
+        "dominant_sources": []
+      }
+    },
+    {
+      "stage": "balance_analysis",
+      "timestamp_utc": "2026-09-17T11:57:53.651195+00:00",
+      "data": {
+        "total_clean_rows": 416325,
+        "subject_distribution": {
+          "chemistry": 2828,
+          "math": 211510,
+          "physics": 516,
+          "biology": 201471
+        },
+        "difficulty_distribution": {
+          "jee_main": 3910,
+          "olympiad": 40826,
+          "jee_advanced": 170118,
+          "neet": 201471
+        },
+        "source_distribution": {
+          "Abc8264/Jee-Chemistry-dataset-with-COT": 2339,
+          "eQOURSE/jee-main-questions": 1571,
+          "nvidia/OpenMathReasoning": 40826,
+          "PRIME-RL/Eurus-2-SFT-Data": 170118,
+          "FreedomIntelligence/medical-o1-reasoning-SFT": 20546,
+          "openlifescienceai/medmcqa": 180925
+        },
+        "underrepresented_subjects": [
+          {
+            "subject": "chemistry",
+            "count": 2828,
+            "percentage": 0.68
+          },
+          {
+            "subject": "physics",
+            "count": 516,
+            "percentage": 0.12
+          }
+        ],
+        "dominant_sources": []
+      }
+    },
+    {
+      "stage": "balance_analysis",
+      "timestamp_utc": "2026-09-17T11:59:19.242069+00:00",
+      "data": {
+        "total_clean_rows": 416325,
+        "subject_distribution": {
+          "chemistry": 2828,
+          "math": 211510,
+          "physics": 516,
+          "biology": 201471
+        },
+        "difficulty_distribution": {
+          "jee_main": 3910,
+          "olympiad": 40826,
+          "jee_advanced": 170118,
+          "neet": 201471
+        },
+        "source_distribution": {
+          "Abc8264/Jee-Chemistry-dataset-with-COT": 2339,
+          "eQOURSE/jee-main-questions": 1571,
+          "nvidia/OpenMathReasoning": 40826,
+          "PRIME-RL/Eurus-2-SFT-Data": 170118,
+          "FreedomIntelligence/medical-o1-reasoning-SFT": 20546,
+          "openlifescienceai/medmcqa": 180925
+        },
+        "underrepresented_subjects": [
+          {
+            "subject": "chemistry",
+            "count": 2828,
+            "percentage": 0.68
+          },
+          {
+            "subject": "physics",
+            "count": 516,
+            "percentage": 0.12
+          }
+        ],
+        "dominant_sources": []
+      }
+    },
+    {
+      "stage": "balance_sampling",
+      "timestamp_utc": "2026-09-17T12:18:13.533698+00:00",
+      "data": {
+        "strategy": "Option C (Explicit Source Allocation)",
+        "total_balanced_rows": 11344,
+        "subject_distribution": {
+          "biology": 4000,
+          "chemistry": 2828,
+          "math": 4000,
+          "physics": 516
+        },
+        "source_allocation_summary": {
+          "math": {
+            "nvidia/OpenMathReasoning": 2200,
+            "PRIME-RL/Eurus-2-SFT-Data": 1800
+          },
+          "biology": {
+            "FreedomIntelligence/medical-o1-reasoning-SFT": 2200,
+            "openlifescienceai/medmcqa": 1800
+          },
+          "chemistry": {
+            "Abc8264/Jee-Chemistry-dataset-with-COT": 2339,
+            "eQOURSE/jee-main-questions": 489
+          },
+          "physics": {
+            "eQOURSE/jee-main-questions": 516
+          }
+        },
+        "seed": 42
+      }
+    },
+    {
+      "stage": "splits",
+      "timestamp_utc": "2026-09-17T12:18:36.204755+00:00",
+      "data": {
+        "total_pool_rows": 11344,
+        "unique_problem_clusters": 11344,
+        "split_counts": {
+          "train": 10210,
+          "val": 567,
+          "test": 567
+        },
+        "split_percentages": {
+          "train": 90.0,
+          "val": 5.0,
+          "test": 5.0
+        },
+        "subject_breakdown_by_split": {
+          "train": {
+            "chemistry": 2546,
+            "math": 3600,
+            "biology": 3600,
+            "physics": 464
+          },
+          "val": {
+            "math": 200,
+            "chemistry": 141,
+            "biology": 200,
+            "physics": 26
+          },
+          "test": {
+            "biology": 200,
+            "chemistry": 141,
+            "math": 200,
+            "physics": 26
+          }
+        },
+        "files_generated": {
+          "train": "D:\\LLM_Project\\llm\\data_pipeline\\split\\train.jsonl",
+          "val": "D:\\LLM_Project\\llm\\data_pipeline\\split\\val.jsonl",
+          "test": "D:\\LLM_Project\\llm\\data_pipeline\\split\\test.jsonl"
+        }
+      }
+    },
+    {
+      "stage": "tokenization",
+      "timestamp_utc": "2026-09-17T12:29:59.044609+00:00",
+      "data": {
+        "max_seq_length": 8192,
+        "hard_max_length": 24000,
+        "split_tokenization_summary": {
+          "train": {
+            "input_rows": 10210,
+            "kept_rows": 10208,
+            "dropped_rows": 2,
+            "truncated_rows": 774,
+            "max_seq_length": 8192
+          },
+          "val": {
+            "input_rows": 567,
+            "kept_rows": 567,
+            "dropped_rows": 0,
+            "truncated_rows": 38,
+            "max_seq_length": 8192
+          },
+          "test": {
+            "input_rows": 567,
+            "kept_rows": 567,
+            "dropped_rows": 0,
+            "truncated_rows": 45,
+            "max_seq_length": 8192
+          }
+        },
+        "total_log_records": 859,
+        "truncated_log_file": "D:\\LLM_Project\\llm\\data_pipeline\\tokenize\\truncated_examples.jsonl",
+        "tokenized_output_dir": "D:\\LLM_Project\\llm\\data\\sft\\v2_reasoning_boost\\tokenized"
+      }
+    }
+  ]
+}

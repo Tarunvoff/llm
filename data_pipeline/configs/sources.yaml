@@ -1,0 +1,94 @@
+sources:
+  # =========================================================================
+  # TRAIN DATASETS: High-confidence, verified or structural SFT reasoning data
+  # =========================================================================
+  - hf_id: "farhananis005/jee-sft-v1"
+    subject: "mixed"
+    role: "train"
+    expected_size: "unknown"
+    notes: "JEE general exam QA, likely already SFT-formatted; requires inspection for CoT vs direct answer."
+
+  - hf_id: "Abc8264/Jee-Chemistry-dataset-with-COT"
+    subject: "chemistry"
+    role: "train"
+    expected_size: "small (~a few thousand)"
+    notes: "JEE Chemistry with verified Chain-of-Thought; ideal template for schema matching."
+
+  - hf_id: "nvidia/OpenMathReasoning"
+    subject: "math"
+    role: "train"
+    expected_size: "~306K"
+    notes: "Bulk competition-level math with verified CoT and Tool-Integrated Reasoning (TIR); good for algebraic depth."
+
+  - hf_id: "openlifescienceai/medmcqa"
+    subject: "biology"
+    role: "train"
+    expected_size: "194K"
+    notes: "NEET-PG / AIIMS medical MCQs with explanations. PG-level, higher than NEET-UG, but explanation style transfers well; downsample and re-level."
+
+  - hf_id: "FreedomIntelligence/medical-o1-reasoning-SFT"
+    subject: "biology"
+    role: "train"
+    expected_size: "medium"
+    notes: "Medical reasoning with verifier-checked CoT; excellent structural template for NEET biology/physiology."
+
+  # =========================================================================
+  # TRAIN_WITH_CARE DATASETS: Usable but require strict verification/filtering
+  # =========================================================================
+  - hf_id: "169Pi/exambench"
+    subject: "mixed"
+    role: "train_with_care"
+    expected_size: "medium"
+    notes: "Mixed exam QA; must decontaminate against held-out JEE Advanced and NEET test years."
+
+  - hf_id: "eQOURSE/jee-main-questions"
+    subject: "mixed"
+    role: "train_with_care"
+    expected_size: "medium"
+    notes: "JEE Main questions; likely raw questions lacking verified CoT traces."
+
+  - hf_id: "camel-ai/physics"
+    subject: "physics"
+    role: "train_with_care"
+    expected_size: "~20K"
+    notes: "LLM-synthesized physics CoT; broad coverage but must be answer-verified against ground truth."
+
+  - hf_id: "camel-ai/chemistry"
+    subject: "chemistry"
+    role: "train_with_care"
+    expected_size: "~20K"
+    notes: "LLM-synthesized chemistry CoT; broad coverage but must be answer-verified against ground truth."
+
+  - hf_id: "camel-ai/math"
+    subject: "math"
+    role: "train_with_care"
+    expected_size: "~50K"
+    notes: "LLM-synthesized math CoT; supplement only, verify correctness against ground truth."
+
+  - hf_id: "camel-ai/biology"
+    subject: "biology"
+    role: "train_with_care"
+    expected_size: "~20K"
+    notes: "LLM-synthesized biology CoT; supplement only, verify correctness against ground truth."
+
+  - hf_id: "PRIME-RL/Eurus-2-SFT-Data"
+    subject: "math"
+    role: "train_with_care"
+    expected_size: "medium"
+    notes: "Action-centric CoT teaching structured verify-refine behavior; not exam-specific."
+
+  # =========================================================================
+  # EVAL_ONLY DATASETS: Strictly held out for benchmark evaluation
+  # NEVER train on these. Physically separated into eval_holdout/
+  # =========================================================================
+  - hf_id: "Reja1/jee-neet-benchmark"
+    subject: "mixed"
+    role: "eval_only"
+    expected_size: "benchmark"
+    notes: "JEE Advanced + NEET real exam years; primary held-out scorecard. Contamination-aware."
+
+  - hf_id: "ByteDance-Seed/ScienceOlympiad"
+    subject: "physics"
+    role: "eval_only"
+    expected_size: "benchmark"
+    notes: "Physics + Chemistry Olympiad-level benchmark; elite difficulty held-out evaluation."

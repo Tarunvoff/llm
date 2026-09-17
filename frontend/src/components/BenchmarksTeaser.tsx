@@ -20,13 +20,13 @@ export const BenchmarksTeaser: React.FC<BenchmarksTeaserProps> = ({ onSeeFullBen
           <div className="space-y-3 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30 text-xs font-bold uppercase tracking-wider">
               <Trophy className="size-3.5 text-amber-400" />
-              <span>Rigorous Empirical Validation</span>
+              <span>Base Model Empirical Baseline</span>
             </div>
             <div className="text-2xl sm:text-3xl font-extrabold tracking-tight">
               86.51% JEE Advanced · 84.66% NEET · 86.67% AIME
             </div>
             <p className="text-slate-400 text-sm max-w-xl">
-              Evaluated strictly with 0-shot chain-of-thought and math verification against recent 2025/2026 exam papers.
+              Aryabhata 2.0 base model scores evaluated strictly with 0-shot CoT against competitive papers. Vidhya 2.0 reasoning fine-tune evaluations will be published post-training.
             </p>
           </div>
 

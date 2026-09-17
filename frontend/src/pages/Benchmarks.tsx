@@ -61,7 +61,7 @@ export const Benchmarks: React.FC = () => {
 
   // In-Distribution data
   const [inDistData, setInDistData] = useState<BenchmarkRow[]>([
-    { model: "Vidhya 2.0 (ours)", jee_adv_2025: 86.51, neet_2025: 84.66, jee_main_2025: 87.80, jee_main_2026: 92.99, avg: 88.95, highlight: true },
+    { model: "Aryabhata 2.0 (Base Baseline)", jee_adv_2025: 86.51, neet_2025: 84.66, jee_main_2025: 87.80, jee_main_2026: 92.99, avg: 88.95, highlight: true },
     { model: "Gemini 2.5 Flash", jee_adv_2025: 96.81, neet_2025: 90.00, jee_main_2025: 87.26, jee_main_2026: 96.22, avg: 90.23 },
     { model: "GPT-5 Mini", jee_adv_2025: 93.65, neet_2025: 87.33, jee_main_2025: 87.07, jee_main_2026: 95.83, avg: 89.71 },
     { model: "Qwen3-30B-A3B (Thinking)", jee_adv_2025: 90.48, neet_2025: 86.00, jee_main_2025: 84.89, jee_main_2026: 97.26, avg: 88.55 },
@@ -72,7 +72,7 @@ export const Benchmarks: React.FC = () => {
 
   // Out-of-Distribution data
   const [oodData, setOodData] = useState<BenchmarkRow[]>([
-    { model: "Vidhya 2.0 (ours)", aime: 86.67, hmmt: 78.96, gpqa: 74.86, mmlu_pro: 88.49, mmlu_redux: 92.92, avg: 87.64, highlight: true },
+    { model: "Aryabhata 2.0 (Base Baseline)", aime: 86.67, hmmt: 78.96, gpqa: 74.86, mmlu_pro: 88.49, mmlu_redux: 92.92, avg: 87.64, highlight: true },
     { model: "GPT-OSS-120B", aime: 90.00, hmmt: 80.01, gpqa: 77.06, mmlu_pro: 90.11, mmlu_redux: 95.94, avg: 89.50 },
     { model: "Qwen3-30B-A3B (Thinking)", aime: 84.58, hmmt: 51.88, gpqa: 73.31, mmlu_pro: 90.80, mmlu_redux: 97.77, avg: 89.42 },
     { model: "Gemini 2.5 Flash", aime: 66.61, hmmt: 59.13, gpqa: 75.09, mmlu_pro: 90.44, mmlu_redux: 96.85, avg: 89.13 },
@@ -83,7 +83,7 @@ export const Benchmarks: React.FC = () => {
 
   // Token efficiency data
   const [efficiencyData, setEfficiencyData] = useState<BenchmarkRow[]>([
-    { model: "Vidhya 2.0 (ours)", avg: 88.95, in_dist_tokens: 2102, in_dist_acc_per_1k: 42.31, highlight: true },
+    { model: "Aryabhata 2.0 (Base Baseline)", avg: 88.95, in_dist_tokens: 2102, in_dist_acc_per_1k: 42.31, highlight: true },
     { model: "GPT-OSS-120B", avg: 88.28, in_dist_tokens: 3312, in_dist_acc_per_1k: 26.66 },
     { model: "Qwen3-30B-A3B (Thinking)", avg: 88.55, in_dist_tokens: 4556, in_dist_acc_per_1k: 19.44 },
     { model: "GPT-OSS-20B (Base)", avg: 83.00, in_dist_tokens: 5293, in_dist_acc_per_1k: 15.68 }
@@ -112,7 +112,7 @@ export const Benchmarks: React.FC = () => {
         }
       }
     } catch (e) {
-      console.warn("Using baseline Vidhya 2.0 benchmark constants:", e);
+      console.warn("Using baseline Aryabhata 2.0 benchmark constants:", e);
     } finally {
       setIsLoading(false);
     }
@@ -129,7 +129,7 @@ export const Benchmarks: React.FC = () => {
     labels: chartLabels,
     datasets: [
       {
-        label: "Vidhya 2.0 (ours)",
+        label: "Aryabhata 2.0 (Base Baseline)",
         data: [86.51, 84.66, 87.80, 86.67, 78.96, 74.86],
         backgroundColor: "#2563eb", // Brand Blue
         borderColor: "#1d4ed8",

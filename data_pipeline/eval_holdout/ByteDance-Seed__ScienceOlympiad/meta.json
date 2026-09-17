@@ -1,0 +1,12 @@
+{
+  "hf_id": "ByteDance-Seed/ScienceOlympiad",
+  "safe_id": "ByteDance-Seed__ScienceOlympiad",
+  "subject": "physics",
+  "role": "eval_only",
+  "status": "success",
+  "total_rows": 204,
+  "splits": {
+    "test": 204
+  },
+  "storage_path": "D:\\LLM_Project\\llm\\data_pipeline\\eval_holdout\\ByteDance-Seed__ScienceOlympiad"
+}

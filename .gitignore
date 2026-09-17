@@ -60,11 +60,21 @@ training/checkpoints/*
 data/raw/
 data/processed/
 data/sft/*.jsonl
+!data/sft/v2_reasoning_boost/
+data/sft/v2_reasoning_boost/tokenized/
 data/dpo/*.jsonl
 !data/sft/seed_gold_100.jsonl
 !data/dpo/seed_dpo_50.jsonl
 .cache/
 hf_cache/
+
+# Data Pipeline Intermediate Artifacts (>100MB)
+data_pipeline/raw/
+data_pipeline/normalized/
+data_pipeline/verified/
+data_pipeline/dedup/
+data_pipeline/decontaminate/
+data_pipeline/split/
 
 # Experiment tracking & benchmark local result caches
 mlruns/

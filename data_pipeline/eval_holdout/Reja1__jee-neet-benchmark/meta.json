@@ -1,0 +1,12 @@
+{
+  "hf_id": "Reja1/jee-neet-benchmark",
+  "safe_id": "Reja1__jee-neet-benchmark",
+  "subject": "mixed",
+  "role": "eval_only",
+  "status": "success",
+  "total_rows": 860,
+  "splits": {
+    "test": 860
+  },
+  "storage_path": "D:\\LLM_Project\\llm\\data_pipeline\\eval_holdout\\Reja1__jee-neet-benchmark"
+}

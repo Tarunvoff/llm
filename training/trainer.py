@@ -31,19 +31,17 @@ class ModelTrainer:
             "task_type": lora_cfg.get("task_type", "CAUSAL_LM")
         }
 
-    def initialize_trainer(self):
-        """Initializes trainer components when training is enabled in future workflows."""
+    def initialize_trainer(self, train_sft_path: Optional[str] = None):
+        """Initializes trainer components when training is enabled."""
         if not self.training_enabled:
             raise RuntimeError(
                 "Training is disabled for this deployment stage. "
-                "Update configs/training.yaml to enable future runs."
+                "Update configs/training.yaml or use configs/vidhya2_sft.yaml."
             )
-        # Future implementation hooks for Trainer / SFTTrainer / GRPO orchestration
-        pass
+        from training.train_sft_vidhya import train_sft
+        return train_sft
 
-    def train(self):
-        """Training invocation hook."""
-        if not self.training_enabled:
-            print("Training execution skipped: 'training_enabled' is set to false.")
-            return None
-        pass
+    def train(self, config_path: str = "configs/vidhya2_sft.yaml", dry_run: bool = False):
+        """Training invocation hook for Vidhya 2.0 SFT."""
+        from training.train_sft_vidhya import train_sft
+        train_sft(config_path=config_path, dry_run=dry_run)

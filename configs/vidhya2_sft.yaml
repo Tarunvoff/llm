@@ -1,0 +1,73 @@
+# ==============================================================================
+# Vidhya 2.0 Reasoning Boost - Supervised Fine-Tuning (SFT) Configuration
+# Base Model: Aryabhata 2.0 (model/aryabhata-2.0)
+# Dataset: Option C Balanced STEM Pool (11,342 loss-masked examples)
+# ==============================================================================
+
+experiment:
+  name: "vidhya2_reasoning_boost_sft"
+  description: "LoRA/QLoRA Fine-Tuning of Aryabhata 2.0 for deep STEM Olympiad & Exam Reasoning"
+  version: "2.0.0"
+  seed: 42
+  tracking:
+    use_mlflow: false
+    report_to: "none"
+
+model:
+  name: "model/aryabhata-2.0"
+  tokenizer_path: "model/aryabhata-2.0"
+  torch_dtype: "bfloat16"
+  trust_remote_code: true
+  use_4bit: true
+  bnb_4bit_compute_dtype: "bfloat16"
+  bnb_4bit_quant_type: "nf4"
+  use_nested_quant: true
+  device_map: "auto"
+
+lora:
+  r: 64
+  lora_alpha: 128
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+data:
+  tokenized_dir: "data/sft/v2_reasoning_boost/tokenized"
+  train_tokenized: "data/sft/v2_reasoning_boost/tokenized/train"
+  val_tokenized: "data/sft/v2_reasoning_boost/tokenized/val"
+  test_tokenized: "data/sft/v2_reasoning_boost/tokenized/test"
+  train_jsonl: "data/sft/v2_reasoning_boost/train.jsonl"
+  val_jsonl: "data/sft/v2_reasoning_boost/val.jsonl"
+  test_jsonl: "data/sft/v2_reasoning_boost/test.jsonl"
+  max_seq_length: 8192
+  pad_to_multiple_of: 8
+  dynamic_padding: true
+
+training:
+  output_dir: "outputs/vidhya2_reasoning_sft"
+  num_train_epochs: 3
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 16
+  learning_rate: 1.0e-4
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.03
+  weight_decay: 0.01
+  gradient_checkpointing: true
+  logging_steps: 10
+  eval_strategy: "steps"
+  eval_steps: 100
+  save_strategy: "steps"
+  save_steps: 250
+  save_total_limit: 3
+  bf16: true
+  fp16: false
+  dataloader_num_workers: 2
