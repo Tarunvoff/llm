@@ -245,16 +245,24 @@ def train_sft(config_path: str, dry_run: bool = False):
         return
 
     # 5. Training Arguments
+    max_steps = train_cfg.get("max_steps", -1)
+    warmup_ratio = train_cfg.get("warmup_ratio", 0.03)
+
+    if max_steps > 0:
+        warmup_steps = int(max_steps * warmup_ratio)
+    else:
+        warmup_steps = train_cfg.get("warmup_steps", 0)
+
     training_args = TrainingArguments(
         output_dir=output_dir,
         num_train_epochs=train_cfg.get("num_train_epochs", 3),
-        max_steps=train_cfg.get("max_steps", -1),
+        max_steps=max_steps,
         per_device_train_batch_size=train_cfg.get("per_device_train_batch_size", 1),
         per_device_eval_batch_size=train_cfg.get("per_device_eval_batch_size", 1),
         gradient_accumulation_steps=train_cfg.get("gradient_accumulation_steps", 16),
         learning_rate=float(train_cfg.get("learning_rate", 1.0e-4)),
         lr_scheduler_type=train_cfg.get("lr_scheduler_type", "cosine"),
-        warmup_ratio=train_cfg.get("warmup_ratio", 0.03),
+        warmup_steps=warmup_steps,
         weight_decay=train_cfg.get("weight_decay", 0.01),
         gradient_checkpointing=train_cfg.get("gradient_checkpointing", True),
         logging_steps=train_cfg.get("logging_steps", 10),
