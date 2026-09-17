@@ -44,16 +44,25 @@ class DynamicLossMaskingCollator:
     Pads input_ids with pad_token_id, attention_mask with 0, and labels with -100.
     """
 
-    def __init__(self, pad_token_id: int = 0, pad_to_multiple_of: int = 8):
+    def __init__(
+        self,
+        pad_token_id: int = 0,
+        pad_to_multiple_of: int = 8,
+        max_seq_length: int = 4096,
+    ):
         self.pad_token_id = pad_token_id
         self.pad_to_multiple_of = pad_to_multiple_of
+        self.max_seq_length = max_seq_length
 
     def __call__(self, features: List[Dict[str, Any]]) -> Dict[str, torch.Tensor]:
         if not features:
             return {}
 
         batch_size = len(features)
-        max_len = max(len(f["input_ids"]) for f in features)
+        max_len = min(
+            max(len(f["input_ids"]) for f in features),
+            self.max_seq_length,
+        )
 
         if self.pad_to_multiple_of and self.pad_to_multiple_of > 0:
             max_len = ((max_len + self.pad_to_multiple_of - 1) // self.pad_to_multiple_of) * self.pad_to_multiple_of
@@ -63,10 +72,17 @@ class DynamicLossMaskingCollator:
         batch_labels = torch.full((batch_size, max_len), -100, dtype=torch.long)
 
         for i, f in enumerate(features):
-            seq_len = len(f["input_ids"])
-            batch_input_ids[i, :seq_len] = torch.tensor(f["input_ids"], dtype=torch.long)
-            batch_attention_mask[i, :seq_len] = torch.tensor(f["attention_mask"], dtype=torch.long)
-            batch_labels[i, :seq_len] = torch.tensor(f["labels"], dtype=torch.long)
+            seq_len = min(len(f["input_ids"]), self.max_seq_length)
+
+            batch_input_ids[i, :seq_len] = torch.tensor(
+                f["input_ids"][:seq_len], dtype=torch.long
+            )
+            batch_attention_mask[i, :seq_len] = torch.tensor(
+                f["attention_mask"][:seq_len], dtype=torch.long
+            )
+            batch_labels[i, :seq_len] = torch.tensor(
+                f["labels"][:seq_len], dtype=torch.long
+            )
 
         return {
             "input_ids": batch_input_ids,
@@ -134,6 +150,7 @@ def train_sft(config_path: str, dry_run: bool = False):
     collator = DynamicLossMaskingCollator(
         pad_token_id=tokenizer.pad_token_id,
         pad_to_multiple_of=data_cfg.get("pad_to_multiple_of", 8),
+        max_seq_length=data_cfg.get("max_seq_length", 4096),
     )
 
     # 3. Model Loading & Quantization
