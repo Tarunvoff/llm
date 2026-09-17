@@ -54,7 +54,6 @@ data:
 training:
   output_dir: "outputs/vidhya2_reasoning_sft"
   num_train_epochs: 2
-  max_steps: 20
   per_device_train_batch_size: 1
   per_device_eval_batch_size: 1
   gradient_accumulation_steps: 16
