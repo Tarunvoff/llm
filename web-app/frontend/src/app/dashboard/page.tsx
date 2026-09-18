@@ -34,13 +34,21 @@ import { Progress } from "@/components/ui/progress";
 export default function DashboardPage() {
   const { user } = useAuth();
   const [data, setData] = useState<DashboardSummary | null>(null);
+  const [nextAction, setNextAction] = useState<any | null>(null);
+  const [retentionMatrix, setRetentionMatrix] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeDrilldownTopic, setActiveDrilldownTopic] = useState<any | null>(null);
 
   const fetchDashboard = async () => {
     try {
-      const res = await ApiClient.getDashboard();
+      const [res, actRes, retRes] = await Promise.all([
+        ApiClient.getDashboard(),
+        ApiClient.getWhatShouldIDoNow().catch(() => ({ recommendation: null })),
+        ApiClient.getRetentionMatrix().catch(() => ({ matrix: [], topics_at_risk_count: 0 }))
+      ]);
       setData(res);
+      setNextAction(actRes.recommendation);
+      setRetentionMatrix(retRes);
     } catch (err) {
       console.error("Error fetching dashboard:", err);
     } finally {
@@ -128,54 +136,61 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Columns: Study Agenda & AI Recommendation */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Large Primary Study Card: TODAY'S FOCUS */}
+          {/* Large Primary Study Card: WHAT SHOULD I STUDY NOW? */}
           <div className="bg-[#FFF3F0] border-2 border-[#151515] rounded-3xl p-6 sm:p-7 shadow-[4px_4px_0px_0px_#151515] space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#BD3012] bg-white px-3 py-1 rounded-full border border-[#FFC8BC]">
-                  TODAY'S FOCUS
+                  WHAT SHOULD I STUDY NOW?
                 </span>
-                <span className="text-xs font-semibold text-[#555555]">High-Yield Priority</span>
+                <span className="text-xs font-semibold text-[#555555]">Personalized Priority</span>
               </div>
               <Badge variant="coral" className="text-xs font-mono font-bold">
-                20 min session
+                {nextAction?.target_minutes || 20} min session
               </Badge>
             </div>
 
             <div className="space-y-1">
               <h3 className="text-xl sm:text-2xl font-display font-bold text-[#151515]">
-                {data?.ai_recommendation?.highlight || "Physics: Rotational Motion (Angular Momentum)"}
+                {nextAction?.title || data?.ai_recommendation?.highlight || "Physics: Conservation of Angular Momentum"}
               </h3>
               <p className="text-xs sm:text-sm text-[#555555] leading-relaxed">
-                {data?.ai_recommendation?.description || "Review conservation of angular momentum and rolling without slipping before your next problem set."}
+                {nextAction?.reason || data?.ai_recommendation?.description || "Master core formulas and recurring PYQ traps before your next test."}
               </p>
             </div>
 
-            {/* Mastery bar */}
-            <div className="bg-white p-4 rounded-2xl border border-[#FFC8BC] space-y-2">
-              <div className="flex justify-between text-xs font-bold text-[#151515]">
-                <span>Current Topic Mastery</span>
-                <span className="text-[#FF5734]">42%</span>
+            {/* Suggested Steps */}
+            {nextAction?.suggested_steps?.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 py-1">
+                {nextAction.suggested_steps.map((st: any) => (
+                  <div key={st.step} className="p-2.5 bg-white rounded-xl border border-[#FFC8BC] text-[11px] text-[#151515]">
+                    <span className="font-bold text-[#FF5734] block">Step {st.step} ({st.duration})</span>
+                    <span className="text-[#555555]">{st.action}</span>
+                  </div>
+                ))}
               </div>
-              <div className="h-2.5 w-full bg-[#FFE4DE] rounded-full overflow-hidden">
-                <div className="h-full bg-[#FF5734] rounded-full" style={{ width: "42%" }} />
-              </div>
-            </div>
+            )}
 
             <div className="pt-2 flex flex-wrap items-center gap-3">
-              <Link href="/tutor">
+              <Link href={`/topics/${encodeURIComponent(nextAction?.topic || "Rotational Motion")}`}>
                 <Button variant="primary" size="sm" className="text-xs h-9 px-4 font-bold">
-                  {data?.ai_recommendation?.action_text || "Start Studying Now"}
+                  Open Topic 360 Center
                   <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                 </Button>
               </Link>
-              <Link href="/mistakes">
+              <Link href="/recall">
                 <Button variant="outline" size="sm" className="text-xs h-9 bg-white border-[#FFC8BC] text-[#BD3012] hover:bg-[#FFF3F0] font-bold">
-                  Review 3 Mistakes on this Topic
+                  10-Min Fast Recall
+                </Button>
+              </Link>
+              <Link href="/flashcards">
+                <Button variant="outline" size="sm" className="text-xs h-9 bg-white border-[#E8E6DE] text-[#151515] font-bold">
+                  Due Flashcards
                 </Button>
               </Link>
             </div>
           </div>
+
 
           {/* Today's Study Plan Checklist */}
           <Card>

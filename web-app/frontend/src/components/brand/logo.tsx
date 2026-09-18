@@ -8,13 +8,16 @@ interface LogoProps {
   className?: string;
 }
 
-export function LogoIcon({ className = "h-9 w-9" }: { className?: string }) {
+export function LogoIcon({ className = "h-9 w-9", width = 36, height = 36 }: { className?: string; width?: number | string; height?: number | string }) {
   return (
     <svg
       viewBox="0 0 100 100"
+      width={width}
+      height={height}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={className}
+      className={`${className} max-w-full shrink-0`}
+      style={{ display: "inline-block", verticalAlign: "middle" }}
     >
       {/* 1. Orange 'i' Dot */}
       <circle cx="28" cy="22" r="9" fill="#FF5734" />

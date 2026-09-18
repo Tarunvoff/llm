@@ -6,7 +6,10 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import verify_password, get_password_hash, create_access_token, decode_access_token
 from app.core.config import settings
-from app.models import User, UserProfile, TopicMastery, RevisionItem, StudyPlan, StudyPlanItem, Mistake
+from app.models import (
+    User, UserProfile, TopicMastery, RevisionItem, StudyPlan, StudyPlanItem, Mistake,
+    KnowledgeItem, Flashcard, PYQItem, Book, BookChapter, VideoResource
+)
 from app.schemas import UserRegister, UserLogin, TokenResponse, UserOut, OnboardingRequest, UserProfileSchema
 from datetime import datetime, timezone, timedelta as dt_timedelta
 
@@ -159,6 +162,171 @@ def seed_initial_user_data(db: Session, user: User):
             is_resolved=False
         )
         db.add(m)
+
+    # Seed Knowledge Items & LaTeX Formulas from Rich Dataset
+    from app.core.rich_seed_data import RICH_FORMULAS, RICH_PYQS, RICH_VIDEOS, RICH_BOOKS
+
+    for f_data in RICH_FORMULAS:
+        existing_k = db.query(KnowledgeItem).filter(
+            KnowledgeItem.user_id == user.id,
+            KnowledgeItem.title == f_data["title"]
+        ).first()
+        if not existing_k:
+            k_obj = KnowledgeItem(
+                user_id=user.id,
+                type="FORMULA",
+                title=f_data["title"],
+                content=f_data["summary"],
+                summary=f_data["summary"],
+                subject=f_data["subject"],
+                chapter=f_data["chapter"],
+                topic=f_data["topic"],
+                formula_equation=f_data["formula_equation"],
+                variables_explanation=f_data["variables_explanation"],
+                importance_score=f_data["importance_score"],
+                mastery_score=f_data["mastery_score"],
+                recurring_pattern=f_data["recurring_pattern"],
+                tags=f_data["tags"],
+                source_reference=f_data["source_reference"]
+            )
+            db.add(k_obj)
+
+    # Seed Flashcards (Spaced recall cards)
+    flashcard_seeds = [
+        Flashcard(
+            user_id=user.id,
+            subject="Physics",
+            chapter="Rotational Mechanics",
+            topic="Conservation of Angular Momentum",
+            card_type="FORMULA",
+            front="What is the condition and mathematical formula for Conservation of Angular Momentum?",
+            back="Condition: Net external torque τ_ext = 0\nFormula: L = I₁ω₁ = I₂ω₂ = Constant",
+            hint="Think of an ice skater pulling arms inward",
+            retention_state="LEARNING",
+            interval_days=1,
+            repetition_count=1,
+            due_date=now
+        ),
+        Flashcard(
+            user_id=user.id,
+            subject="Biology",
+            chapter="Cell Biology",
+            topic="Cell Division (Mitosis vs Meiosis)",
+            card_type="CLOZE",
+            front="During meiosis, crossing over between non-sister chromatids occurs at the [_______] sub-stage of Prophase I.",
+            back="PACHYTENE (facilitated by recombinase enzyme)",
+            hint="Leptotene -> Zygotene -> Pachytene -> Diplotene -> Diakinesis",
+            retention_state="REVIEW",
+            interval_days=3,
+            repetition_count=2,
+            due_date=now
+        ),
+        Flashcard(
+            user_id=user.id,
+            subject="Chemistry",
+            chapter="Hydrocarbons",
+            topic="Markovnikov Addition & Carbocations",
+            card_type="CONCEPT",
+            front="Why does the peroxide effect (Kharasch effect) occur only with HBr and NOT with HCl or HI?",
+            back="H-Cl bond is too strong for free-radical homolytic cleavage, while H-I adds too slowly and iodine radicals recombine into I₂.",
+            hint="Thermodynamic feasibility of both propagation steps",
+            retention_state="NEW",
+            interval_days=0,
+            repetition_count=0,
+            due_date=now
+        ),
+        Flashcard(
+            user_id=user.id,
+            subject="Physics",
+            chapter="Mechanics",
+            topic="Kinematics 2D Projectile Equations",
+            card_type="FORMULA",
+            front="State the formula for maximum height (H_max) and horizontal range (R) in terms of launch angle θ and initial speed u.",
+            back="H_max = (u² sin²θ) / (2g)\nRange R = (u² sin 2θ) / g",
+            hint="R is maximum at 45 degrees",
+            retention_state="MASTERED",
+            interval_days=14,
+            repetition_count=4,
+            due_date=now + dt_timedelta(days=7)
+        )
+    ]
+    for fc in flashcard_seeds:
+        db.add(fc)
+
+    # Seed PYQs (NEET / JEE Archive from Rich Dataset)
+    for pyq_data in RICH_PYQS:
+        existing_pyq = db.query(PYQItem).filter(
+            PYQItem.exam_name == pyq_data["exam_name"],
+            PYQItem.year == pyq_data["year"],
+            PYQItem.question_text == pyq_data["question_text"]
+        ).first()
+        if not existing_pyq:
+            pyq_obj = PYQItem(
+                exam_name=pyq_data["exam_name"],
+                year=pyq_data["year"],
+                subject=pyq_data["subject"],
+                chapter=pyq_data["chapter"],
+                topic=pyq_data["topic"],
+                question_text=pyq_data["question_text"],
+                options=pyq_data["options"],
+                correct_answer=pyq_data["correct_answer"],
+                explanation=pyq_data["explanation"],
+                difficulty=pyq_data.get("difficulty", "Medium"),
+                question_type=pyq_data.get("question_type", "MCQ"),
+                source=pyq_data.get("source", "Official Archive"),
+                key_formula_used=pyq_data.get("key_formula_used"),
+                recurring_pattern_tag=pyq_data.get("recurring_pattern_tag"),
+                repeat_frequency_score=pyq_data.get("repeat_frequency_score", 4.0),
+                appeared_years=pyq_data.get("appeared_years", [pyq_data["year"]])
+            )
+            db.add(pyq_obj)
+
+    # Seed Video Resources from Rich Dataset
+    for v in RICH_VIDEOS:
+        existing_vid = db.query(VideoResource).filter(VideoResource.id == v["id"]).first()
+        if not existing_vid:
+            v_obj = VideoResource(
+                id=v["id"],
+                title=v["title"],
+                channel=v["channel"],
+                topic=v["topic"],
+                subject=v["subject"],
+                duration_minutes=v["duration_minutes"],
+                duration_category=v["duration_category"],
+                style=v["style"],
+                language=v["language"],
+                video_id_or_url=v["video_id_or_url"],
+                thumbnail_url=v["thumbnail_url"],
+                difficulty=v["difficulty"],
+                why_recommended=v["why_recommended"]
+            )
+            db.add(v_obj)
+
+    # Seed Reference Books from Rich Dataset
+    for b in RICH_BOOKS:
+        existing_book = db.query(Book).filter(Book.id == b["id"]).first()
+        if not existing_book:
+            b_obj = Book(
+                id=b["id"],
+                title=b["title"],
+                author=b["author"],
+                subject=b["subject"],
+                cover_color=b.get("cover_color", "coral"),
+                source_type=b.get("source_type", "REFERENCE"),
+                description=b["description"]
+            )
+            db.add(b_obj)
+            db.flush()
+
+            for ch in b["chapters"]:
+                ch_obj = BookChapter(
+                    book_id=b["id"],
+                    chapter_number=ch["chapter_number"],
+                    title=ch["title"],
+                    summary=f"Covers key concepts: {', '.join(ch.get('topics_covered', []))}",
+                    key_facts=ch.get("topics_covered", [])
+                )
+                db.add(ch_obj)
     
     db.commit()
 

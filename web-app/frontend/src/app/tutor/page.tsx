@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   ArrowRight,
   Bot,
@@ -20,24 +21,35 @@ import {
   Plus,
   Lightbulb,
   Check,
+  Copy,
+  RotateCcw,
+  BookMarked,
+  Brain,
+  GraduationCap,
+  Calculator,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ApiClient, ChatMessage, Citation, ConversationItem } from "@/lib/api";
+import { MathRenderer } from "@/components/ui/math-renderer";
 
 export default function TutorPage() {
+  const searchParams = useSearchParams();
+  const initialPrompt = searchParams.get("prompt");
+
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputPrompt, setInputPrompt] = useState("");
   const [explanationMode, setExplanationMode] = useState("Exam-oriented");
+  const [selectedSubject, setSelectedSubject] = useState("Physics");
   const [isStreaming, setIsStreaming] = useState(false);
   const [activeCitation, setActiveCitation] = useState<Citation | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
 
   const imageInputRef = useRef<HTMLInputElement>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
@@ -45,8 +57,8 @@ export default function TutorPage() {
   const fetchConversations = async () => {
     try {
       const res = await ApiClient.getConversations();
-      setConversations(res.conversations);
-      if (res.conversations.length > 0 && !activeConvId) {
+      setConversations(res.conversations || []);
+      if (res.conversations && res.conversations.length > 0 && !activeConvId) {
         setActiveConvId(res.conversations[0].id);
       }
     } catch (err) {
@@ -57,7 +69,7 @@ export default function TutorPage() {
   const loadMessages = async (convId: string) => {
     try {
       const res = await ApiClient.getConversationDetails(convId);
-      setMessages(res.messages);
+      setMessages(res.messages || []);
     } catch (err) {
       console.error("Failed to load conversation details:", err);
     }
@@ -73,19 +85,33 @@ export default function TutorPage() {
     } else {
       setMessages([
         {
-          id: "initial-1",
+          id: "welcome-init",
           role: "assistant",
           content:
-            "### Welcome to your Socratic AI Study Coach\n\n" +
-            "I am initialized with your syllabus knowledge and uploaded notes. Ask a question, paste a problem, or upload a diagram.\n\n" +
-            "• **Socratic Scaffolding**: I will guide you step-by-step.\n" +
-            "• **Grounded Citations**: Explanations cite your uploaded textbook pages.\n" +
-            "• **Custom Pedagogy**: Switch explanation styles above anytime.",
-          related_topics: ["Mechanics", "Electrostatics", "Organic Chemistry"],
+            "### 🎓 Welcome to your Socratic AI Study Coach\n\n" +
+            "I'm grounded in your uploaded textbooks, syllabus, and exam archives with full **LaTeX math** and **step-by-step Socratic pedagogy**.\n\n" +
+            "**How I can help you right now:**\n" +
+            "- 📐 **Derive equations & formulas** step-by-step in $\\LaTeX$\n" +
+            "- 🎯 **Deconstruct tough PYQs** and point out exam trap options\n" +
+            "- 📖 **Ground answers in your NCERT/Reference notes** with exact page citations\n" +
+            "- 🧠 **Diagnose root cause errors** from your Mistake Journal\n\n" +
+            "Ask a question below or choose a high-yield study prompt to begin!",
+          related_topics: [
+            "Rotational Dynamics",
+            "Conservation of Angular Momentum",
+            "Markovnikov Addition",
+            "Kinematics 2D",
+          ],
         },
       ]);
     }
   }, [activeConvId]);
+
+  useEffect(() => {
+    if (initialPrompt && !inputPrompt) {
+      setInputPrompt(initialPrompt);
+    }
+  }, [initialPrompt]);
 
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -93,14 +119,14 @@ export default function TutorPage() {
 
   const handleNewSession = async () => {
     try {
-      const newConv = await ApiClient.createConversation("New Study Session", "Physics");
+      const newConv = await ApiClient.createConversation("New Study Session", selectedSubject);
       setConversations((prev) => [newConv, ...prev]);
       setActiveConvId(newConv.id);
       setMessages([
         {
-          id: "init",
+          id: `init-${Date.now()}`,
           role: "assistant",
-          content: "What concept or problem would you like to explore together today?",
+          content: `What concept, formula, or problem in **${selectedSubject}** would you like to explore step-by-step?`,
         },
       ]);
     } catch (err) {
@@ -108,15 +134,15 @@ export default function TutorPage() {
     }
   };
 
-  const handleSend = async () => {
-    if (!inputPrompt.trim() || isStreaming) return;
-    const userText = inputPrompt;
+  const handleSend = async (customPrompt?: string) => {
+    const textToSend = customPrompt || inputPrompt;
+    if (!textToSend.trim() || isStreaming) return;
     setInputPrompt("");
 
     const userMsg: ChatMessage = {
       id: `user-${Date.now()}`,
       role: "user",
-      content: userText,
+      content: textToSend,
       explanation_mode: explanationMode,
     };
 
@@ -141,9 +167,9 @@ export default function TutorPage() {
     await ApiClient.streamTutorChat(
       {
         conversation_id: activeConvId || undefined,
-        prompt: userText,
+        prompt: textToSend,
         explanation_mode: explanationMode,
-        subject: "Physics",
+        subject: selectedSubject,
       },
       {
         onInit: (data) => {
@@ -167,7 +193,7 @@ export default function TutorPage() {
             )
           );
         },
-        onDone: (messageId) => {
+        onDone: () => {
           setIsStreaming(false);
           fetchConversations();
         },
@@ -179,6 +205,12 @@ export default function TutorPage() {
     );
   };
 
+  const handleCopyMessage = (id: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedMsgId(id);
+    setTimeout(() => setCopiedMsgId(null), 2000);
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -186,14 +218,17 @@ export default function TutorPage() {
     setIsUploadingImage(true);
     const formData = new FormData();
     formData.append("image", file);
-    formData.append("prompt", "Analyze this educational diagram, identify the physical principles, and guide me step-by-step.");
+    formData.append(
+      "prompt",
+      "Analyze this educational diagram, identify the physical principles, and guide me step-by-step."
+    );
 
     try {
       const res = await ApiClient.analyzeDiagram(formData);
       const userImgMsg: ChatMessage = {
         id: `img-user-${Date.now()}`,
         role: "user",
-        content: `[Attached Diagram: ${file.name}]`,
+        content: `📷 **Uploaded Diagram for Analysis:** \`${file.name}\``,
       };
       const asstImgMsg: ChatMessage = {
         id: `img-asst-${Date.now()}`,
@@ -209,38 +244,58 @@ export default function TutorPage() {
     }
   };
 
-  const handleQuickAction = (actionText: string) => {
-    setInputPrompt(actionText);
-  };
-
   const quickActions = [
-    "Explain simpler",
-    "Give realistic example",
-    "Give practice question",
-    "Show formula derivation",
-    "Test me on this topic",
+    { label: "Derive in LaTeX", prompt: "Derive the mathematical formula for this topic step-by-step using LaTeX." },
+    { label: "Give High-Yield PYQ", prompt: "Give me a high-yield previous year exam question on this concept with step-by-step reasoning." },
+    { label: "Explain Simpler (ELI5)", prompt: "Explain this concept in simple, intuitive terms with a real-life analogy." },
+    { label: "Common Traps & Mistakes", prompt: "What are the common traps, calculation mistakes, and careless errors students make on this topic?" },
+    { label: "Test My Understanding", prompt: "Ask me a diagnostic conceptual question to test my understanding of this topic." },
   ];
 
   return (
     <AppShell>
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-8.5rem)]">
-        {/* Left Column: Recent Conversations */}
-        <div className="hidden lg:flex flex-col border border-[#E8E6DE] rounded-2xl bg-white p-4 space-y-4 shadow-subtle">
-          <div className="flex items-center justify-between pb-2 border-b border-[#EFEFE8]">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#707070]">
-              Study Sessions
-            </span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 h-[calc(100vh-8.5rem)]">
+        
+        {/* Left Column (3 cols): Sessions & Subject Switcher */}
+        <div className="hidden lg:flex lg:col-span-3 flex-col border border-[#E8E6DE] rounded-2xl bg-white p-4 space-y-4 shadow-subtle">
+          
+          {/* Header */}
+          <div className="flex items-center justify-between pb-3 border-b border-[#EFEFE8]">
+            <div className="flex items-center gap-2">
+              <Brain className="h-4 w-4 text-[#FF5734]" />
+              <span className="text-xs font-bold uppercase tracking-wider text-[#151515]">
+                Tutor Sessions
+              </span>
+            </div>
             <Button
               variant="outline"
               size="sm"
               onClick={handleNewSession}
-              className="text-[11px] h-7 px-2.5 font-bold border-[#E4E2D8] text-[#151515] hover:bg-[#FAF9F5]"
+              className="text-[11px] h-7 px-2.5 font-bold border-[#E4E2D8] text-[#151515] hover:bg-[#FAF9F5] shadow-xs"
             >
-              + New
+              <Plus className="h-3.5 w-3.5 mr-1" /> New
             </Button>
           </div>
 
-          <div className="space-y-1.5 overflow-y-auto flex-1">
+          {/* Subject Filter Bar */}
+          <div className="flex items-center gap-1.5 p-1 bg-[#FAF9F5] rounded-xl border border-[#E8E6DE]">
+            {["Physics", "Chemistry", "Biology", "Math"].map((subj) => (
+              <button
+                key={subj}
+                onClick={() => setSelectedSubject(subj)}
+                className={`flex-1 py-1 text-[11px] font-bold rounded-lg transition-all ${
+                  selectedSubject === subj
+                    ? "bg-white text-[#151515] shadow-xs border border-[#E8E6DE]"
+                    : "text-[#707070] hover:text-[#151515]"
+                }`}
+              >
+                {subj}
+              </button>
+            ))}
+          </div>
+
+          {/* Sessions List */}
+          <div className="space-y-1.5 overflow-y-auto flex-1 pr-1">
             {conversations.length > 0 ? (
               conversations.map((c) => (
                 <div
@@ -248,51 +303,74 @@ export default function TutorPage() {
                   onClick={() => setActiveConvId(c.id)}
                   className={`p-3 rounded-xl text-xs cursor-pointer transition-all space-y-1 ${
                     activeConvId === c.id
-                      ? "bg-[#FFF3F0] text-[#BD3012] font-bold border border-[#FFC8BC]"
-                      : "text-[#555555] hover:text-[#151515] hover:bg-[#FAF9F5]"
+                      ? "bg-[#FFF3F0] text-[#BD3012] font-bold border border-[#FFC8BC] shadow-xs"
+                      : "text-[#555555] hover:text-[#151515] hover:bg-[#FAF9F5] border border-transparent"
                   }`}
                 >
-                  <p className="truncate font-semibold">{c.title}</p>
-                  <p className="text-[10px] text-[#707070]">
-                    {c.subject} • {c.topic || "Session"}
-                  </p>
+                  <p className="truncate font-semibold text-xs">{c.title}</p>
+                  <div className="flex items-center justify-between text-[10px] text-[#707070]">
+                    <span>{c.subject}</span>
+                    <span>{c.topic || "Session"}</span>
+                  </div>
                 </div>
               ))
             ) : (
               <div className="p-4 text-center text-xs text-[#707070]">
-                No previous sessions.
+                No previous sessions. Start a new one above!
               </div>
             )}
           </div>
+
+          {/* Quick Stats Footer */}
+          <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E8E6DE] space-y-2">
+            <div className="flex items-center justify-between text-[11px] font-bold text-[#151515]">
+              <span className="flex items-center gap-1.5">
+                <GraduationCap className="h-3.5 w-3.5 text-[#FF5734]" /> Active Exam
+              </span>
+              <span className="text-[#FF5734]">NEET / JEE</span>
+            </div>
+            <div className="flex items-center justify-between text-[10px] text-[#707070]">
+              <span>RAG Textbook Citations</span>
+              <span className="font-bold text-[#16A34A]">Active (NCERT)</span>
+            </div>
+          </div>
         </div>
 
-        {/* Center 2 Columns: Tutor Chat Workspace */}
-        <div className="lg:col-span-2 flex flex-col border border-[#E8E6DE] rounded-2xl bg-white overflow-hidden shadow-subtle">
+        {/* Center Workspace (6 cols): Chat Display & Input */}
+        <div className="lg:col-span-6 flex flex-col border border-[#E8E6DE] rounded-2xl bg-white overflow-hidden shadow-subtle">
+          
           {/* Top Chat Bar */}
           <div className="h-14 border-b border-[#E8E6DE] px-5 flex items-center justify-between bg-[#FAF9F5]">
             <div className="flex items-center gap-2.5">
-              <div className="h-7 w-7 rounded-lg bg-[#FF5734] text-white flex items-center justify-center font-bold text-xs">
+              <div className="h-8 w-8 rounded-xl bg-[#FF5734] text-white flex items-center justify-center font-bold text-xs shadow-xs">
                 IT
               </div>
-              <span className="font-display font-bold text-xs sm:text-sm text-[#151515]">Socratic AI Tutor</span>
-              <Badge variant="coral" className="text-[10px] font-bold">
-                RAG Grounded
-              </Badge>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-display font-bold text-xs sm:text-sm text-[#151515]">
+                    Socratic AI Tutor
+                  </span>
+                  <Badge variant="coral" className="text-[9px] font-bold py-0 h-4">
+                    LaTeX Ready
+                  </Badge>
+                </div>
+                <p className="text-[10px] text-[#707070]">Grounded in verified syllabus & textbook RAG</p>
+              </div>
             </div>
 
             {/* Explanation Mode Selector */}
-            <div className="flex items-center gap-2 text-xs text-[#555555]">
-              <span className="text-[11px] font-semibold">Mode:</span>
+            <div className="flex items-center gap-1.5 text-xs text-[#555555]">
+              <span className="text-[11px] font-semibold hidden sm:inline">Pedagogy:</span>
               <select
                 value={explanationMode}
                 onChange={(e) => setExplanationMode(e.target.value)}
-                className="bg-white border border-[#E4E2D8] text-[#151515] text-xs font-semibold rounded-lg px-2.5 py-1 focus:outline-none focus:border-[#FF5734]"
+                className="bg-white border border-[#E4E2D8] text-[#151515] text-xs font-semibold rounded-lg px-2.5 py-1 focus:outline-none focus:border-[#FF5734] shadow-xs"
               >
-                <option value="Exam-oriented">Exam Mode</option>
-                <option value="Intermediate">Intermediate</option>
-                <option value="Beginner">Beginner</option>
-                <option value="Child">Child (ELI5)</option>
-                <option value="Expert">Expert</option>
+                <option value="Exam-oriented">🎯 Exam Mode</option>
+                <option value="Intermediate">📚 Intermediate</option>
+                <option value="Beginner">🌱 Beginner</option>
+                <option value="Child">💡 Simple (ELI5)</option>
+                <option value="Expert">🔬 Deep Rigor</option>
               </select>
             </div>
           </div>
@@ -307,24 +385,37 @@ export default function TutorPage() {
                 }`}
               >
                 {msg.role === "assistant" && (
-                  <div className="h-7 w-7 rounded-xl bg-[#B99AF5] text-[#151515] flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5 border border-[#151515]">
+                  <div className="h-8 w-8 rounded-xl bg-[#BE94F5] text-[#151515] flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5 border border-[#151515] shadow-xs">
                     IT
                   </div>
                 )}
+                
                 <div
-                  className={`max-w-[85%] rounded-2xl p-4 space-y-3 ${
+                  className={`max-w-[90%] rounded-2xl p-4 space-y-3 transition-all ${
                     msg.role === "user"
-                      ? "bg-[#FF5734] text-white font-medium shadow-sm"
+                      ? "bg-[#FF5734] text-white font-medium shadow-sm ml-auto"
                       : "bg-white border border-[#E8E6DE] text-[#151515] leading-relaxed shadow-subtle"
                   }`}
                 >
-                  <div className="whitespace-pre-line font-sans text-xs sm:text-sm">{msg.content || (isStreaming ? "Thinking..." : "")}</div>
+                  {/* Message Content with KaTeX Math Rendering */}
+                  <div className="text-xs sm:text-sm">
+                    {msg.role === "user" ? (
+                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                    ) : msg.content ? (
+                      <MathRenderer content={msg.content} />
+                    ) : isStreaming ? (
+                      <div className="flex items-center gap-2 text-[#707070] italic">
+                        <Sparkles className="h-4 w-4 animate-spin text-[#FF5734]" />
+                        <span>Formulating Socratic explanation in $\LaTeX$...</span>
+                      </div>
+                    ) : null}
+                  </div>
 
-                  {/* Grounded Citations Excerpt Trigger */}
+                  {/* Grounded Citations Excerpt */}
                   {msg.citations && msg.citations.length > 0 && (
-                    <div className="p-3 rounded-xl bg-[#FFF9D6] border border-[#FFF1A3] space-y-1 text-xs text-[#8F6E00]">
+                    <div className="p-3 rounded-xl bg-[#FFF9D6] border border-[#FFF1A3] space-y-1.5 text-xs text-[#8F6E00]">
                       <div className="flex items-center justify-between">
-                        <span className="flex items-center gap-1 font-bold text-[11px]">
+                        <span className="flex items-center gap-1.5 font-bold text-[11px]">
                           <FileText className="h-3.5 w-3.5" />
                           Source Citation • {msg.citations[0].document_title} (p. {msg.citations[0].page})
                         </span>
@@ -335,29 +426,67 @@ export default function TutorPage() {
                           View Excerpt →
                         </button>
                       </div>
-                      <p className="italic text-[#151515]/80 line-clamp-2">"{msg.citations[0].excerpt}"</p>
+                      <p className="italic text-[#151515]/80 line-clamp-2">
+                        &ldquo;{msg.citations[0].excerpt}&rdquo;
+                      </p>
                     </div>
                   )}
 
-                  {/* Recommended Action */}
-                  {msg.recommended_action && (
-                    <div className="pt-2 flex items-center justify-between border-t border-[#EFEFE8] text-xs">
-                      <span className="text-[#FF5734] font-bold">{msg.recommended_action.title}</span>
-                      <Link href="/practice">
-                        <Button variant="outline" size="sm" className="h-7 text-xs font-bold border-[#FFC8BC] text-[#BD3012] hover:bg-[#FFF3F0]">
-                          Launch Practice →
-                        </Button>
-                      </Link>
+                  {/* Related Topics / Next Step Chips */}
+                  {msg.related_topics && msg.related_topics.length > 0 && (
+                    <div className="pt-2 border-t border-[#EFEFE8] space-y-1.5">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#707070]">
+                        Explore Connected Concepts:
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {msg.related_topics.map((t, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleSend(`Tell me more about ${t} and its key formulas.`)}
+                            className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#FAF9F5] border border-[#E8E6DE] text-[#151515] hover:border-[#FF5734] hover:text-[#FF5734] transition-colors"
+                          >
+                            + {t}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
 
-                  {/* Helpful Rating */}
+                  {/* Action Bar: Copy & Feedback */}
                   {msg.role === "assistant" && msg.content && (
                     <div className="flex items-center justify-between pt-2 text-[#707070] text-[11px] border-t border-[#EFEFE8]">
-                      <span>Was this pedagogical explanation helpful?</span>
                       <div className="flex items-center gap-3">
-                        <button className="hover:text-[#151515] flex items-center gap-1"><ThumbsUp className="h-3 w-3" /> Yes</button>
-                        <button className="hover:text-[#151515] flex items-center gap-1"><ThumbsDown className="h-3 w-3" /> No</button>
+                        <button
+                          onClick={() => handleCopyMessage(msg.id, msg.content)}
+                          className="hover:text-[#151515] flex items-center gap-1 transition-colors"
+                        >
+                          {copiedMsgId === msg.id ? (
+                            <>
+                              <Check className="h-3 w-3 text-[#16A34A]" />
+                              <span className="text-[#16A34A] font-bold">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3 w-3" />
+                              <span>Copy $\LaTeX$</span>
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleSend("Can you explain this again using a simpler real-world example?")}
+                          className="hover:text-[#151515] flex items-center gap-1 transition-colors"
+                        >
+                          <RotateCcw className="h-3 w-3" /> Rephrase
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button className="hover:text-[#151515] flex items-center gap-1 p-0.5">
+                          <ThumbsUp className="h-3 w-3" />
+                        </button>
+                        <button className="hover:text-[#151515] flex items-center gap-1 p-0.5">
+                          <ThumbsDown className="h-3 w-3" />
+                        </button>
                       </div>
                     </div>
                   )}
@@ -367,15 +496,15 @@ export default function TutorPage() {
             <div ref={chatBottomRef} />
           </div>
 
-          {/* Quick Action Chips */}
+          {/* Quick Action Chips Bar */}
           <div className="px-4 py-2 border-t border-[#E8E6DE] bg-[#FAF9F5] flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
             {quickActions.map((action, i) => (
               <button
                 key={i}
-                onClick={() => handleQuickAction(action)}
-                className="whitespace-nowrap px-3 py-1 rounded-full bg-white border border-[#E8E6DE] text-xs font-semibold text-[#555555] hover:text-[#151515] hover:border-[#FF5734] transition-colors shadow-subtle"
+                onClick={() => handleSend(action.prompt)}
+                className="whitespace-nowrap px-3 py-1 rounded-full bg-white border border-[#E8E6DE] text-xs font-semibold text-[#555555] hover:text-[#151515] hover:border-[#FF5734] transition-colors shadow-subtle shrink-0"
               >
-                {action}
+                ✨ {action.label}
               </button>
             ))}
           </div>
@@ -395,78 +524,122 @@ export default function TutorPage() {
               type="button"
               onClick={() => imageInputRef.current?.click()}
               isLoading={isUploadingImage}
-              title="Upload circuit or physics diagram"
+              title="Upload circuit or physics diagram for AI vision analysis"
               className="h-10 w-10 border-[#E4E2D8] text-[#555555] hover:text-[#151515] shrink-0"
             >
               <ImageIcon className="h-4 w-4" />
             </Button>
+            
             <input
               type="text"
               value={inputPrompt}
               onChange={(e) => setInputPrompt(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder="Ask a question, request an analogy, or paste a problem..."
+              placeholder="Ask a question, enter a formula, or paste a problem..."
               className="flex-1 bg-[#FAF9F5] border border-[#E4E2D8] rounded-full px-4 py-2 text-xs sm:text-sm text-[#151515] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#FF5734] focus:ring-1 focus:ring-[#FF5734]"
             />
+            
             <Button
               variant="primary"
               size="sm"
-              onClick={handleSend}
+              onClick={() => handleSend()}
               isLoading={isStreaming}
-              className="h-10 px-5 text-xs font-bold shrink-0"
+              className="h-10 px-5 text-xs font-bold shrink-0 rounded-full"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-4 w-4 mr-1.5" /> Send
             </Button>
           </div>
         </div>
 
-        {/* Right Column: Active Context Panel */}
-        <div className="hidden lg:flex flex-col border border-[#E8E6DE] rounded-2xl bg-white p-5 space-y-5 shadow-subtle">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#707070]">
-            Topic Context & Mastery
-          </span>
+        {/* Right Column (3 cols): Topic Context, Formulas & Grounded Materials */}
+        <div className="hidden lg:flex lg:col-span-3 flex-col border border-[#E8E6DE] rounded-2xl bg-white p-5 space-y-5 shadow-subtle overflow-y-auto">
+          
+          <div className="flex items-center justify-between pb-2 border-b border-[#EFEFE8]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#707070]">
+              Active Topic Context
+            </span>
+            <Badge variant="yellow" className="text-[10px] font-bold">High Yield</Badge>
+          </div>
 
-          <div className="space-y-4">
+          {/* Topic Card */}
+          <div className="space-y-3">
             <div>
-              <p className="text-sm font-display font-bold text-[#151515]">Rotational Dynamics & Torque</p>
-              <p className="text-xs text-[#707070]">Physics • Chapter 5</p>
+              <p className="text-sm font-display font-bold text-[#151515]">
+                Rotational Dynamics & Torque
+              </p>
+              <p className="text-xs text-[#707070]">Physics • Chapter 7 • NEET/JEE</p>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
                 <span className="text-[#555555] font-semibold">Mastery Level</span>
                 <span className="font-bold text-[#FF5734]">42%</span>
               </div>
               <Progress value={42} />
             </div>
+          </div>
 
-            <div className="pt-3 border-t border-[#EFEFE8] space-y-2.5">
-              <p className="text-xs font-bold text-[#151515]">Active Prerequisites</p>
-              <div className="space-y-1.5 text-xs text-[#555555]">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#16A34A]" />
-                  <span>Kinematics Equations (82%)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#16A34A]" />
-                  <span>Newton's Laws & Friction (74%)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-red-500" />
-                  <span>Angular Momentum Vector (42%)</span>
-                </div>
+          {/* Key Formula Vault Quick Access */}
+          <div className="pt-3 border-t border-[#EFEFE8] space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#151515] flex items-center gap-1.5">
+                <Calculator className="h-3.5 w-3.5 text-[#FF5734]" /> Key Formulas
+              </span>
+              <Link href="/memory/formulas" className="text-[10px] font-bold text-[#FF5734] hover:underline">
+                Vault →
+              </Link>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-[#FAF9F5] border border-[#E8E6DE] space-y-1">
+              <span className="text-[10px] font-bold text-[#BD3012] uppercase">Angular Momentum</span>
+              <div className="text-center py-1">
+                <MathRenderer content="$L = I\omega = \text{constant}$" />
               </div>
             </div>
 
-            <div className="pt-3 border-t border-[#EFEFE8] space-y-2">
-              <p className="text-xs font-bold text-[#151515]">Grounded Textbooks</p>
-              <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E8E6DE] text-xs text-[#555555] space-y-1">
-                <p className="font-bold text-[#151515] truncate">NCERT Physics Part 1</p>
-                <p className="text-[#707070]">Chapter 5 • Pages 140-172</p>
+            <div className="p-2.5 rounded-xl bg-[#FAF9F5] border border-[#E8E6DE] space-y-1">
+              <span className="text-[10px] font-bold text-[#6C38D4] uppercase">Torque Equation</span>
+              <div className="text-center py-1">
+                <MathRenderer content="$\vec{\tau}_{\text{net}} = I\vec{\alpha} = \frac{d\vec{L}}{dt}$" />
               </div>
             </div>
           </div>
+
+          {/* Prerequisites Status */}
+          <div className="pt-3 border-t border-[#EFEFE8] space-y-2.5">
+            <p className="text-xs font-bold text-[#151515]">Prerequisites & Diagnostic Status</p>
+            <div className="space-y-2 text-xs text-[#555555]">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-[#F0FDF4] border border-[#BBF7D0]">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-[#16A34A]" />
+                  <span className="text-[#166534] font-semibold text-[11px]">Kinematics 2D</span>
+                </div>
+                <span className="text-[10px] font-bold text-[#166534]">82%</span>
+              </div>
+
+              <div className="flex items-center justify-between p-2 rounded-lg bg-[#FFF3F0] border border-[#FFC8BC]">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-[#FF5734] animate-pulse"></span>
+                  <span className="text-[#BD3012] font-semibold text-[11px]">Angular Momentum Vector</span>
+                </div>
+                <span className="text-[10px] font-bold text-[#BD3012]">42%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Connected Textbook Source */}
+          <div className="pt-3 border-t border-[#EFEFE8] space-y-2">
+            <p className="text-xs font-bold text-[#151515]">Grounded Reference Notes</p>
+            <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E8E6DE] text-xs text-[#555555] space-y-1">
+              <div className="flex items-center gap-1.5">
+                <BookMarked className="h-3.5 w-3.5 text-[#FF5734]" />
+                <p className="font-bold text-[#151515] truncate">NCERT Physics Class 11</p>
+              </div>
+              <p className="text-[10px] text-[#707070]">Chapter 7 • System of Particles & Rotational Motion</p>
+            </div>
+          </div>
         </div>
+
       </div>
 
       {/* Citation Detail Modal */}
@@ -489,7 +662,7 @@ export default function TutorPage() {
             </div>
 
             <div className="p-4 rounded-2xl bg-[#FFF9D6] border border-[#FFF1A3] text-xs sm:text-sm text-[#151515] leading-relaxed">
-              "{activeCitation.excerpt}"
+              <MathRenderer content={`"${activeCitation.excerpt}"`} />
             </div>
 
             <div className="flex justify-end pt-2">
