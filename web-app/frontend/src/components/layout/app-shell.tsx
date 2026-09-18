@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { CommandPalette } from "@/components/layout/command-palette";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -35,6 +36,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-[#F7F7F2] text-[#151515] antialiased overflow-hidden selection:bg-coral-100 selection:text-coral-700">
+      {/* Global Command Palette (Ctrl+K / /) */}
+      <CommandPalette />
+
       {/* Collapsible Left Sidebar */}
       <Sidebar />
 
@@ -50,3 +54,4 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+

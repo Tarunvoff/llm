@@ -22,6 +22,15 @@ import {
   ChevronRight,
   Flame,
   Zap,
+  Brain,
+  Layers,
+  Sparkles,
+  BookMarked,
+  Film,
+  Compass,
+  Search,
+  Sigma,
+  Timer
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
@@ -34,21 +43,60 @@ interface NavItem {
   badge?: string;
 }
 
-const mainNav: NavItem[] = [
-  { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { label: "AI Tutor", href: "/tutor", icon: Bot, badge: "AI" },
-  { label: "Study Library", href: "/library", icon: BookOpen },
-  { label: "Adaptive Practice", href: "/practice", icon: HelpCircle },
-  { label: "Mock Tests", href: "/mock-tests", icon: FileSpreadsheet },
-  { label: "Mistake Journal", href: "/mistakes", icon: AlertTriangle, badge: "2 New" },
-  { label: "Revision Queue", href: "/revision", icon: RotateCcw, badge: "Today" },
-  { label: "Study Planner", href: "/planner", icon: Calendar },
-  { label: "Analytics", href: "/analytics", icon: BarChart3 },
-];
+interface NavGroup {
+  groupName: string;
+  items: NavItem[];
+}
 
-const secondaryNav: NavItem[] = [
-  { label: "Goals", href: "/goals", icon: Target },
-  { label: "Achievements", href: "/achievements", icon: Trophy },
+const navGroups: NavGroup[] = [
+  {
+    groupName: "WORKSPACE",
+    items: [
+      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    ]
+  },
+  {
+    groupName: "LEARN",
+    items: [
+      { label: "AI Socratic Tutor", href: "/tutor", icon: Bot, badge: "AI" },
+      { label: "Knowledge Hub", href: "/knowledge", icon: Brain, badge: "New" },
+      { label: "Study Library", href: "/library", icon: BookOpen },
+      { label: "Reference Books", href: "/library/books", icon: BookMarked },
+    ]
+  },
+  {
+    groupName: "PRACTICE",
+    items: [
+      { label: "Adaptive Practice", href: "/practice", icon: HelpCircle },
+      { label: "PYQ Exam Archive", href: "/pyq", icon: Compass, badge: "2018-24" },
+      { label: "Mock Tests", href: "/mock-tests", icon: FileSpreadsheet },
+    ]
+  },
+  {
+    groupName: "REMEMBER",
+    items: [
+      { label: "Smart Flashcards", href: "/flashcards", icon: Layers, badge: "Recall" },
+      { label: "Spaced Revision", href: "/revision", icon: RotateCcw, badge: "Today" },
+      { label: "Formula & Memory", href: "/memory", icon: Sigma },
+      { label: "Quick Recall", href: "/recall", icon: Timer },
+    ]
+  },
+  {
+    groupName: "UNDERSTAND",
+    items: [
+      { label: "Visual Diagrams", href: "/diagrams", icon: Sparkles },
+      { label: "Video Recommender", href: "/resources/videos", icon: Film },
+    ]
+  },
+  {
+    groupName: "ANALYSE",
+    items: [
+      { label: "Mistake Journal", href: "/mistakes", icon: AlertTriangle, badge: "Review" },
+      { label: "Learning Analytics", href: "/analytics", icon: BarChart3 },
+      { label: "Study Planner", href: "/planner", icon: Calendar },
+      { label: "Goals & Milestones", href: "/goals", icon: Target },
+    ]
+  }
 ];
 
 export function Sidebar() {
@@ -88,85 +136,57 @@ export function Sidebar() {
       </div>
 
       {/* Navigation List */}
-      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
-        {/* Main Section */}
-        <div className="space-y-1">
-          {!collapsed && (
-            <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[#9CA3AF]">
-              WORKSPACE
-            </p>
-          )}
-          {mainNav.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "group relative flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150",
-                  isActive
-                    ? "bg-[#FFF3F0] text-[#BD3012] font-bold border border-[#FFC8BC]"
-                    : "text-[#555555] hover:text-[#151515] hover:bg-[#FAF9F5]"
-                )}
-                title={collapsed ? item.label : undefined}
-              >
-                <Icon
+      <div className="flex-1 overflow-y-auto py-3 px-3 space-y-4">
+        {navGroups.map((group) => (
+          <div key={group.groupName} className="space-y-0.5">
+            {!collapsed && (
+              <p className="px-3 pb-1 text-[9px] font-bold uppercase tracking-wider text-[#9CA3AF]">
+                {group.groupName}
+              </p>
+            )}
+            {group.items.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
                   className={cn(
-                    "h-4 w-4 shrink-0 transition-colors",
-                    isActive ? "text-[#FF5734]" : "text-[#707070] group-hover:text-[#151515]"
+                    "group relative flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150",
+                    isActive
+                      ? "bg-[#FFF3F0] text-[#BD3012] font-bold border border-[#FFC8BC]"
+                      : "text-[#555555] hover:text-[#151515] hover:bg-[#FAF9F5]"
                   )}
-                />
-                {!collapsed && (
-                  <span className="truncate flex-1">{item.label}</span>
-                )}
-                {!collapsed && item.badge && (
-                  <span
+                  title={collapsed ? item.label : undefined}
+                >
+                  <Icon
                     className={cn(
-                      "text-[9px] font-semibold px-2 py-0.5 rounded-full border",
-                      item.badge === "Today"
-                        ? "bg-[#FFF9D6] text-[#8F6E00] border-[#FFF1A3]"
-                        : item.badge === "2 New"
-                        ? "bg-[#FFF3F0] text-[#BD3012] border-[#FFC8BC]"
-                        : "bg-[#F0E9FD] text-[#6C38D4] border-[#E0D1FB]"
+                      "h-4 w-4 shrink-0 transition-colors",
+                      isActive ? "text-[#FF5734]" : "text-[#707070] group-hover:text-[#151515]"
                     )}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Secondary Section */}
-        <div className="space-y-1 pt-3 border-t border-[#EFEFE8]">
-          {!collapsed && (
-            <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[#9CA3AF]">
-              PROGRESSION
-            </p>
-          )}
-          {secondaryNav.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "group flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150",
-                  isActive
-                    ? "bg-[#FFF3F0] text-[#BD3012] font-bold border border-[#FFC8BC]"
-                    : "text-[#555555] hover:text-[#151515] hover:bg-[#FAF9F5]"
-                )}
-                title={collapsed ? item.label : undefined}
-              >
-                <Icon className={cn("h-4 w-4 shrink-0", isActive ? "text-[#FF5734]" : "text-[#707070]")} />
-                {!collapsed && <span className="truncate">{item.label}</span>}
-              </Link>
-            );
-          })}
-        </div>
+                  />
+                  {!collapsed && (
+                    <span className="truncate flex-1 text-[11px]">{item.label}</span>
+                  )}
+                  {!collapsed && item.badge && (
+                    <span
+                      className={cn(
+                        "text-[8.5px] font-bold px-1.5 py-0.2 rounded-full border",
+                        item.badge === "Today"
+                          ? "bg-[#FFF9D6] text-[#8F6E00] border-[#FFF1A3]"
+                          : item.badge === "New" || item.badge === "AI"
+                          ? "bg-[#FFF3F0] text-[#BD3012] border-[#FFC8BC]"
+                          : "bg-[#F0E9FD] text-[#6C38D4] border-[#E0D1FB]"
+                      )}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </div>
 
       {/* User & Exam Info Footer */}
