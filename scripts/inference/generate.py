@@ -123,6 +123,7 @@ def main():
     prompt_len = inputs["input_ids"].shape[1]
 
     gen_start = time.time()
+
     with torch.no_grad():
         output_ids = model.generate(
             **inputs,
@@ -130,14 +131,70 @@ def main():
             temperature=args.temperature,
             top_p=args.top_p,
             do_sample=args.temperature > 0,
-            pad_token_id=tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id,
+            pad_token_id=tokenizer.pad_token_id,
+            eos_token_id=tokenizer.eos_token_id,
         )
 
-    generated_tokens = output_ids[0, prompt_len:]
-    response = tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
+    generated_ids = output_ids[0, prompt_len:]
+
+    print("\n" + "=" * 50)
+    print("DIAGNOSTIC")
+    print("=" * 50)
+
+    print(f"Prompt tokens: {prompt_len}")
+    print(f"Generated tokens: {len(generated_ids)}")
+
+    print("\nFirst 20 generated tokens:")
+
+    for i, token_id in enumerate(generated_ids[:20]):
+        token_text = tokenizer.decode(
+            [token_id],
+            skip_special_tokens=False,
+        )
+        print(f"{i:3d}: ID={int(token_id):<8} TEXT={repr(token_text)}")
+
+    print("\nLast 20 generated tokens:")
+
+    start = max(0, len(generated_ids) - 20)
+
+    for i, token_id in enumerate(generated_ids[start:], start):
+        token_text = tokenizer.decode(
+            [token_id],
+            skip_special_tokens=False,
+        )
+        print(f"{i:3d}: ID={int(token_id):<8} TEXT={repr(token_text)}")
+
+    eos_ids = tokenizer.eos_token_id
+
+    if not isinstance(eos_ids, list):
+        eos_ids = [eos_ids]
+
+    found_eos = [
+        (i, int(token_id))
+        for i, token_id in enumerate(generated_ids.tolist())
+        if int(token_id) in eos_ids
+    ]
+
+    print("\nEOS IDs:", eos_ids)
+    print("EOS detected:", "YES" if found_eos else "NO")
+
+    if found_eos:
+        print("EOS positions:", found_eos)
+
+    print("=" * 50)
+
+    response = tokenizer.decode(
+        generated_ids,
+        skip_special_tokens=False,
+    ).strip()
+
+    print("\nRAW DECODED RESPONSE:")
+    print(response)
+    print("=" * 50)
+
     gen_time = time.time() - gen_start
 
-    print("TUTOR RESPONSE:")
+    print("\nTUTOR RESPONSE:")
     print(response)
     print("=" * 50)
     print(f"Generated in {gen_time:.2f} seconds.")
