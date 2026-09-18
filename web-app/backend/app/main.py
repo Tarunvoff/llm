@@ -24,6 +24,14 @@ from app.api.feedback import router as feedback_router
 from app.api.goals import router as goals_router
 from app.api.achievements import router as achievements_router
 from app.api.settings import router as settings_router
+from app.api.knowledge import router as knowledge_router
+from app.api.flashcards import router as flashcards_router
+from app.api.memory import router as memory_router
+from app.api.diagrams import router as diagrams_router
+from app.api.pyq import router as pyq_router
+from app.api.books import router as books_router
+from app.api.resources import router as resources_router
+from app.api.topics import router as topics_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("intellitutor")
@@ -66,6 +74,15 @@ def init_db():
             db.refresh(demo_user)
             seed_initial_user_data(db, demo_user)
             logger.info("Demo user successfully initialized.")
+        else:
+            # Check if new Phase 10-29 models need seeding for existing demo user
+            from app.models import KnowledgeItem
+            has_knowledge = db.query(KnowledgeItem).filter(KnowledgeItem.user_id == demo_user.id).first()
+            if not has_knowledge:
+                logger.info("Seeding Phase 10-29 knowledge, flashcards, PYQs and resources for demo user...")
+                seed_initial_user_data(db, demo_user)
+                logger.info("Demo user Phase 10-29 items seeded.")
+
     except Exception as e:
         logger.error(f"Error during DB initialization: {e}")
         db.rollback()
@@ -110,6 +127,15 @@ app.include_router(feedback_router, prefix="/api")
 app.include_router(goals_router, prefix="/api")
 app.include_router(achievements_router, prefix="/api")
 app.include_router(settings_router, prefix="/api")
+app.include_router(knowledge_router, prefix="/api")
+app.include_router(flashcards_router, prefix="/api")
+app.include_router(memory_router, prefix="/api")
+app.include_router(diagrams_router, prefix="/api")
+app.include_router(pyq_router, prefix="/api")
+app.include_router(books_router, prefix="/api")
+app.include_router(resources_router, prefix="/api")
+app.include_router(topics_router, prefix="/api")
+
 
 
 @app.get("/api/health", tags=["Health"])

@@ -508,5 +508,264 @@ export class ApiClient {
       method: "POST",
     });
   }
+
+  // --- Phase 10: Unified Knowledge Hub & Global Search ---
+  static async getKnowledgeItems(params?: {
+    type?: string;
+    subject?: string;
+    topic?: string;
+    is_pinned?: boolean;
+    search?: string;
+  }): Promise<{ count: number; items: any[] }> {
+    const q = new URLSearchParams();
+    if (params?.type) q.append("type", params.type);
+    if (params?.subject) q.append("subject", params.subject);
+    if (params?.topic) q.append("topic", params.topic);
+    if (params?.is_pinned !== undefined) q.append("is_pinned", String(params.is_pinned));
+    if (params?.search) q.append("search", params.search);
+    const qs = q.toString();
+    return this.request<{ count: number; items: any[] }>(`/knowledge${qs ? `?${qs}` : ""}`);
+  }
+
+  static async getKnowledgeItem(id: string): Promise<any> {
+    return this.request<any>(`/knowledge/${id}`);
+  }
+
+  static async createKnowledgeItem(data: any): Promise<any> {
+    return this.request<any>("/knowledge", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async extractKnowledge(data: {
+    document_id?: string;
+    raw_text?: string;
+    subject: string;
+    chapter?: string;
+    topic: string;
+  }): Promise<any> {
+    return this.request<any>("/knowledge/extract", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async togglePinKnowledge(id: string): Promise<any> {
+    return this.request<any>(`/knowledge/${id}/toggle-pin`, {
+      method: "PUT",
+    });
+  }
+
+  static async deleteKnowledgeItem(id: string): Promise<any> {
+    return this.request<any>(`/knowledge/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  static async globalSearch(query: string, subject?: string): Promise<{ query: string; results: any }> {
+    return this.request<{ query: string; results: any }>("/knowledge/search", {
+      method: "POST",
+      body: JSON.stringify({ query, subject }),
+    });
+  }
+
+  // --- Phase 11: Smart Flashcards & Spaced Recall ---
+  static async getFlashcards(params?: {
+    subject?: string;
+    topic?: string;
+    card_type?: string;
+    state?: string;
+  }): Promise<{ summary: any; cards: any[] }> {
+    const q = new URLSearchParams();
+    if (params?.subject) q.append("subject", params.subject);
+    if (params?.topic) q.append("topic", params.topic);
+    if (params?.card_type) q.append("card_type", params.card_type);
+    if (params?.state) q.append("state", params.state);
+    const qs = q.toString();
+    return this.request<{ summary: any; cards: any[] }>(`/flashcards${qs ? `?${qs}` : ""}`);
+  }
+
+  static async getDueFlashcards(subject?: string): Promise<{ total_due: number; breakdown: any; cards: any[] }> {
+    const q = subject && subject !== "All" ? `?subject=${encodeURIComponent(subject)}` : "";
+    return this.request<{ total_due: number; breakdown: any; cards: any[] }>(`/flashcards/due${q}`);
+  }
+
+  static async reviewFlashcard(cardId: string, data: { rating: string; time_taken_ms?: number }): Promise<any> {
+    return this.request<any>(`/flashcards/${cardId}/review`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async generateFlashcards(data: {
+    subject: string;
+    chapter?: string;
+    topic: string;
+    source: string;
+    count: number;
+  }): Promise<any> {
+    return this.request<any>("/flashcards/generate", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async createFlashcard(data: any): Promise<any> {
+    return this.request<any>("/flashcards", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async deleteFlashcard(cardId: string): Promise<any> {
+    return this.request<any>(`/flashcards/${cardId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // --- Phase 12, 20, 21: Formula & Memory Vault, Quick Recall, Exam Cram ---
+  static async getMemoryOverview(): Promise<any> {
+    return this.request<any>("/memory");
+  }
+
+  static async getFormulaVault(subject?: string, topic?: string): Promise<{ grouped_formulas: any; total_formulas: number }> {
+    const q = new URLSearchParams();
+    if (subject && subject !== "All") q.append("subject", subject);
+    if (topic) q.append("topic", topic);
+    const qs = q.toString();
+    return this.request<{ grouped_formulas: any; total_formulas: number }>(`/memory/formulas${qs ? `?${qs}` : ""}`);
+  }
+
+  static async getFactsAndDefinitions(subject?: string, type?: string): Promise<{ count: number; facts: any[] }> {
+    const q = new URLSearchParams();
+    if (subject && subject !== "All") q.append("subject", subject);
+    if (type && type !== "ALL") q.append("type", type);
+    const qs = q.toString();
+    return this.request<{ count: number; facts: any[] }>(`/memory/facts${qs ? `?${qs}` : ""}`);
+  }
+
+  static async getQuickRecallSession(durationMinutes: number = 10, subject?: string): Promise<any> {
+    const q = new URLSearchParams({ duration_minutes: String(durationMinutes) });
+    if (subject && subject !== "All") q.append("subject", subject);
+    return this.request<any>(`/memory/quick-recall?${q.toString()}`);
+  }
+
+  static async getExamMemoryCramMode(exam: string = "NEET"): Promise<any> {
+    return this.request<any>(`/memory/exam?exam=${encodeURIComponent(exam)}`);
+  }
+
+  // --- Phase 13: Educational Diagrams ---
+  static async getDiagrams(subject?: string): Promise<{ count: number; diagrams: any[] }> {
+    const q = subject && subject !== "All" ? `?subject=${encodeURIComponent(subject)}` : "";
+    return this.request<{ count: number; diagrams: any[] }>(`/diagrams${q}`);
+  }
+
+  static async getDiagramDetails(diagramId: string): Promise<any> {
+    return this.request<any>(`/diagrams/${diagramId}`);
+  }
+
+  static async generateDiagram(topic: string, subject: string = "Physics"): Promise<any> {
+    return this.request<any>("/diagrams/generate", {
+      method: "POST",
+      body: JSON.stringify({ topic, subject }),
+    });
+  }
+
+  // --- Phase 14: PYQ Knowledge System ---
+  static async getPYQs(params?: {
+    exam?: string;
+    year?: number;
+    subject?: string;
+    topic?: string;
+    difficulty?: string;
+    status_filter?: string;
+  }): Promise<{ count: number; total_available_years: number[]; pyqs: any[] }> {
+    const q = new URLSearchParams();
+    if (params?.exam) q.append("exam", params.exam);
+    if (params?.year) q.append("year", String(params.year));
+    if (params?.subject) q.append("subject", params.subject);
+    if (params?.topic) q.append("topic", params.topic);
+    if (params?.difficulty) q.append("difficulty", params.difficulty);
+    if (params?.status_filter) q.append("status_filter", params.status_filter);
+    const qs = q.toString();
+    return this.request<any>(`/pyq${qs ? `?${qs}` : ""}`);
+  }
+
+  static async getPYQDetails(pyqId: string): Promise<any> {
+    return this.request<any>(`/pyq/${pyqId}`);
+  }
+
+  static async submitPYQAttempt(pyqId: string, data: { selected_option: string; time_taken_seconds?: number }): Promise<any> {
+    return this.request<any>(`/pyq/${pyqId}/submit`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async getPYQAnalytics(): Promise<any> {
+    return this.request<any>("/pyq/analytics/overview");
+  }
+
+  // --- Phase 15: Reference Book System ---
+  static async getBooks(subject?: string, sourceType?: string): Promise<{ count: number; books: any[] }> {
+    const q = new URLSearchParams();
+    if (subject && subject !== "All") q.append("subject", subject);
+    if (sourceType && sourceType !== "ALL") q.append("source_type", sourceType);
+    const qs = q.toString();
+    return this.request<{ count: number; books: any[] }>(`/books${qs ? `?${qs}` : ""}`);
+  }
+
+  static async getBookDetails(bookId: string): Promise<any> {
+    return this.request<any>(`/books/${bookId}`);
+  }
+
+  static async getChapterStudyCenter(bookId: string, chapterId: string): Promise<any> {
+    return this.request<any>(`/books/${bookId}/chapters/${chapterId}/study-center`);
+  }
+
+  // --- Phase 16, 17, 19: Personalized Videos, Recommender & What to study next ---
+  static async getRecommendedVideos(params?: {
+    topic?: string;
+    subject?: string;
+    style?: string;
+    duration_category?: string;
+  }): Promise<{ target_topic: string; target_subject: string; videos: any[] }> {
+    const q = new URLSearchParams();
+    if (params?.topic) q.append("topic", params.topic);
+    if (params?.subject) q.append("subject", params.subject);
+    if (params?.style) q.append("style", params.style);
+    if (params?.duration_category) q.append("duration_category", params.duration_category);
+    const qs = q.toString();
+    return this.request<any>(`/resources/videos${qs ? `?${qs}` : ""}`);
+  }
+
+  static async submitVideoFeedback(videoId: string, data: { feedback_rating: string; watch_percentage?: number }): Promise<any> {
+    return this.request<any>(`/resources/videos/${videoId}/feedback`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async logVideoInteraction(videoId: string, data: { watch_percentage: number; is_completed?: boolean; is_saved?: boolean; is_liked?: boolean }): Promise<any> {
+    return this.request<any>(`/resources/videos/${videoId}/interaction`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async getWhatShouldIDoNow(): Promise<{ recommendation: any }> {
+    return this.request<{ recommendation: any }>("/resources/next-action");
+  }
+
+  static async getRetentionMatrix(): Promise<{ overall_retention_score: number; topics_at_risk_count: number; matrix: any[] }> {
+    return this.request<any>("/resources/retention-matrix");
+  }
+
+  // --- Phase 18: Unified Topic 360 Center ---
+  static async getTopicOverview(topicName: string): Promise<{ overview: any }> {
+    return this.request<{ overview: any }>(`/topics/${encodeURIComponent(topicName)}/overview`);
+  }
 }
+
 

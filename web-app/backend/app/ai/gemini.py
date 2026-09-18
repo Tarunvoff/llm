@@ -205,3 +205,18 @@ class GeminiService(AIService):
 
 # Singleton AI Service instance
 ai_service: AIService = GeminiService()
+
+class GeminiClient:
+    @staticmethod
+    def generate_text(prompt: str, temperature: float = 0.3) -> str:
+        if getattr(ai_service, "_initialized", False):
+            try:
+                model = genai.GenerativeModel(model_name=getattr(ai_service, "model_name", "gemini-2.5-flash"))
+                response = model.generate_content(
+                    prompt,
+                    generation_config=genai.types.GenerationConfig(temperature=temperature)
+                )
+                return response.text
+            except Exception as e:
+                logger.error(f"GeminiClient generation error: {e}")
+        return ai_service._fallback_pedagogical_response(prompt)
