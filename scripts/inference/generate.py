@@ -101,8 +101,40 @@ def main():
     print(args.prompt)
     print("=" * 50)
 
+    import torch
+
+    messages = [{"role": "user", "content": args.prompt}]
+    if hasattr(tokenizer, "apply_chat_template"):
+        inputs = tokenizer.apply_chat_template(
+            messages,
+            tokenize=True,
+            add_generation_prompt=True,
+            return_tensors="pt",
+        )
+    else:
+        inputs = tokenizer(args.prompt, return_tensors="pt")
+
+    device = next(model.parameters()).device
+    if isinstance(inputs, torch.Tensor):
+        inputs = {"input_ids": inputs.to(device)}
+    else:
+        inputs = {k: v.to(device) for k, v in inputs.items()}
+
+    prompt_len = inputs["input_ids"].shape[1]
+
     gen_start = time.time()
-    response = generator.generate(args.prompt, config=gen_config)
+    with torch.no_grad():
+        output_ids = model.generate(
+            **inputs,
+            max_new_tokens=args.max_new_tokens,
+            temperature=args.temperature,
+            top_p=args.top_p,
+            do_sample=args.temperature > 0,
+            pad_token_id=tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id,
+        )
+
+    generated_tokens = output_ids[0, prompt_len:]
+    response = tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
     gen_time = time.time() - gen_start
 
     print("TUTOR RESPONSE:")
