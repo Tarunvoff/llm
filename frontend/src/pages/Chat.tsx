@@ -78,7 +78,12 @@ export const Chat: React.FC<ChatProps> = ({ initialPrompt, onClearInitialPrompt 
       });
 
       if (!response.ok) {
-        throw new Error(`Server returned status ${response.status}`);
+        let errorDetail = `Server returned status ${response.status}`;
+        try {
+          const errData = await response.json();
+          if (errData.detail) errorDetail += `: ${errData.detail}`;
+        } catch (_) {}
+        throw new Error(errorDetail);
       }
 
       const data = await response.json();
